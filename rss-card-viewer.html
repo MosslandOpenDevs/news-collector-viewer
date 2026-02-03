@@ -1,0 +1,1137 @@
+﻿<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>뉴스 수집 뷰어</title>
+    <style>
+      :root {
+        --bg: #0b0d12;
+        --panel: #121625;
+        --card: #151a2b;
+        --text: #e8ecff;
+        --muted: #a8b1d9;
+        --border: rgba(255, 255, 255, 0.1);
+        --accent: #35c5f0;
+        --shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        --radius: 16px;
+        --radius-sm: 12px;
+        --glass: rgba(255, 255, 255, 0.08);
+        --shadow-strong: 0 20px 60px rgba(0, 0, 0, 0.45);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family:
+          ui-sans-serif,
+          system-ui,
+          -apple-system,
+          Segoe UI,
+          Roboto,
+          "Noto Sans KR",
+          Arial,
+          "Apple SD Gothic Neo",
+          "Malgun Gothic",
+          sans-serif;
+        background:
+          radial-gradient(1200px 700px at 30% -10%, rgba(53, 197, 240, 0.18), transparent 55%),
+          radial-gradient(900px 500px at 90% 10%, rgba(124, 92, 255, 0.12), transparent 55%), var(--bg);
+        color: var(--text);
+        line-height: 1.45;
+      }
+
+      header {
+        padding: 20px 16px 8px;
+        max-width: 640px;
+        margin: 0 auto;
+      }
+
+      .title {
+        display: flex;
+        gap: 14px;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: 20px;
+        letter-spacing: -0.2px;
+      }
+
+      .subtitle {
+        margin: 6px 0 0;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      main {
+        max-width: 640px;
+        margin: 0 auto;
+        padding: 10px 16px 30px;
+      }
+
+      .panel {
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02));
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        padding: 14px;
+      }
+
+      .controls {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 10px;
+        align-items: center;
+      }
+
+      label {
+        display: block;
+        font-size: 12px;
+        color: var(--muted);
+        margin-bottom: 6px;
+      }
+
+      select,
+      input {
+        width: 100%;
+        padding: 11px 12px;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        background: rgba(0, 0, 0, 0.18);
+        color: var(--text);
+        outline: none;
+      }
+
+      select:focus,
+      input:focus {
+        border-color: rgba(53, 197, 240, 0.55);
+        box-shadow: 0 0 0 4px rgba(53, 197, 240, 0.12);
+      }
+
+      button {
+        padding: 11px 14px;
+        border-radius: 12px;
+        border: 1px solid rgba(53, 197, 240, 0.35);
+        background: rgba(53, 197, 240, 0.15);
+        color: var(--text);
+        cursor: pointer;
+        transition:
+          transform 120ms ease,
+          background 120ms ease;
+        white-space: nowrap;
+      }
+
+      button:hover {
+        background: rgba(53, 197, 240, 0.22);
+      }
+
+      button:active {
+        transform: translateY(1px);
+      }
+
+      .metaRow {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        margin-top: 12px;
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .status {
+        display: inline-flex;
+        gap: 8px;
+        align-items: center;
+      }
+
+      .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.25);
+      }
+
+      .dot.ok {
+        background: rgba(38, 208, 124, 0.85);
+      }
+      .dot.warn {
+        background: rgba(255, 196, 46, 0.9);
+      }
+      .dot.err {
+        background: rgba(255, 78, 78, 0.9);
+      }
+
+      .stage {
+        margin-top: 16px;
+        position: relative;
+        border-radius: 26px;
+        overflow: hidden;
+        min-height: 62vh;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        box-shadow: var(--shadow-strong);
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.02));
+      }
+
+      .stageBg {
+        position: absolute;
+        inset: 0;
+        background-size: cover;
+        background-position: center;
+        filter: saturate(1.05);
+        transform: scale(1.02);
+        pointer-events: none;
+      }
+
+      .stageBg.loading {
+        background-image:
+          linear-gradient(110deg, rgba(255, 255, 255, 0.08) 8%, rgba(255, 255, 255, 0.18) 18%, rgba(255, 255, 255, 0.08) 33%),
+          linear-gradient(180deg, rgba(20, 24, 38, 0.9), rgba(10, 12, 20, 0.9));
+        background-size:
+          200% 100%,
+          100% 100%;
+        animation: shimmer 1.2s ease-in-out infinite;
+      }
+
+      .stageBg.ready {
+        animation: none;
+      }
+
+      .stageBg.noimage {
+        background-image:
+          radial-gradient(180px 180px at 20% 10%, rgba(53, 197, 240, 0.15), transparent 60%),
+          radial-gradient(260px 260px at 90% 20%, rgba(124, 92, 255, 0.18), transparent 60%),
+          linear-gradient(180deg, rgba(10, 12, 20, 0.9), rgba(7, 9, 16, 0.98));
+        animation: none;
+      }
+
+      @keyframes shimmer {
+        0% {
+          background-position:
+            200% 0,
+            0 0;
+        }
+        100% {
+          background-position:
+            -200% 0,
+            0 0;
+        }
+      }
+
+      .stageShade {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, rgba(8, 10, 16, 0.05) 0%, rgba(8, 10, 16, 0.35) 50%, rgba(8, 10, 16, 0.78) 100%);
+        pointer-events: none;
+      }
+
+      .stageContent {
+        position: relative;
+        z-index: 2;
+        display: grid;
+        grid-template-rows: 1fr auto;
+        min-height: 62vh;
+        padding: 18px;
+      }
+
+      .chipRow {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      .pill {
+        display: inline-flex;
+        padding: 6px 10px;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        background: rgba(0, 0, 0, 0.2);
+        color: rgba(255, 255, 255, 0.88);
+        font-size: 12px;
+        backdrop-filter: blur(6px);
+      }
+
+      .headline {
+        margin: 10px 0 0;
+        font-size: 22px;
+        letter-spacing: -0.4px;
+        line-height: 1.25;
+      }
+
+      .headline a {
+        color: #ffffff;
+        text-decoration: none;
+      }
+
+      .headline a:hover {
+        text-decoration: underline;
+        text-decoration-color: rgba(255, 255, 255, 0.65);
+      }
+
+      .byline {
+        margin-top: 8px;
+        font-size: 13px;
+        color: rgba(255, 255, 255, 0.75);
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+
+      .desc {
+        margin: 10px 0 0;
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 14px;
+        display: -webkit-box;
+        -webkit-line-clamp: 4;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+
+      .footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        color: rgba(255, 255, 255, 0.78);
+        font-size: 12px;
+        margin-top: 10px;
+      }
+
+      .footer a {
+        color: #ffffff;
+        text-decoration: none;
+      }
+
+      .footer a:hover {
+        text-decoration: underline;
+      }
+
+      .noImageBadge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 10px;
+        border-radius: 999px;
+        background: rgba(0, 0, 0, 0.45);
+        color: rgba(255, 255, 255, 0.85);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        font-size: 12px;
+        margin-top: 10px;
+        backdrop-filter: blur(6px);
+      }
+
+      .navBtn {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 3;
+        width: 42px;
+        height: 42px;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.35);
+        background: rgba(0, 0, 0, 0.35);
+        color: #fff;
+        display: grid;
+        place-items: center;
+        font-size: 20px;
+        cursor: pointer;
+        backdrop-filter: blur(6px);
+        touch-action: manipulation;
+      }
+
+      .navBtn:hover {
+        background: rgba(0, 0, 0, 0.5);
+      }
+      .navPrev {
+        left: 12px;
+      }
+      .navNext {
+        right: 12px;
+      }
+
+      .counter {
+        position: absolute;
+        right: 12px;
+        top: 12px;
+        z-index: 3;
+        padding: 6px 10px;
+        border-radius: 999px;
+        background: rgba(0, 0, 0, 0.35);
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(6px);
+      }
+
+      .note {
+        margin-top: 14px;
+        padding: 12px 12px;
+        border-radius: 12px;
+        border: 1px dashed rgba(255, 255, 255, 0.18);
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      code {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        font-size: 0.95em;
+        color: rgba(232, 236, 255, 0.9);
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="title">
+        <div>
+          <h1 data-i18n="title">뉴스 수집 뷰어</h1>
+          <p class="subtitle" data-i18n="subtitle">아래에서 카테고리를 선택하면 RSS 피드를 카드 형태로 보여줍니다.</p>
+        </div>
+        <button id="langToggle" type="button" style="padding:6px 10px; font-size:12px;">EN</button>
+      </div>
+    </header>
+
+<main>
+      <section class="panel">
+        <div class="controls">
+          <div>
+            <label for="category" data-i18n="label_category">카테고리</label>
+            <select id="category"></select>
+          </div>
+
+          <div>
+            <label for="datePick" data-i18n="label_date">날짜 (UTC)</label>
+            <input id="datePick" type="date" />
+          </div>
+
+          <div>
+            <label for="q" data-i18n="label_query">검색어 (옵션)</label>
+            <input id="q" placeholder="예: OpenAI, funding, iPhone..." data-i18n-placeholder="placeholder_query" />
+          </div>
+
+          <div style="align-self: end; display: flex; gap: 10px; justify-content: flex-end">
+            <button id="reload" data-i18n="btn_reload">새로고침</button>
+          </div>
+        </div>
+
+        <div class="metaRow">
+          <div class="status"><span id="dot" class="dot"></span><span id="statusText">대기 중</span></div>
+          <div id="metaText"></div>
+        </div>
+
+        <div id="grid" class="stage" aria-live="polite"></div>
+
+        <div class="note">
+          <div><strong data-i18n="note_title">중요:</strong></div>
+          <div data-i18n-html="note_body_1">
+            브라우저에서 <code>https://techcrunch.com/...</code> RSS를 직접 <code>fetch</code>하면 CORS 때문에 실패할 수 있습니다.
+          </div>
+          <div style="margin-top: 6px" data-i18n-html="note_body_2">
+            예시는 공개 CORS 프록시(<code>api.allorigins.win</code>)를 사용합니다. 안정성이 필요하면 자체 서버나 서버리스(Cloudflare Workers, Vercel, Netlify)로 RSS를 프록시하는 방식을 권장합니다.
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      // =========================
+      // 1) 카테고리별 RSS URL
+      // =========================
+      // TechCrunch는 카테고리 URL에 /feed/를 붙이면 RSS가 됩니다.
+      // 예: https://techcrunch.com/category/startups/ -> https://techcrunch.com/category/startups/feed/
+      const FEEDS = [
+        { key: "latest", label: "Latest", url: "https://techcrunch.com/feed/" },
+        { key: "startups", label: "Startups", url: "https://techcrunch.com/category/startups/feed/" },
+        { key: "venture", label: "Venture", url: "https://techcrunch.com/category/venture/feed/" },
+        { key: "ai", label: "AI", url: "https://techcrunch.com/category/artificial-intelligence/feed/" },
+        { key: "apps", label: "Apps", url: "https://techcrunch.com/category/apps/feed/" },
+        { key: "security", label: "Security", url: "https://techcrunch.com/category/security/feed/" },
+      ];
+
+      // =========================
+      // 2) CORS 프록시(예시)
+      // =========================
+      // AllOrigins raw endpoint는 CORS 헤더가 붙은 "raw" 응답을 제공합니다.
+      // 臾몄꽌: https://allorigins.win/
+      const USE_BACKEND = true;
+      const BACKEND_API = "http://localhost:3000/api/feed";
+      const CORS_PROXY = "https://api.allorigins.win/raw?url=";
+      const IMG_PROXY = "https://images.weserv.nl/?url=";
+      const IMG_PROXY_ALT = "https://wsrv.nl/?url=";
+      const IMG_LOW_W = 520;
+      const IMG_HIGH_W = 1400;
+      const IMG_QUALITY_LOW = 55;
+      const IMG_QUALITY_HIGH = 90;
+      const PREFETCH_RANGE = 6;
+      const OG_FETCH_LIMIT = 20;
+      const OG_CACHE_KEY = "tc_og_cache_v1";
+      const OG_CACHE_MAX = 80;
+      const OG_CACHE_TTL_MS = 1000 * 60 * 60 * 24 * 7;
+      const IMG_PRELOAD_CONCURRENCY = 2;
+
+      const elCategory = document.getElementById("category");
+      const elGrid = document.getElementById("grid");
+      const elQ = document.getElementById("q");
+      const elDatePick = document.getElementById("datePick");
+      const elReload = document.getElementById("reload");
+      const elDot = document.getElementById("dot");
+      const elStatusText = document.getElementById("statusText");
+      const elMetaText = document.getElementById("metaText");
+      const elLangToggle = document.getElementById("langToggle");
+      const DEBUG = true;
+      const log = (...args) => {
+        if (DEBUG) console.log("[FE]", ...args);
+      };
+      const navHandlers = { prev: null, next: null };
+      let lastStatus = { kind: "", key: "status_idle" };
+
+      const I18N = {
+        ko: {
+          title: "뉴스 수집 뷰어",
+          subtitle: "아래에서 카테고리를 선택하면 RSS 피드를 카드 형태로 보여줍니다.",
+          label_category: "카테고리",
+          label_date: "날짜 (UTC)",
+          label_query: "검색어 (옵션)",
+          placeholder_query: "예: OpenAI, funding, iPhone...",
+          btn_reload: "새로고침",
+          status_idle: "대기 중",
+          status_loading: "불러오는 중...",
+          status_done: "완료",
+          status_failed: "실패",
+          meta_count_suffix: "개",
+          no_items: "표시할 항목이 없습니다. (검색어를 지우거나 다른 카테고리를 선택해보세요)",
+          no_image: "이미지 없음",
+          footer_source: "RSS",
+          footer_link: "원문 보기",
+          nav_prev: "이전 기사",
+          nav_next: "다음 기사",
+          note_title: "중요:",
+          note_body_1: "브라우저에서 <code>https://techcrunch.com/...</code> RSS를 직접 <code>fetch</code>하면 CORS 때문에 실패할 수 있습니다.",
+          note_body_2: "예시는 공개 CORS 프록시(<code>api.allorigins.win</code>)를 사용합니다. 안정성이 필요하면 자체 서버나 서버리스(Cloudflare Workers, Vercel, Netlify)로 RSS를 프록시하는 방식을 권장합니다.",
+          err_title: "가져오기에 실패했습니다.",
+          err_label: "에러:",
+          err_tip1: "공개 CORS 프록시(AllOrigins)가 일시적으로 느리거나 차단되었을 수 있어요.",
+          err_tip2: "안정성이 필요하면 서버/서버리스에서 RSS를 받아 JSON으로 내려주는 방식을 권장합니다.",
+          err_tip3: "또는 <code>CORS_PROXY</code>를 다른 프록시로 교체해 보세요.",
+        },
+        en: {
+          title: "News Collector Viewer",
+          subtitle: "Select a category to view the RSS feed as cards.",
+          label_category: "Category",
+          label_date: "Date (UTC)",
+          label_query: "Query (optional)",
+          placeholder_query: "e.g. OpenAI, funding, iPhone...",
+          btn_reload: "Reload",
+          status_idle: "Idle",
+          status_loading: "Loading...",
+          status_done: "Done",
+          status_failed: "Failed",
+          meta_count_suffix: " items",
+          no_items: "No items to display. (Clear the query or choose another category)",
+          no_image: "No image",
+          footer_source: "RSS",
+          footer_link: "Open article",
+          nav_prev: "Previous",
+          nav_next: "Next",
+          note_title: "Note:",
+          note_body_1: "Fetching <code>https://techcrunch.com/...</code> RSS directly in the browser may fail due to CORS.",
+          note_body_2: "This demo uses the public CORS proxy (<code>api.allorigins.win</code>). For stability, proxy RSS with your own server/serverless (Cloudflare Workers, Vercel, Netlify).",
+          err_title: "Failed to load feed.",
+          err_label: "Error:",
+          err_tip1: "The public CORS proxy (AllOrigins) may be slow or temporarily blocked.",
+          err_tip2: "For stability, proxy RSS on a server/serverless and return JSON.",
+          err_tip3: "Or replace <code>CORS_PROXY</code> with another proxy.",
+        },
+      };
+      let currentLang = localStorage.getItem("lang") || (navigator.language?.startsWith("ko") ? "ko" : "en");
+      const t = (key) => I18N[currentLang]?.[key] ?? I18N.en[key] ?? key;
+      const getLocale = () => (currentLang === "ko" ? "ko-KR" : "en-US");
+
+      function applyI18n() {
+        document.documentElement.lang = currentLang;
+        document.title = t("title");
+        document.querySelectorAll("[data-i18n]").forEach((el) => {
+          el.textContent = t(el.getAttribute("data-i18n"));
+        });
+        document.querySelectorAll("[data-i18n-placeholder]").forEach((el) => {
+          el.setAttribute("placeholder", t(el.getAttribute("data-i18n-placeholder")));
+        });
+        document.querySelectorAll("[data-i18n-html]").forEach((el) => {
+          el.innerHTML = t(el.getAttribute("data-i18n-html"));
+        });
+        if (elLangToggle) elLangToggle.textContent = currentLang === "ko" ? "EN" : "KR";
+      }
+
+/** @type {Array<ReturnType<typeof mapItem>>} */
+      let lastItems = [];
+      let lastFeedMeta = { title: "", link: "", updated: "" };
+      const ogImageCache = new Map();
+      let currentIndex = 0;
+      let preloadQueueRunning = false;
+      const imagePreloadCache = new Map();
+
+      function loadOgCacheFromStorage() {
+        try {
+          const raw = localStorage.getItem(OG_CACHE_KEY);
+          if (!raw) return;
+          const parsed = JSON.parse(raw);
+          const now = Date.now();
+          Object.entries(parsed).forEach(([k, v]) => {
+            if (!v || !v.url || !v.ts) return;
+            if (now - v.ts > OG_CACHE_TTL_MS) return;
+            ogImageCache.set(k, v.url);
+          });
+        } catch (e) {}
+      }
+
+      function saveOgCacheToStorage() {
+        try {
+          const entries = Array.from(ogImageCache.entries()).slice(-OG_CACHE_MAX);
+          const obj = {};
+          entries.forEach(([k, v]) => {
+            obj[k] = { url: v, ts: Date.now() };
+          });
+          localStorage.setItem(OG_CACHE_KEY, JSON.stringify(obj));
+        } catch (e) {}
+      }
+
+      function setStatus(kind, text, key) {
+        elDot.className = "dot" + (kind ? ` ${kind}` : "");
+        elStatusText.textContent = text;
+        if (key) lastStatus = { kind, key };
+        log("status", { kind, text });
+      }
+
+      function setMetaText() {
+        const now = new Date();
+        const ts = now.toLocaleString(getLocale(), { hour12: false });
+        const feedTitle = lastFeedMeta.title ? ` - ${lastFeedMeta.title}` : "";
+        const count = lastItems.length ? ` - ${lastItems.length}${t("meta_count_suffix")}` : "";
+        elMetaText.textContent = `${ts}${feedTitle}${count}`;
+      }
+
+      function escapeHtml(s) {
+        return (s ?? "").replace(
+          /[&<>"]/g,
+          (c) =>
+            ({
+              "&": "&amp;",
+              "<": "&lt;",
+              ">": "&gt;",
+              '"': "&quot;",
+            })[c],
+        );
+      }
+
+      function stripHtml(html) {
+        const div = document.createElement("div");
+        div.innerHTML = html || "";
+        return (div.textContent || "").trim();
+      }
+
+      function firstImageUrlFromHtml(html) {
+        if (!html) return "";
+        // 단순 img src/data-src/srcset 추출
+        const src = html.match(/<img[^>]+src=["']([^"']+)["']/i);
+        if (src && src[1]) return src[1];
+        const dataSrc = html.match(/<img[^>]+data-src=["']([^"']+)["']/i);
+        if (dataSrc && dataSrc[1]) return dataSrc[1];
+        const dataOrig = html.match(/<img[^>]+data-original=["']([^"']+)["']/i);
+        if (dataOrig && dataOrig[1]) return dataOrig[1];
+        const srcset = html.match(/<img[^>]+srcset=["']([^"']+)["']/i);
+        if (srcset && srcset[1]) {
+          const first = srcset[1].split(",")[0]?.trim()?.split(" ")[0];
+          if (first) return first;
+        }
+        return "";
+      }
+
+      function normalizeImageUrl(url) {
+        if (!url) return "";
+        let u = url.trim();
+        if (u.startsWith("//")) u = "https:" + u;
+        if (!/^https?:\/\//i.test(u)) return "";
+        return u;
+      }
+
+      function buildImageUrl(rawUrl, quality) {
+        if (!rawUrl) return "";
+        const base =
+          quality === "low"
+            ? `${IMG_PROXY}${encodeURIComponent(rawUrl)}&w=${IMG_LOW_W}&q=${IMG_QUALITY_LOW}&fit=cover`
+            : `${IMG_PROXY}${encodeURIComponent(rawUrl)}&w=${IMG_HIGH_W}&q=${IMG_QUALITY_HIGH}&fit=cover`;
+        return base;
+      }
+
+      function shouldLoadHighRes() {
+        const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+        if (!conn || !conn.effectiveType) return true;
+        const type = conn.effectiveType;
+        return type === "4g";
+      }
+
+      function setStageBg(bgEl, url) {
+        if (!bgEl || !url) return;
+        bgEl.style.backgroundImage = `url('${url}')`;
+      }
+
+      function upgradeStageBg(bgEl, rawUrl) {
+        if (!bgEl || !rawUrl) return;
+        setStageBg(bgEl, buildImageUrl(rawUrl, "low"));
+        if (shouldLoadHighRes()) {
+          preloadImage(buildImageUrl(rawUrl, "high")).then(() => {
+            setStageBg(bgEl, buildImageUrl(rawUrl, "high"));
+          });
+        }
+      }
+
+      async function fetchOgImageUrl(pageUrl) {
+        if (!pageUrl) return "";
+        if (ogImageCache.has(pageUrl)) return ogImageCache.get(pageUrl);
+        try {
+          const proxied = CORS_PROXY + encodeURIComponent(pageUrl);
+          const res = await fetch(proxied, { method: "GET", cache: "no-store" });
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          const html = await res.text();
+          const m =
+            html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i) ||
+            html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:image["']/i);
+          const url = m && m[1] ? normalizeImageUrl(m[1]) : "";
+          ogImageCache.set(pageUrl, url);
+          saveOgCacheToStorage();
+          return url;
+        } catch (e) {
+          ogImageCache.set(pageUrl, "");
+          saveOgCacheToStorage();
+          return "";
+        }
+      }
+
+      function preloadImage(url) {
+        if (!url) return Promise.resolve(false);
+        if (imagePreloadCache.get(url) === "done") return Promise.resolve(true);
+        if (imagePreloadCache.get(url) === "loading") return Promise.resolve(false);
+        imagePreloadCache.set(url, "loading");
+        const load = (u, triedAlt) =>
+          new Promise((resolve) => {
+            const img = new Image();
+            img.onload = () => {
+              imagePreloadCache.set(url, "done");
+              resolve(true);
+            };
+            img.onerror = () => {
+              if (!triedAlt && u.includes(IMG_PROXY)) {
+                const altUrl = u.replace(IMG_PROXY, IMG_PROXY_ALT);
+                load(altUrl, true).then(resolve);
+                return;
+              }
+              imagePreloadCache.set(url, "error");
+              resolve(false);
+            };
+            img.src = u;
+          });
+        return load(url, false);
+      }
+
+      async function ensureImageForItem(item) {
+        if (!item) return "";
+        if (item.imgUrl) {
+          await preloadImage(buildImageUrl(item.imgUrl, "low"));
+          if (shouldLoadHighRes()) {
+            await preloadImage(buildImageUrl(item.imgUrl, "high"));
+          }
+          return item.imgUrl;
+        }
+        if (!item.link) return "";
+        const ogUrl = await fetchOgImageUrl(item.link);
+        if (ogUrl) {
+          item.imgUrl = ogUrl;
+          await preloadImage(buildImageUrl(ogUrl, "low"));
+          if (shouldLoadHighRes()) {
+            await preloadImage(buildImageUrl(ogUrl, "high"));
+          }
+          return ogUrl;
+        }
+        return "";
+      }
+
+      async function preloadAllImagesInOrder(items, startIndex) {
+        if (!items.length) return;
+        if (preloadQueueRunning) return;
+        preloadQueueRunning = true;
+        const total = items.length;
+        let cursor = startIndex;
+        let inFlight = 0;
+
+        const nextIndex = () => {
+          const idx = cursor;
+          cursor = (cursor + 1) % total;
+          return idx;
+        };
+
+        const runOne = async () => {
+          const idx = nextIndex();
+          const item = items[idx];
+          await ensureImageForItem(item);
+        };
+
+        const runners = [];
+        for (let i = 0; i < Math.min(IMG_PRELOAD_CONCURRENCY, total); i++) {
+          runners.push(
+            (async function loop() {
+              while (true) {
+                await runOne();
+                if (cursor === startIndex) break;
+              }
+            })(),
+          );
+        }
+
+        await Promise.all(runners);
+        preloadQueueRunning = false;
+      }
+
+      function textFromNode(parent, selector) {
+        const n = parent.querySelector(selector);
+        return n?.textContent?.trim?.() ?? "";
+      }
+
+      function attrFromNode(parent, selector, attr) {
+        const n = parent.querySelector(selector);
+        return n?.getAttribute?.(attr) ?? "";
+      }
+
+      function mapItem(itemEl) {
+        const title = textFromNode(itemEl, "title") || "(No title)";
+        const link = textFromNode(itemEl, "link");
+        const guid = textFromNode(itemEl, "guid") || link || title;
+        const pubDate = textFromNode(itemEl, "pubDate");
+
+        // author: dc:creator / author
+        const creator = textFromNode(itemEl, "dc\\:creator") || textFromNode(itemEl, "creator") || textFromNode(itemEl, "author");
+
+        // categories
+        const categories = Array.from(itemEl.querySelectorAll("category"))
+          .map((x) => x.textContent.trim())
+          .filter(Boolean);
+
+        // description / content
+        const descHtml = textFromNode(itemEl, "description");
+        const contentHtml = textFromNode(itemEl, "content\\:encoded");
+        const summaryHtml = contentHtml || descHtml;
+        const summaryText = stripHtml(summaryHtml);
+
+        // image
+        // RSS 사례: enclosure / media:content / media:thumbnail / img in html
+        const enclosureUrl = attrFromNode(itemEl, "enclosure", "url");
+        const mediaUrl = attrFromNode(itemEl, "media\\:content", "url") || attrFromNode(itemEl, "media\\:thumbnail", "url");
+        const imgUrl = mediaUrl || enclosureUrl || firstImageUrlFromHtml(summaryHtml);
+
+        return { title, link, guid, pubDate, creator, categories, summaryText, imgUrl: normalizeImageUrl(imgUrl) };
+      }
+
+      function render(items) {
+        const q = (elQ.value || "").trim().toLowerCase();
+        const filtered = !q
+          ? items
+          : items.filter((it) => {
+              const hay = `${it.title} ${it.summaryText} ${it.creator} ${it.categories.join(" ")}`.toLowerCase();
+              return hay.includes(q);
+            });
+
+        if (!filtered.length) {
+          elGrid.innerHTML = `<div class="note">${t("no_items")}</div>`;
+          return;
+        }
+
+        if (currentIndex >= filtered.length) currentIndex = 0;
+        if (currentIndex < 0) currentIndex = filtered.length - 1;
+
+        const it = filtered[currentIndex];
+        log("render", { index: currentIndex, total: filtered.length, title: it?.title });
+        const date = it.pubDate ? new Date(it.pubDate) : null;
+        const dateText =
+          date && !Number.isNaN(date.valueOf())
+            ? date.toLocaleString(getLocale(), { year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" })
+            : it.pubDate || "";
+        const cats = it.categories
+          .slice(0, 3)
+          .map((c) => `<span class="pill">${escapeHtml(c)}</span>`)
+          .join("");
+        const cachedOg = it.link ? ogImageCache.get(it.link) : undefined;
+        const state = it.imgUrl ? "ready" : cachedOg === "" ? "noimage" : "loading";
+        const bg = it.imgUrl ? `style="background-image:url('${escapeHtml(buildImageUrl(it.imgUrl, "low"))}')"` : "";
+
+        elGrid.innerHTML = `
+          <button class="navBtn navPrev" id="navPrev" aria-label="${t("nav_prev")}" type="button">&lt;</button>
+          <button class="navBtn navNext" id="navNext" aria-label="${t("nav_next")}" type="button">&gt;</button>
+          <div class="counter">${currentIndex + 1}/${filtered.length}</div>
+          <div class="stageBg ${state}" ${bg}></div>
+          <div class="stageShade"></div>
+          <div class="stageContent">
+            <div></div>
+            <div>
+              <div class="chipRow">${cats}</div>
+              <h3 class="headline"><a href="${escapeHtml(it.link)}" target="_blank" rel="noopener noreferrer">${escapeHtml(it.title)}</a></h3>
+              <div class="byline">
+                ${it.creator ? `<span>${escapeHtml(it.creator)}</span>` : ""}
+                ${dateText ? `<span>${escapeHtml(dateText)}</span>` : ""}
+              </div>
+              <p class="desc">${escapeHtml(it.summaryText)}</p>
+              ${state === "noimage" ? `<div class="noImageBadge">${t("no_image")}</div>` : ""}
+              <div class="footer">
+                <span>${t("footer_source")}</span>
+                <a href="${escapeHtml(it.link)}" target="_blank" rel="noopener noreferrer">${t("footer_link")}</a>
+              </div>
+            </div>
+          </div>
+        `;
+
+        const prevBtn = elGrid.querySelector("#navPrev");
+        const nextBtn = elGrid.querySelector("#navNext");
+        const goPrev = () => {
+          currentIndex = (currentIndex - 1 + filtered.length) % filtered.length;
+          log("nav", { dir: "prev", index: currentIndex });
+          render(items);
+        };
+        const goNext = () => {
+          currentIndex = (currentIndex + 1) % filtered.length;
+          log("nav", { dir: "next", index: currentIndex });
+          render(items);
+        };
+        navHandlers.prev = goPrev;
+        navHandlers.next = goNext;
+        // delegated handler will trigger these
+
+      if (it.imgUrl) {
+        const bgEl = elGrid.querySelector(".stageBg");
+        upgradeStageBg(bgEl, it.imgUrl);
+      }
+
+        let startX = 0;
+        let startY = 0;
+        let tracking = false;
+        elGrid.onpointerdown = (e) => {
+          if (e.target && e.target.closest && e.target.closest(".navBtn")) return;
+          tracking = true;
+          startX = e.clientX;
+          startY = e.clientY;
+          log("swipe-start", { x: startX, y: startY });
+        };
+        elGrid.onpointerup = (e) => {
+          if (!tracking) return;
+          tracking = false;
+          const dx = e.clientX - startX;
+          const dy = e.clientY - startY;
+          log("swipe-end", { dx, dy });
+          if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) {
+            if (dx > 0) goPrev();
+            else goNext();
+          }
+        };
+        elGrid.onpointercancel = () => {
+          tracking = false;
+        };
+
+        const prefetchTargets = [];
+        if (!it.imgUrl && it.link) prefetchTargets.push({ it, index: currentIndex });
+        const nextIndex = (currentIndex + 1) % filtered.length;
+        const prevIndex = (currentIndex - 1 + filtered.length) % filtered.length;
+        const nextItem = filtered[nextIndex];
+        const prevItem = filtered[prevIndex];
+        if (nextItem && !nextItem.imgUrl && nextItem.link) prefetchTargets.push({ it: nextItem, index: nextIndex });
+        if (prevItem && !prevItem.imgUrl && prevItem.link) prefetchTargets.push({ it: prevItem, index: prevIndex });
+        for (let i = 2; i <= PREFETCH_RANGE; i++) {
+          const idxF = (currentIndex + i) % filtered.length;
+          const idxB = (currentIndex - i + filtered.length) % filtered.length;
+          const itF = filtered[idxF];
+          const itB = filtered[idxB];
+          if (itF && !itF.imgUrl && itF.link) prefetchTargets.push({ it: itF, index: idxF });
+          if (itB && !itB.imgUrl && itB.link) prefetchTargets.push({ it: itB, index: idxB });
+        }
+
+        prefetchTargets.slice(0, OG_FETCH_LIMIT).forEach(({ it: target, index }) => {
+          ensureImageForItem(target).then((ogUrl) => {
+            if (!ogUrl) {
+              if (index === currentIndex) {
+                const bgEl = elGrid.querySelector(".stageBg");
+                if (bgEl) {
+                  bgEl.classList.remove("loading");
+                  bgEl.classList.add("noimage");
+                }
+              }
+              return;
+            }
+            if (index === currentIndex) {
+              const bgEl = elGrid.querySelector(".stageBg");
+              if (bgEl) {
+                bgEl.classList.remove("loading");
+                bgEl.classList.add("ready");
+                upgradeStageBg(bgEl, ogUrl);
+              }
+            }
+          });
+        });
+
+        // 순차 전체 프리로드 시작 (현재 인덱스 기준)
+        preloadAllImagesInOrder(filtered, currentIndex);
+      }
+
+      async function fetchFeedJson(cat, dateStr) {
+        const params = new URLSearchParams({ cat });
+        if (dateStr) params.set("date", dateStr);
+        const url = `${BACKEND_API}?${params.toString()}`;
+        log("fetch-feed", { url });
+        const res = await fetch(url, { method: "GET", cache: "no-store" });
+        if (res.status === 404) {
+          log("fetch-feed-404", { url });
+          return { meta: { title: "", link: "", updated: "" }, items: [] };
+        }
+        if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText}`);
+        return await res.json();
+      }
+
+      async function fetchRssXml(url) {
+        // 브라우저 CORS 문제를 피하기 위해 프록시 사용
+        const proxied = CORS_PROXY + encodeURIComponent(url);
+        const res = await fetch(proxied, {
+          method: "GET",
+          headers: { Accept: "application/rss+xml, application/xml, text/xml, */*" },
+          cache: "no-store",
+        });
+        if (!res.ok) {
+          throw new Error(`HTTP ${res.status} ${res.statusText}`);
+        }
+        return await res.text();
+      }
+
+      function parseRss(xmlText) {
+        const parser = new DOMParser();
+        const xml = parser.parseFromString(xmlText, "text/xml");
+
+        // 파서 체크
+        const parserError = xml.querySelector("parsererror");
+        if (parserError) {
+          throw new Error("RSS XML 파싱 실패 (parsererror)");
+        }
+
+        const channel = xml.querySelector("channel");
+        const feedTitle = channel?.querySelector("title")?.textContent?.trim?.() ?? "";
+        const feedLink = channel?.querySelector("link")?.textContent?.trim?.() ?? "";
+        const updated = channel?.querySelector("lastBuildDate")?.textContent?.trim?.() ?? "";
+        lastFeedMeta = { title: feedTitle, link: feedLink, updated };
+
+        const items = Array.from(xml.querySelectorAll("item")).map(mapItem);
+
+        // 중복 제거(guid 기준)
+        const seen = new Set();
+        const deduped = [];
+        for (const it of items) {
+          if (seen.has(it.guid)) continue;
+          seen.add(it.guid);
+          deduped.push(it);
+        }
+        return deduped;
+      }
+
+      async function loadCurrentFeed() {
+        const selected = FEEDS.find((f) => f.key === elCategory.value) || FEEDS[0];
+        const dateStr = (elDatePick.value || "").trim();
+
+        setStatus("warn", t("status_loading"), "status_loading");
+        elGrid.innerHTML = `<div class="note" style="grid-column: 1 / -1;">${t("status_loading")}</div>`;
+
+        try {
+          log("load-feed", { cat: selected.key, date: dateStr });
+          if (USE_BACKEND) {
+            const data = await fetchFeedJson(selected.key, dateStr);
+            lastFeedMeta = data.meta || { title: "", link: "", updated: "" };
+            lastItems = data.items || [];
+          } else {
+            const xmlText = await fetchRssXml(selected.url);
+            lastItems = parseRss(xmlText);
+          }
+          log("load-feed-done", { items: lastItems.length });
+          setStatus("ok", t("status_done"), "status_done");
+          setMetaText();
+          render(lastItems);
+        } catch (err) {
+          console.error(err);
+          log("load-feed-error", { error: String(err?.message || err) });
+          setStatus("err", t("status_failed"), "status_failed");
+          setMetaText();
+          elGrid.innerHTML = `
+            <div class="note" style="grid-column: 1 / -1;">
+              <div style="font-weight:600; color: rgba(255,255,255,0.92);">${t("err_title")}</div>
+              <div style="margin-top:6px;">${t("err_label")} <code>${escapeHtml(String(err?.message || err))}</code></div>
+              <div style="margin-top:8px;">
+                <ul style="margin: 0; padding-left: 18px;">
+                  <li>${t("err_tip1")}</li>
+                  <li>${t("err_tip2")}</li>
+                  <li>${t("err_tip3")}</li>
+                </ul>
+              </div>
+            </div>
+          `;
+        }
+      }
+
+      function init() {
+        loadOgCacheFromStorage();
+        applyI18n();
+        // Options
+        elCategory.innerHTML = FEEDS.map((f) => `<option value="${f.key}">${f.label}</option>`).join("");
+        elDatePick.value = new Date().toISOString().slice(0, 10);
+
+        // URL param for category ?cat=ai
+        const params = new URLSearchParams(location.search);
+        const cat = (params.get("cat") || "").toLowerCase();
+        if (cat && FEEDS.some((f) => f.key === cat)) {
+          elCategory.value = cat;
+        }
+
+        elCategory.addEventListener("change", loadCurrentFeed);
+        elDatePick.addEventListener("change", loadCurrentFeed);
+        elReload.addEventListener("click", loadCurrentFeed);
+        elQ.addEventListener("input", () => render(lastItems));
+        elLangToggle?.addEventListener("click", () => {
+          currentLang = currentLang === "ko" ? "en" : "ko";
+          localStorage.setItem("lang", currentLang);
+          applyI18n();
+          setStatus(lastStatus.kind, t(lastStatus.key), lastStatus.key);
+          setMetaText();
+          render(lastItems);
+        });
+        elGrid.addEventListener(
+          "click",
+          (e) => {
+            const btn = e.target && e.target.closest ? e.target.closest(".navBtn") : null;
+            if (!btn) return;
+            if (btn.id === "navPrev") {
+              if (navHandlers.prev) navHandlers.prev();
+              else log("nav-miss", { dir: "prev" });
+            } else if (btn.id === "navNext") {
+              if (navHandlers.next) navHandlers.next();
+              else log("nav-miss", { dir: "next" });
+            }
+          },
+          true,
+        );
+
+        setStatus("", t("status_idle"), "status_idle");
+        setMetaText();
+        loadCurrentFeed();
+      }
+
+init();
+    </script>
+  </body>
+</html>
+
