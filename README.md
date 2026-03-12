@@ -1,77 +1,81 @@
-﻿# news-collector-viewer (EN)
-
-A simple RSS-based news collector/viewer demo. The backend fetches and caches RSS, and the frontend renders a card-style UI by date/category.
-
-## Structure
-- `rss-card-viewer.html`: Frontend (mobile card UI)
-- `backend/`: Node + Express backend
-
-## How To Run
-### 1) Start backend
-```powershell
-cd backend
-npm install
-npm start
-```
-
-### 2) Open frontend
-- Open `rss-card-viewer.html` in your browser.
-- By default, it calls `http://localhost:3000/api/feed`.
-
-## API
-- `GET /api/feed?cat=latest&date=YYYY-MM-DD`
-  - Returns a snapshot by category and UTC date.
-  - If `date` is omitted, returns the latest feed.
-
-- `GET /api/backfill?cat=latest&days=7`
-  - Creates snapshots for the last N days (UTC).
-
-- `GET /api/health`
-  - Health check
-
-## Cache
-- RSS and og:image are stored in memory and `backend/cache.json`.
-- Cache is restored on server restart.
-
-## Notes
-- TechCrunch RSS often provides only the latest N items, so historical coverage may be limited.
-
----
-
 # news-collector-viewer
 
-간단한 RSS 기반 뉴스 수집/뷰어 데모입니다. 백엔드가 RSS를 가져와 캐시하고, 프론트는 날짜/카테고리 기준으로 카드형 UI로 보여줍니다.
+AI 뉴스 소스를 수집해 주간 카드형 랭킹으로 보여주는 뷰어입니다. 백엔드는 피드 수집과 캐시를 담당하고, 프런트는 `ai2.html` 기준으로 주간 HOT 15 카드를 렌더링합니다.
 
-## 구성
-- `rss-card-viewer.html`: 프론트엔드(모바일 카드 UI)
-- `backend/`: Node + Express 백엔드
+## Table of Contents
 
-## 실행 방법
-### 1) 백엔드 실행
+- [Overview](#overview)
+- [Features](#features)
+- [Tech Stack](#tech-stack)
+- [Getting Started](#getting-started)
+
+## Overview
+
+이 프로젝트는 여러 AI 뉴스/블로그 소스를 모아 우선순위 기반으로 주간 카드 뉴스를 구성합니다. 현재 메인 화면은 `ai2.html`이며, `AI Times`와 `TechCrunch`를 가장 높은 우선순위로 두고 나머지 소스를 뒤에 배치합니다. 백엔드는 RSS와 HTML 파서를 함께 사용해 기사를 수집하고, 일부 소스는 기사 본문까지 추가로 읽어 카드 문구 품질을 보강합니다. 요약과 `Dev Insight`는 기본 소스 텍스트로 동작하고, 필요하면 OpenAI 또는 Gemini를 붙여 AI 생성으로 확장할 수 있습니다.
+
+## Features
+
+- 주간 카드 랭킹: 우선순위가 적용된 소스 기준으로 `Weekly AI Hot 15` 카드를 구성합니다.
+- 소스 우선순위: `AI Times`와 `TechCrunch`를 최우선으로 두고, 그 뒤에 The Rundown AI, Superhuman, The Decoder, TLDR AI, MIT Technology Review AI 등을 반영합니다.
+- 본문 보강: `AI Times`와 `TechCrunch`는 기사 본문을 추가 수집해 카드 요약과 분석 품질을 높입니다.
+- AI 요약/인사이트: `/api/summary`, `/api/insight`를 통해 OpenAI 또는 Gemini 기반 문구 생성을 선택할 수 있습니다.
+- 다국어 카드 뷰: 카드 텍스트와 하단 안내 문구를 한국어/영어 토글로 전환할 수 있습니다.
+- 선택형 소스 제어: 화면에서 소스를 포함하거나 제외해 카드 후보군을 조정할 수 있습니다.
+
+## Tech Stack
+
+- Frontend: HTML, CSS, Vanilla JavaScript
+- Backend: Node.js, Express
+- Parsing: fast-xml-parser, Cheerio
+- HTTP: node-fetch, CORS
+- AI Providers: OpenAI Responses API, Google Gemini API
+
+## Getting Started
+
+Node.js가 설치되어 있어야 합니다.
+
+### 1. Install dependencies
+
 ```powershell
 cd backend
 npm install
+```
+
+### 2. Configure environment variables
+
+AI 요약과 `Dev Insight`를 사용할 경우에만 `.env`를 설정하면 됩니다. AI 기능을 쓰지 않아도 기본 카드 뷰와 소스 요약은 동작합니다.
+
+```env
+INSIGHT_PROVIDER=gemini
+GEMINI_API_KEY=your_gemini_api_key
+GEMINI_INSIGHT_MODEL=gemini-2.5-flash
+GEMINI_SUMMARY_MODEL=gemini-2.5-flash
+```
+
+OpenAI를 사용할 경우에는 아래 항목을 대신 설정할 수 있습니다.
+
+```env
+INSIGHT_PROVIDER=openai
+OPENAI_API_KEY=your_openai_api_key
+OPENAI_INSIGHT_MODEL=gpt-5-mini
+OPENAI_SUMMARY_MODEL=gpt-5-mini
+```
+
+### 3. Start backend
+
+```powershell
+cd backend
 npm start
 ```
 
-### 2) 프론트 열기
-- `rss-card-viewer.html`을 브라우저에서 열면 됩니다.
-- 기본적으로 백엔드는 `http://localhost:3000/api/feed`를 사용합니다.
+기본 포트는 `http://localhost:3000`입니다.
 
-## API
-- `GET /api/feed?cat=latest&date=YYYY-MM-DD`
-  - 카테고리와 UTC 날짜 기준 스냅샷을 반환합니다.
-  - 날짜가 없으면 최신 피드를 반환합니다.
+### 4. Open frontend
 
-- `GET /api/backfill?cat=latest&days=7`
-  - 최근 N일치 스냅샷을 생성합니다(UTC 기준).
+브라우저에서 `ai2.html`을 열면 됩니다. 프런트는 기본적으로 아래 엔드포인트를 사용합니다.
 
+- `GET /api/feed`
+- `GET /api/article-body`
+- `GET|POST /api/summary`
+- `GET|POST /api/insight`
 - `GET /api/health`
-  - 헬스 체크
-
-## 캐시
-- RSS와 og:image는 백엔드 메모리 + `backend/cache.json`에 저장됩니다.
-- 서버 재시작 시 `cache.json`을 로드합니다.
-
-## 참고
-- TechCrunch RSS는 최근 N개만 제공되는 경우가 많아 과거 데이터가 제한될 수 있습니다.

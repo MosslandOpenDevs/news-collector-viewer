@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>뉴스 수집 뷰어 - HOT TOP10</title>
+    <title>WEEKLY AI HOT 10 - Medium Layout</title>
     <style>
       :root {
         --bg: #0b0d12;
@@ -420,22 +420,16 @@
         border: 1px solid rgba(255, 255, 255, 0.14);
         background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03));
         scroll-snap-align: start;
-        align-items: stretch;
       }
 
       .hotThumb {
         position: relative;
-        display: block;
-        width: 100%;
         min-height: 132px;
-        height: 100%;
-        align-self: stretch;
         border-radius: 10px;
         overflow: hidden;
         border: 1px solid rgba(255, 255, 255, 0.14);
         background-size: cover;
         background-position: center;
-        background-repeat: no-repeat;
       }
 
       .hotThumbFallback {
@@ -443,23 +437,9 @@
         place-items: center;
         color: rgba(255, 255, 255, 0.82);
         font-size: 12px;
-        background-color: rgba(10, 14, 24, 0.44);
-      }
-
-      .hotThumbFallback::after {
-        content: "";
-        position: absolute;
-        inset: 0;
-        z-index: 0;
         background:
-          radial-gradient(190px 120px at 0% 0%, rgba(53, 197, 240, 0.2), transparent 70%),
-          linear-gradient(180deg, rgba(0, 0, 0, 0.08), rgba(0, 0, 0, 0.34));
-        pointer-events: none;
-      }
-
-      .hotThumbFallback > span {
-        position: relative;
-        z-index: 1;
+          radial-gradient(190px 120px at 0% 0%, rgba(53, 197, 240, 0.26), transparent 70%),
+          linear-gradient(150deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.03));
       }
 
       .hotRank {
@@ -569,60 +549,856 @@
         font-size: 0.95em;
         color: rgba(232, 236, 255, 0.9);
       }
+
+      /* Trend UI overrides */
+      @import url("https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap");
+
+      body {
+        font-family: "Sora", "Noto Sans KR", "Segoe UI", sans-serif;
+        background:
+          radial-gradient(900px 500px at 0% 0%, rgba(253, 181, 102, 0.24), transparent 68%),
+          radial-gradient(720px 460px at 100% 0%, rgba(60, 181, 205, 0.2), transparent 66%),
+          linear-gradient(180deg, #f3f0e9 0%, #f7f6f4 100%);
+        color: #1d2128;
+      }
+
+      body::before,
+      body::after {
+        content: "";
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+      }
+
+      body::before {
+        background-image: radial-gradient(rgba(14, 22, 36, 0.06) 1px, transparent 1px);
+        background-size: 22px 22px;
+        opacity: 0.18;
+      }
+
+      body::after {
+        background:
+          radial-gradient(380px 200px at 8% 18%, rgba(255, 177, 100, 0.24), transparent 70%),
+          radial-gradient(320px 180px at 92% 22%, rgba(67, 157, 210, 0.2), transparent 72%);
+        animation: auraShift 12s ease-in-out infinite alternate;
+      }
+
+      @keyframes auraShift {
+        0% {
+          transform: translate3d(0, 0, 0) scale(1);
+        }
+        100% {
+          transform: translate3d(0, -14px, 0) scale(1.05);
+        }
+      }
+
+      .blogShell {
+        width: min(1060px, 92vw);
+        margin: 28px auto 50px;
+        position: relative;
+        z-index: 1;
+      }
+
+      .heroSection {
+        max-width: none;
+        margin: 0;
+        padding: 0;
+      }
+
+      .heroThumb {
+        position: relative;
+        border-radius: 28px;
+        overflow: hidden;
+        min-height: 320px;
+        border: 1px solid rgba(19, 20, 24, 0.2);
+        background:
+          radial-gradient(760px 360px at -6% -8%, rgba(255, 178, 109, 0.58), transparent 66%),
+          radial-gradient(760px 380px at 102% 120%, rgba(88, 188, 210, 0.38), transparent 70%),
+          linear-gradient(130deg, #171a22 0%, #2a2f39 45%, #1d2f43 100%);
+        box-shadow:
+          0 30px 70px rgba(18, 27, 45, 0.22),
+          inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        animation: heroIntro 700ms cubic-bezier(0.2, 0.9, 0.18, 1) both;
+      }
+
+      @keyframes heroIntro {
+        from {
+          opacity: 0;
+          transform: translateY(16px) scale(0.985);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+        }
+      }
+
+      .heroThumb::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        border: 1px solid rgba(255, 255, 255, 0.24);
+        mix-blend-mode: screen;
+        pointer-events: none;
+      }
+
+      .heroShade {
+        position: absolute;
+        inset: 0;
+        background:
+          linear-gradient(120deg, rgba(0, 0, 0, 0.62) 8%, rgba(0, 0, 0, 0.18) 54%),
+          linear-gradient(180deg, rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.45));
+      }
+
+      .heroContent {
+        position: relative;
+        z-index: 1;
+        padding: 30px 34px;
+        color: #fff;
+      }
+
+      .heroKicker {
+        margin: 0;
+        letter-spacing: 1.3px;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        opacity: 0.92;
+      }
+
+      .heroContent h1 {
+        margin: 11px 0 0;
+        font-family: "Fraunces", Georgia, serif;
+        font-size: clamp(40px, 6vw, 76px);
+        line-height: 0.92;
+        letter-spacing: -1.3px;
+      }
+
+      .heroDesc {
+        margin: 16px 0 0;
+        max-width: 560px;
+        font-size: 15px;
+        color: rgba(255, 255, 255, 0.92);
+      }
+
+      .heroPills {
+        margin-top: 18px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .heroPill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 7px 12px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 600;
+        color: rgba(255, 255, 255, 0.95);
+        border: 1px solid rgba(255, 255, 255, 0.34);
+        background: rgba(255, 255, 255, 0.14);
+        backdrop-filter: blur(8px);
+      }
+
+      .blogMain {
+        max-width: none;
+        padding: 18px 0 0;
+      }
+
+      .blogPanel {
+        padding: 0;
+        border: 0;
+        box-shadow: none;
+        background: transparent;
+      }
+
+      .metaLine {
+        margin: 0 0 12px;
+        padding: 12px 16px;
+        border-radius: 14px;
+        font-size: 12px;
+        color: #4f5662;
+        border: 1px solid rgba(24, 31, 45, 0.11);
+        background: rgba(255, 255, 255, 0.72);
+        backdrop-filter: blur(8px);
+      }
+
+      .srOnlyControls {
+        display: none;
+      }
+
+      .stage {
+        border: 0;
+        border-radius: 0;
+        overflow: visible;
+        min-height: auto;
+        box-shadow: none;
+        background: transparent;
+      }
+
+      .stage.hotList {
+        min-height: auto;
+        padding: 0;
+        gap: 12px;
+      }
+
+      .hotHeader {
+        align-items: center;
+        margin-bottom: 2px;
+      }
+
+      .hotTitle {
+        color: #1a1f28;
+        font-family: "Fraunces", Georgia, serif;
+        font-size: 27px;
+        letter-spacing: -0.4px;
+      }
+
+      .hotSub {
+        color: #646d7b;
+        font-size: 13px;
+      }
+
+      .hotScroller {
+        overflow: visible;
+        min-height: auto;
+        max-height: none;
+        scroll-snap-type: none;
+        gap: 14px;
+      }
+
+      .hotCard {
+        grid-template-columns: 274px minmax(0, 1fr);
+        border-radius: 18px;
+        border: 1px solid rgba(24, 31, 45, 0.13);
+        background:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.88), rgba(255, 255, 255, 0.8)),
+          linear-gradient(120deg, rgba(250, 252, 255, 0.75), rgba(253, 247, 240, 0.8));
+        box-shadow:
+          0 18px 42px rgba(21, 26, 38, 0.08),
+          0 3px 10px rgba(21, 26, 38, 0.06);
+        padding: 12px;
+        transition:
+          transform 220ms ease,
+          box-shadow 220ms ease,
+          border-color 220ms ease;
+        opacity: 0;
+        transform: translateY(12px);
+        animation: cardRise 540ms cubic-bezier(0.19, 0.9, 0.25, 1) both;
+        animation-delay: var(--delay, 0ms);
+      }
+
+      .hotCard:hover {
+        transform: translateY(-3px);
+        border-color: rgba(39, 97, 158, 0.34);
+        box-shadow:
+          0 24px 46px rgba(21, 28, 42, 0.14),
+          0 6px 16px rgba(21, 28, 42, 0.1);
+      }
+
+      @keyframes cardRise {
+        from {
+          opacity: 0;
+          transform: translateY(14px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .hotThumb {
+        border: 1px solid rgba(28, 34, 43, 0.09);
+        border-radius: 12px;
+        min-height: 164px;
+      }
+
+      .hotThumb::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.26));
+      }
+
+      .hotThumbFallback {
+        color: #3d4450;
+        background:
+          radial-gradient(200px 120px at 0% 0%, rgba(255, 186, 122, 0.4), transparent 75%),
+          linear-gradient(150deg, rgba(197, 220, 247, 0.7), rgba(245, 246, 248, 0.9));
+      }
+
+      .hotRank {
+        background: rgba(10, 16, 28, 0.78);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+      }
+
+      .hotBody {
+        padding-right: 4px;
+      }
+
+      .hotHeadline a,
+      .hotHeadline {
+        color: #1f2430;
+      }
+
+      .hotHeadline a:hover {
+        text-decoration-thickness: 2px;
+        text-decoration-color: rgba(46, 101, 158, 0.44);
+      }
+
+      .hotMeta {
+        color: #606978;
+      }
+
+      .hotMetric {
+        color: #194967;
+        background: linear-gradient(90deg, #eaf7ff, #eef7ec);
+        border-color: rgba(63, 146, 177, 0.34);
+      }
+
+      .hotDesc {
+        color: #3f4958;
+      }
+
+      .pill {
+        border-color: rgba(24, 31, 45, 0.15);
+        background: #f2f5fa;
+        color: #4c5668;
+      }
+
+      @media (max-width: 900px) {
+        .blogShell {
+          width: min(95vw, 1060px);
+        }
+
+        .heroThumb {
+          min-height: 270px;
+        }
+
+        .heroContent {
+          padding: 24px 22px;
+        }
+
+        .heroContent h1 {
+          font-size: clamp(34px, 12vw, 62px);
+        }
+
+        .hotCard {
+          grid-template-columns: 1fr;
+        }
+
+        .hotThumb {
+          min-height: 188px;
+        }
+      }
+
+      /* Neo Magazine refresh */
+      body {
+        font-family: "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", "Segoe UI", sans-serif;
+        background:
+          radial-gradient(1200px 600px at 10% -10%, rgba(77, 226, 255, 0.2), transparent 60%),
+          radial-gradient(900px 540px at 98% -12%, rgba(255, 142, 116, 0.22), transparent 62%),
+          linear-gradient(180deg, #eef4ff 0%, #f7fbff 100%);
+        color: #1c2538;
+        line-height: 1.64;
+      }
+
+      .blogShell {
+        --content-width: min(88%, 900px);
+        width: min(1120px, 93vw);
+        position: relative;
+        z-index: 2;
+      }
+
+      .heroThumb {
+        position: relative;
+        width: var(--content-width);
+        margin-inline: auto;
+        min-height: 430px;
+        isolation: isolate;
+        border-radius: 30px;
+        border: 1px solid rgba(128, 191, 255, 0.46);
+        background:
+          linear-gradient(rgba(12, 22, 42, 0.12), rgba(12, 22, 42, 0.12)),
+          radial-gradient(820px 330px at -5% 10%, rgba(86, 226, 255, 0.18), transparent 65%),
+          radial-gradient(920px 360px at 95% 90%, rgba(255, 103, 103, 0.12), transparent 68%),
+          linear-gradient(128deg, #0c1423 0%, #16233f 44%, #2a205f 100%);
+        background-repeat: no-repeat;
+        background-size: cover, auto, auto;
+        background-position: center, center, center;
+        background-blend-mode: normal, normal, normal;
+        filter: saturate(1.04) contrast(1.02);
+        box-shadow:
+          0 0 0 1px rgba(123, 192, 255, 0.2) inset,
+          0 34px 78px rgba(10, 16, 34, 0.72),
+          0 22px 56px rgba(47, 30, 95, 0.2),
+          inset 0 1px 0 rgba(255, 255, 255, 0.18),
+          inset 0 -38px 68px rgba(3, 11, 32, 0.54);
+      }
+
+      .heroThumb::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: transparent;
+        opacity: 0.08;
+        pointer-events: none;
+        animation: heroGloss 16s ease-in-out infinite;
+        mix-blend-mode: normal;
+      }
+
+      @keyframes heroGloss {
+        0% {
+          transform: translateX(-8px) translateY(0px) scale(1);
+          opacity: 0.22;
+        }
+        50% {
+          transform: translateX(8px) translateY(4px) scale(1.01);
+          opacity: 0.35;
+        }
+        100% {
+          transform: translateX(-8px) translateY(0px) scale(1);
+          opacity: 0.22;
+        }
+      }
+
+      @keyframes heroGrain {
+        0% {
+          background-position: 0 0, 0 0;
+        }
+        100% {
+          background-position: 38px 38px, 20px 20px;
+        }
+      }
+
+      .heroThumb::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+          radial-gradient(circle at 15% 16%, rgba(255, 255, 255, 0.05), transparent 42%),
+          radial-gradient(circle at 88% 84%, rgba(93, 214, 255, 0.06), transparent 48%);
+        opacity: 0.1;
+        background-size: auto, auto;
+        mix-blend-mode: normal;
+        animation: heroGrain 6.5s steps(2) infinite;
+      }
+
+      .heroShade {
+        position: absolute;
+        inset: 0;
+        overflow: hidden;
+        background:
+          linear-gradient(120deg, rgba(11, 24, 49, 0.06) 10%, rgba(36, 14, 63, 0.09) 54%, rgba(8, 16, 34, 0.22) 100%),
+          linear-gradient(180deg, rgba(4, 9, 21, 0.01), rgba(4, 9, 21, 0.16) 72%, rgba(19, 30, 58, 0.28)),
+          radial-gradient(circle at 84% 18%, rgba(255, 117, 211, 0.2), transparent 45%);
+        backdrop-filter: blur(0.6px);
+      }
+
+      .heroShade::after {
+        content: "";
+        position: absolute;
+        inset: -20%;
+        background:
+          radial-gradient(500px 220px at 22% 38%, rgba(255, 255, 255, 0.18), transparent 62%),
+          radial-gradient(620px 260px at 82% 66%, rgba(120, 214, 255, 0.16), transparent 64%);
+        mix-blend-mode: soft-light;
+        opacity: 0.32;
+        animation: heroSweep 14s linear infinite;
+        pointer-events: none;
+      }
+
+      @keyframes heroSweep {
+        0% {
+          transform: translate3d(-2%, -1%, 0) rotate(0deg);
+        }
+        50% {
+          transform: translate3d(2%, 1%, 0) rotate(1.4deg);
+        }
+        100% {
+          transform: translate3d(-2%, -1%, 0) rotate(0deg);
+        }
+      }
+
+      .heroContent::before {
+        display: none;
+      }
+
+      .heroContent {
+        position: absolute;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        text-align: center;
+        padding: 0 40px;
+        position: absolute;
+        z-index: 2;
+        overflow: hidden;
+      }
+
+      .heroContent > * {
+        position: relative;
+        z-index: 2;
+      }
+
+      .heroContent h1 {
+        margin: 0;
+        font-family: "Segoe UI Semibold", "Noto Sans KR", "Malgun Gothic", sans-serif;
+        font-size: clamp(43px, 6.3vw, 76px);
+        font-weight: 700;
+        letter-spacing: -0.4px;
+        text-transform: none;
+        color: #f3f8ff;
+        text-shadow:
+          0 2px 0 rgba(255, 255, 255, 0.45),
+          0 0 26px rgba(80, 203, 255, 0.62),
+          0 10px 24px rgba(32, 8, 73, 0.48);
+      }
+
+      .heroImage {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: 48% 38%;
+        z-index: 0;
+        transform: scale(1.03);
+        animation: heroDrift 18s ease-in-out infinite alternate;
+      }
+
+      @keyframes heroDrift {
+        0% {
+          transform: scale(1.03) translate3d(0, 0, 0);
+        }
+        100% {
+          transform: scale(1.06) translate3d(-8px, -5px, 0);
+        }
+      }
+
+      .heroDesc {
+        color: rgba(244, 249, 255, 0.94);
+      }
+
+      .heroPill {
+        border-color: rgba(162, 228, 255, 0.42);
+        background: rgba(11, 18, 28, 0.42);
+      }
+
+      .metaLine {
+        width: var(--content-width);
+        margin-inline: auto;
+        color: #364b71;
+        border-color: rgba(110, 163, 237, 0.24);
+        background: rgba(255, 255, 255, 0.82);
+        font-size: 15px;
+      }
+
+      .hotTitle {
+        color: #253d63;
+        font-family: "Bahnschrift", "Segoe UI", sans-serif;
+        font-size: 32px;
+        letter-spacing: -0.9px;
+      }
+
+      .hotSub {
+        color: #5f739a;
+        font-size: 13px;
+      }
+
+      .hotScroller {
+        width: var(--content-width);
+        margin-inline: auto;
+        gap: 16px;
+        align-items: stretch;
+      }
+
+      .hotHeader {
+        width: var(--content-width);
+        margin-inline: auto;
+      }
+
+      .hotCard {
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        overflow: hidden;
+        min-height: 441px;
+        padding: 39px 44px;
+        border-radius: 21px;
+        border: 1px solid rgba(137, 178, 235, 0.35);
+        box-shadow: 0 16px 34px rgba(55, 95, 156, 0.16);
+        width: 100%;
+        margin-inline: 0;
+      }
+
+      .hotCardBg {
+        background:
+          var(--card-bg),
+          linear-gradient(140deg, rgba(229, 239, 255, 0.96), rgba(236, 244, 255, 0.94));
+        background-size: 100% 100%, 100% 100%;
+        background-repeat: no-repeat, no-repeat;
+        background-position: center, center;
+      }
+
+      .hotCardBg.noImage {
+        background:
+          radial-gradient(580px 220px at 0% 0%, rgba(72, 203, 232, 0.22), transparent 70%),
+          radial-gradient(420px 240px at 100% 100%, rgba(255, 133, 103, 0.2), transparent 72%),
+          linear-gradient(140deg, rgba(232, 242, 255, 0.98), rgba(241, 247, 255, 0.95));
+      }
+
+      .hotCardOverlay {
+        position: absolute;
+        inset: 0;
+        background:
+          linear-gradient(180deg, rgba(247, 251, 255, 0.28), rgba(240, 247, 255, 0.58)),
+          linear-gradient(90deg, rgba(247, 251, 255, 0.48) 0%, rgba(240, 247, 255, 0.3) 58%, rgba(240, 247, 255, 0.46) 100%);
+      }
+
+      .hotBody {
+        position: relative;
+        z-index: 2;
+        padding-right: 15px;
+        width: 100%;
+        max-width: none;
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        min-height: 0;
+      }
+
+      .hotRank {
+        z-index: 3;
+        top: 18px;
+        left: 20px;
+        background: rgba(31, 66, 117, 0.84);
+        border-color: rgba(232, 244, 255, 0.75);
+        font-size: 13px;
+        padding: 8px 12px;
+      }
+
+      .hotHeadline {
+        margin-top: 44px;
+        font-size: 34px;
+        line-height: 1.22;
+        letter-spacing: -0.8px;
+        font-family: "Georgia", "Times New Roman", "Noto Serif KR", serif;
+      }
+
+      .hotHeadline,
+      .hotHeadline a {
+        color: #1a2f57;
+      }
+
+      .hotHeadline a:hover {
+        text-decoration-color: rgba(37, 82, 153, 0.62);
+      }
+
+      .hotMeta {
+        color: #546b92;
+        font-size: 15px;
+        gap: 10px;
+        margin-top: 15px;
+      }
+
+      .hotMetric {
+        color: #204f83;
+        border-color: rgba(127, 191, 255, 0.5);
+        background: rgba(236, 248, 255, 0.95);
+        font-size: 12px;
+        padding: 6px 10px;
+      }
+
+      .hotDesc {
+        color: #2f3f5a;
+        font-size: 18px;
+        line-height: 1.62;
+        margin-top: 18px;
+        display: block;
+        overflow: visible;
+        -webkit-line-clamp: unset;
+        font-family: "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+        font-weight: 500;
+      }
+
+      .summaryLabel {
+        margin: 18px 0 0;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.3px;
+        color: #2f5f95;
+      }
+
+      .hotCats {
+        margin-top: 18px;
+        gap: 8px;
+      }
+
+      .hotSource {
+        margin-top: auto;
+        padding-top: 12px;
+        border-top: 1px solid rgba(47, 79, 132, 0.15);
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 8px;
+        font-size: 12px;
+        color: #4a678f;
+      }
+
+      .hotSourceLabel {
+        font-weight: 700;
+        color: #375986;
+      }
+
+      .hotSourceText {
+        color: #4a678f;
+      }
+
+      .hotSourceLink {
+        color: #2a5c95;
+        text-decoration: none;
+        word-break: break-all;
+      }
+
+      .hotSourceLink:hover {
+        text-decoration: underline;
+        text-decoration-color: rgba(37, 82, 153, 0.62);
+      }
+
+      .pill {
+        color: #285280;
+        border-color: rgba(119, 186, 255, 0.38);
+        background: rgba(236, 248, 255, 0.92);
+        font-size: 12px;
+        padding: 6px 10px;
+      }
+
+      @media (max-width: 900px) {
+        .blogShell {
+          --content-width: 100%;
+        }
+
+        .heroThumb {
+          min-height: 360px;
+        }
+
+        .heroContent h1 {
+          font-size: clamp(35px, 9.4vw, 56px);
+        }
+
+        .hotTitle {
+          font-size: 24px;
+        }
+
+        .hotSub {
+          font-size: 11px;
+        }
+
+        .hotCard {
+          min-height: 282px;
+          padding: 26px 21px;
+          width: 100%;
+          margin-inline: 0;
+        }
+
+        .hotRank {
+          top: 14px;
+          left: 14px;
+          font-size: 10px;
+          padding: 8px 12px;
+        }
+
+        .hotHeadline {
+          margin-top: 34px;
+          font-size: 23px;
+        }
+
+        .hotMeta {
+          font-size: 11px;
+          margin-top: 12px;
+        }
+
+        .hotDesc {
+          font-size: 14px;
+          margin-top: 12px;
+          -webkit-line-clamp: unset;
+        }
+
+        .summaryLabel {
+          margin-top: 12px;
+          font-size: 10px;
+        }
+
+        .hotCats {
+          margin-top: 12px;
+          gap: 6px;
+        }
+
+        .hotSource {
+          margin-top: auto;
+          padding-top: 9px;
+          font-size: 11px;
+          gap: 6px;
+        }
+
+        .pill {
+          font-size: 10px;
+          padding: 5px 8px;
+        }
+
+        .hotScroller {
+          gap: 12px;
+        }
+
+      }
     </style>
   </head>
   <body>
-    <header>
-      <div class="title">
-        <div>
-          <h1 data-i18n="title">뉴스 수집 뷰어</h1>
-          <p class="subtitle" data-i18n="subtitle">아래에서 카테고리를 선택하면 RSS 피드를 카드 형태로 보여줍니다.</p>
-        </div>
-        <button id="langToggle" type="button" style="padding:6px 10px; font-size:12px;">EN</button>
-      </div>
-    </header>
-
-<main>
-      <section class="panel">
-        <div class="controls">
-          <div>
-            <label for="category" data-i18n="label_category">카테고리</label>
-            <select id="category"></select>
-          </div>
-
-          <div>
-            <label for="datePick" data-i18n="label_date">날짜 (UTC)</label>
-            <input id="datePick" type="date" />
-          </div>
-
-          <div>
-            <label for="q" data-i18n="label_query">검색어 (옵션)</label>
-            <input id="q" placeholder="예: OpenAI, funding, iPhone..." data-i18n-placeholder="placeholder_query" />
-          </div>
-
-          <div style="align-self: end; display: flex; gap: 10px; justify-content: flex-end">
-            <button id="reload" data-i18n="btn_reload">새로고침</button>
+    <div class="blogShell">
+      <header class="heroSection">
+        <div class="heroThumb" role="img" aria-label="WEEKLY AI HOT 10">
+          <img
+            class="heroImage"
+            src="https://upload.wikimedia.org/wikipedia/commons/b/b7/HUMAN-AI.jpg"
+            alt="AI and human collaboration"
+            onerror="const fb=document.getElementById('heroImageFallback'); if(fb){fb.style.display='block';} this.style.display='none';"
+          />
+          <img
+            id="heroImageFallback"
+            class="heroImage"
+            src="./ai-hero-3d-scene.svg"
+            alt="AI concept fallback"
+            style="display: none;"
+          />
+          <div class="heroShade"></div>
+          <div class="heroContent">
+            <h1>WEEKLY AI HOT 10</h1>
           </div>
         </div>
+      </header>
 
-        <div class="metaRow">
-          <div class="status"><span id="dot" class="dot"></span><span id="statusText">대기 중</span></div>
-          <div id="metaText"></div>
-        </div>
+      <main class="blogMain">
+        <section class="blogPanel">
+          <div id="metaText" class="metaLine" aria-live="polite"></div>
+          <div id="grid" class="stage" aria-live="polite"></div>
+        </section>
+      </main>
+    </div>
 
-        <div id="grid" class="stage" aria-live="polite"></div>
-
-        <div class="note">
-          <div><strong data-i18n="note_title">중요:</strong></div>
-          <div data-i18n-html="note_body_1">
-            브라우저에서 <code>https://techcrunch.com/...</code> RSS를 직접 <code>fetch</code>하면 CORS 때문에 실패할 수 있습니다.
-          </div>
-          <div style="margin-top: 6px" data-i18n-html="note_body_2">
-            예시는 공개 CORS 프록시(<code>api.allorigins.win</code>)를 사용합니다. 안정성이 필요하면 자체 서버나 서버리스(Cloudflare Workers, Vercel, Netlify)로 RSS를 프록시하는 방식을 권장합니다.
-          </div>
-        </div>
-      </section>
-    </main>
+    <div class="srOnlyControls" aria-hidden="true">
+      <select id="category"></select>
+      <input id="datePick" type="date" />
+      <input id="q" />
+      <button id="reload" type="button">reload</button>
+      <span id="dot"></span>
+      <span id="statusText"></span>
+    </div>
 
     <script>
       // =========================
@@ -667,20 +1443,74 @@
       const IMG_PRELOAD_CONCURRENCY = 2;
       const HOT_WINDOW_DAYS = 7;
       const HOT_LIMIT = 10;
-      const HOT_THUMB_FALLBACKS = [
-        "https://images.pexels.com/photos/6153354/pexels-photo-6153354.jpeg?auto=compress&cs=tinysrgb&w=1800",
-        "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&w=1800&q=80",
-        "https://source.unsplash.com/1800x1100/?artificial-intelligence,robotics&sig=101",
-        "https://source.unsplash.com/1800x1100/?ai,chip,server&sig=102",
-        "https://source.unsplash.com/1800x1100/?humanoid,robot,technology&sig=103",
-        "https://source.unsplash.com/1800x1100/?future,ai,interface&sig=104",
-        "https://source.unsplash.com/1800x1100/?ai,neural-network,lab&sig=105",
-        "https://source.unsplash.com/1800x1100/?technology,robot,city&sig=106",
-        "https://source.unsplash.com/1800x1100/?machine-learning,vision&sig=107",
-        "https://source.unsplash.com/1800x1100/?data-center,ai,hardware&sig=108",
-        "https://source.unsplash.com/1800x1100/?cybernetics,android&sig=109",
-        "./HUMAN-AI.jpg",
-      ];
+      const ISSUE_TOKEN_MIN_LEN = 3;
+      const ISSUE_STOPWORDS = new Set([
+        "a",
+        "an",
+        "the",
+        "and",
+        "or",
+        "for",
+        "to",
+        "of",
+        "in",
+        "on",
+        "at",
+        "by",
+        "with",
+        "from",
+        "is",
+        "are",
+        "was",
+        "were",
+        "be",
+        "been",
+        "being",
+        "this",
+        "that",
+        "these",
+        "those",
+        "as",
+        "it",
+        "its",
+        "into",
+        "about",
+        "after",
+        "before",
+        "over",
+        "under",
+        "between",
+        "within",
+        "through",
+        "via",
+        "than",
+        "then",
+        "their",
+        "they",
+        "you",
+        "your",
+        "we",
+        "our",
+        "new",
+        "now",
+        "will",
+        "would",
+        "can",
+        "could",
+        "should",
+        "may",
+        "might",
+        "관련",
+        "대한",
+        "에서",
+        "으로",
+        "하는",
+        "했다",
+        "있는",
+        "없는",
+        "최근",
+        "이번",
+      ]);
 
       const elCategory = document.getElementById("category");
       const elGrid = document.getElementById("grid");
@@ -700,8 +1530,8 @@
 
       const I18N = {
         ko: {
-          title: "뉴스 수집 뷰어",
-          subtitle: "아래에서 카테고리를 선택하면 RSS 피드를 카드 형태로TMXK 보여줍니다.",
+          title: "WEEKLY AI HOT 10",
+          subtitle: "미디엄 블로그용 AI 카드뉴스 뷰어",
           label_category: "카테고리",
           label_date: "날짜 (UTC)",
           label_query: "검색어 (옵션)",
@@ -714,6 +1544,7 @@
           meta_count_suffix: "개",
           meta_hot_window: "최근 7일",
           meta_basis_views: "조회수 우선",
+          meta_basis_issue: "이슈 점수 우선",
           meta_basis_recent: "최신 발행순",
           no_items: "표시할 항목이 없습니다. (검색어를 지우거나 다른 카테고리를 선택해보세요)",
           no_image: "이미지 없음",
@@ -722,10 +1553,14 @@
           nav_prev: "이전 기사",
           nav_next: "다음 기사",
           hot_title: "최근 7일 핫이슈 TOP 10",
-          hot_subtitle: "버튼 없이 스크롤해서 카드뉴스를 확인하세요.",
+          hot_subtitle: "아래로 스크롤하며 주간 이슈를 확인하세요.",
           hot_metric_views: "조회수",
+          hot_metric_issue: "이슈 점수",
           hot_metric_recent: "최신 발행순",
           hot_rank: "순위",
+          summary_label: "요약",
+          source_label: "출처",
+          summary_empty: "요약 정보가 없습니다.",
           note_title: "중요:",
           note_body_1: "브라우저에서 <code>https://techcrunch.com/...</code> RSS를 직접 <code>fetch</code>하면 CORS 때문에 실패할 수 있습니다.",
           note_body_2: "예시는 공개 CORS 프록시(<code>api.allorigins.win</code>)를 사용합니다. 안정성이 필요하면 자체 서버나 서버리스(Cloudflare Workers, Vercel, Netlify)로 RSS를 프록시하는 방식을 권장합니다.",
@@ -736,8 +1571,8 @@
           err_tip3: "또는 <code>CORS_PROXY</code>를 다른 프록시로 교체해 보세요.",
         },
         en: {
-          title: "News Collector Viewer",
-          subtitle: "Select a category to view the RSS feed as cards.",
+          title: "WEEKLY AI HOT 10",
+          subtitle: "Medium-ready AI card news viewer",
           label_category: "Category",
           label_date: "Date (UTC)",
           label_query: "Query (optional)",
@@ -750,6 +1585,7 @@
           meta_count_suffix: " items",
           meta_hot_window: "Last 7 days",
           meta_basis_views: "Views first",
+          meta_basis_issue: "Issue score first",
           meta_basis_recent: "Newest first",
           no_items: "No items to display. (Clear the query or choose another category)",
           no_image: "No image",
@@ -758,10 +1594,14 @@
           nav_prev: "Previous",
           nav_next: "Next",
           hot_title: "Weekly Hot Issues TOP 10",
-          hot_subtitle: "Scroll to browse card news without buttons.",
+          hot_subtitle: "Scroll down to browse weekly issues.",
           hot_metric_views: "Views",
+          hot_metric_issue: "Issue score",
           hot_metric_recent: "Newest first",
           hot_rank: "Rank",
+          summary_label: "Summary",
+          source_label: "Source",
+          summary_empty: "No summary available.",
           note_title: "Note:",
           note_body_1: "Fetching <code>https://techcrunch.com/...</code> RSS directly in the browser may fail due to CORS.",
           note_body_2: "This demo uses the public CORS proxy (<code>api.allorigins.win</code>). For stability, proxy RSS with your own server/serverless (Cloudflare Workers, Vercel, Netlify).",
@@ -800,8 +1640,7 @@
       let imageRefreshPending = false;
       const imagePreloadCache = new Map();
       let hotWindowLabel = "";
-      let hotSortBasis = "recent";
-      let hotThumbShuffleSalt = Date.now();
+      let hotSortBasis = "issue";
 
       function loadOgCacheFromStorage() {
         try {
@@ -841,10 +1680,7 @@
         const feedTitle = lastFeedMeta.title ? ` - ${lastFeedMeta.title}` : "";
         const count = lastItems.length ? ` - ${lastItems.length}${t("meta_count_suffix")}` : "";
         const hotWindow = hotWindowLabel ? ` - ${hotWindowLabel}` : "";
-        const basis = lastItems.length
-          ? ` - ${hotSortBasis === "views" ? t("meta_basis_views") : t("meta_basis_recent")}`
-          : "";
-        elMetaText.textContent = `${ts}${feedTitle}${count}${hotWindow}${basis}`;
+        elMetaText.textContent = `${ts}${feedTitle}${count}${hotWindow}`;
       }
 
       function escapeHtml(s) {
@@ -893,11 +1729,10 @@
 
       function buildImageUrl(rawUrl, quality) {
         if (!rawUrl) return "";
-        if (!/^https?:\/\//i.test(rawUrl)) return rawUrl;
         const base =
           quality === "low"
-            ? `${IMG_PROXY}${encodeURIComponent(rawUrl)}&w=${IMG_LOW_W}&q=${IMG_QUALITY_LOW}&fit=cover`
-            : `${IMG_PROXY}${encodeURIComponent(rawUrl)}&w=${IMG_HIGH_W}&q=${IMG_QUALITY_HIGH}&fit=cover`;
+            ? `${IMG_PROXY}${encodeURIComponent(rawUrl)}&w=${IMG_LOW_W}&q=${IMG_QUALITY_LOW}&fit=contain`
+            : `${IMG_PROXY}${encodeURIComponent(rawUrl)}&w=${IMG_HIGH_W}&q=${IMG_QUALITY_HIGH}&fit=contain`;
         return base;
       }
 
@@ -1131,18 +1966,92 @@
         return out;
       }
 
-      function getItemViewCount(item) {
+      function toMetricNumber(value) {
+        if (typeof value === "number" && Number.isFinite(value)) return value;
+        if (typeof value === "string") {
+          const n = Number(value.replace(/[^\d.-]/g, ""));
+          return Number.isFinite(n) ? n : null;
+        }
+        return null;
+      }
+
+      function getMetricByAliases(item, aliases) {
         if (!item || typeof item !== "object") return null;
-        const keys = ["viewCount", "views", "hits", "readCount", "popularity", "score"];
-        for (const k of keys) {
-          const v = item[k];
-          if (typeof v === "number" && Number.isFinite(v)) return v;
-          if (typeof v === "string") {
-            const n = Number(v.replace(/[^\d.-]/g, ""));
-            if (Number.isFinite(n)) return n;
+        const aliasSet = new Set((aliases || []).map((k) => String(k).toLowerCase()));
+        const containers = [item, item.metrics, item.stats, item.engagement, item.social, item.meta];
+        for (const obj of containers) {
+          if (!obj || typeof obj !== "object") continue;
+          for (const alias of aliases || []) {
+            const direct = toMetricNumber(obj[alias]);
+            if (direct !== null) return direct;
+          }
+          for (const [k, v] of Object.entries(obj)) {
+            if (!aliasSet.has(String(k).toLowerCase())) continue;
+            const n = toMetricNumber(v);
+            if (n !== null) return n;
           }
         }
         return null;
+      }
+
+      function getItemViewCount(item) {
+        return getMetricByAliases(item, ["viewCount", "views", "hits", "readCount", "impressions", "popularity", "score"]);
+      }
+
+      function getItemLikeCount(item) {
+        return getMetricByAliases(item, ["likes", "likeCount", "hearts", "applause", "applauds", "claps", "upvotes"]);
+      }
+
+      function getItemCommentCount(item) {
+        return getMetricByAliases(item, ["comments", "commentCount", "replies", "replyCount"]);
+      }
+
+      function getItemShareCount(item) {
+        return getMetricByAliases(item, ["shares", "shareCount", "reposts", "repostCount", "retweets"]);
+      }
+
+      function buildIssueTokens(item) {
+        const raw = `${item?.title || ""} ${((item?.categories || []).join(" ") || "").toLowerCase()}`.toLowerCase();
+        const normalized = raw.replace(/[^0-9a-zA-Z\u00C0-\u024F\uAC00-\uD7A3]+/g, " ");
+        const tokens = normalized
+          .split(/\s+/)
+          .filter((tok) => tok.length >= ISSUE_TOKEN_MIN_LEN && !ISSUE_STOPWORDS.has(tok));
+        return Array.from(new Set(tokens)).slice(0, 18);
+      }
+
+      function buildIssueTokenFrequency(items) {
+        const freq = new Map();
+        for (const it of items || []) {
+          const tokens = buildIssueTokens(it);
+          tokens.forEach((tok) => {
+            freq.set(tok, (freq.get(tok) || 0) + 1);
+          });
+        }
+        return freq;
+      }
+
+      function getEngagementScore(item) {
+        const views = getItemViewCount(item) || 0;
+        const likes = getItemLikeCount(item) || 0;
+        const comments = getItemCommentCount(item) || 0;
+        const shares = getItemShareCount(item) || 0;
+        const v = views > 0 ? Math.log10(views + 1) * 100 : 0;
+        const l = likes > 0 ? Math.log10(likes + 1) * 78 : 0;
+        const c = comments > 0 ? Math.log10(comments + 1) * 88 : 0;
+        const s = shares > 0 ? Math.log10(shares + 1) * 92 : 0;
+        return v + l + c + s;
+      }
+
+      function getIssueFrequencyScore(item, tokenFreq) {
+        const tokens = buildIssueTokens(item);
+        if (!tokens.length) return 0;
+        let score = 0;
+        for (const tok of tokens) {
+          const f = tokenFreq.get(tok) || 0;
+          if (f > 1) score += (f - 1) * 9;
+        }
+        const categoryBoost = Math.min(8, (item?.categories || []).length * 1.2);
+        return score + categoryBoost;
       }
 
       function toDateMs(pubDate) {
@@ -1150,48 +2059,39 @@
         return Number.isNaN(d.valueOf()) ? 0 : d.valueOf();
       }
 
-      const PROMO_SELF_PATTERNS = [
-        /\btechcrunch\s+disrupt\b/i,
-        /\bdisrupt\s+20\d{2}\b/i,
-        /\b(?:ticket|tickets|pass)\b.*\b(?:price|prices|pricing|sale)\b/i,
-        /\b(?:price|prices)\s+(?:go|goes)\s+up\b/i,
-        /\b\d+\s+days?\s+left\b/i,
-        /\bearly[-\s]?bird\b/i,
-        /\b(?:buy|get)\s+(?:your\s+)?tickets?\b/i,
-        /\bregister\s+now\b/i,
-        /\bsave\s+your\s+spot\b/i,
-        /\bjoin\s+us\s+at\b/i,
-        /\bsubscribe\b/i,
-        /\bsubscription\b/i,
-        /\bsubscriber\b/i,
-        /\bsign[\s-]?up\b/i,
-        /\bjoin\s+(?:now|today)\b/i,
-        /\bmembership\b/i,
-        /\bnewsletter\b/i,
-        /(?:가입|회원가입|구독|뉴스레터\s*신청|알림\s*신청)/,
-        /티켓.*(?:가격|인상|할인)/,
-        /가격\s*인상(?:까지)?\s*\d+\s*일/,
-        /(?:얼리버드|사전\s*등록|지금\s*등록|참가\s*신청)/,
-      ];
+      function buildSummaryText(raw) {
+        const txt = String(raw || "").replace(/\s+/g, " ").trim();
+        if (!txt) return t("summary_empty");
 
-      function isPromotionalSelfPost(item) {
-        const title = stripHtml(decodeHtmlEntitiesText(item?.title || ""));
-        const summary = stripHtml(decodeHtmlEntitiesText(item?.summaryText || ""));
-        const cats = (item?.categories || []).map((c) => decodeHtmlEntitiesText(c)).join(" ");
-        const link = String(item?.link || "");
-        const merged = `${title} ${summary} ${cats}`.replace(/\s+/g, " ").trim();
-        if (!merged) return false;
+        // Remove RSS trailing ellipsis and keep a compact, image-friendly summary.
+        const cleaned = txt.replace(/\s*(\.\.\.|…)+\s*$/g, "").trim();
+        const MAX_SUMMARY_CHARS = 220;
+        if (cleaned.length <= MAX_SUMMARY_CHARS) return cleaned;
 
-        if (PROMO_SELF_PATTERNS.some((re) => re.test(merged))) return true;
-
-        const isTechCrunch = /(?:^|\/\/)(?:www\.)?techcrunch\.com/i.test(link);
-        if (!isTechCrunch) return false;
-        const tcPromoSignals = [/\bdisrupt\b/i, /\bsessions?\b/i, /\bevent\b/i, /\bconference\b/i, /\btickets?\b/i, /\bregister\b/i];
-        let hits = 0;
-        for (const re of tcPromoSignals) {
-          if (re.test(merged) || re.test(link)) hits++;
+        // Prefer full sentences that fit within the target length.
+        const sentences = cleaned.split(/(?<=[.!?。！？])\s+/).filter(Boolean);
+        let compact = "";
+        for (const s of sentences) {
+          const next = compact ? `${compact} ${s}` : s;
+          if (next.length > MAX_SUMMARY_CHARS) break;
+          compact = next;
         }
-        return hits >= 2;
+        if (compact) return compact.replace(/\s*(\.\.\.|…)+\s*$/g, "").trim();
+
+        const sliced = cleaned.slice(0, MAX_SUMMARY_CHARS);
+        const cutAt = sliced.lastIndexOf(" ");
+        const safe = (cutAt > 120 ? sliced.slice(0, cutAt) : sliced).trim();
+        return safe.replace(/\s*(\.\.\.|…)+\s*$/g, "").trim();
+      }
+
+      function getArticleSource(link) {
+        if (!link) return t("footer_source");
+        try {
+          const host = new URL(link).hostname.replace(/^www\./i, "").trim();
+          return host || t("footer_source");
+        } catch (e) {
+          return t("footer_source");
+        }
       }
 
       function dedupeItems(items) {
@@ -1207,18 +2107,22 @@
       }
 
       function sortHotItems(items) {
-        const hasViewData = (items || []).some((it) => getItemViewCount(it) !== null);
-        const sorted = (items || []).slice().sort((a, b) => {
-          const av = getItemViewCount(a);
-          const bv = getItemViewCount(b);
-          if (av !== null || bv !== null) {
-            if (av === null) return 1;
-            if (bv === null) return -1;
-            if (bv !== av) return bv - av;
-          }
+        const all = (items || []).slice();
+        const tokenFreq = buildIssueTokenFrequency(all);
+        const hasEngagementData = all.some((it) => getEngagementScore(it) > 0);
+        const sorted = all.sort((a, b) => {
+          const avEng = getEngagementScore(a);
+          const bvEng = getEngagementScore(b);
+          const avIssue = getIssueFrequencyScore(a, tokenFreq);
+          const bvIssue = getIssueFrequencyScore(b, tokenFreq);
+          const avTotal = avIssue + avEng * 1.8;
+          const bvTotal = bvIssue + bvEng * 1.8;
+          if (bvTotal !== avTotal) return bvTotal - avTotal;
+          if (bvEng !== avEng) return bvEng - avEng;
+          if (bvIssue !== avIssue) return bvIssue - avIssue;
           return toDateMs(b.pubDate) - toDateMs(a.pubDate);
         });
-        return { sorted, sortBasis: hasViewData ? "views" : "recent" };
+        return { sorted, sortBasis: hasEngagementData ? "views" : "issue" };
       }
 
       function buildHotBundleFromItems(items, endDateStr) {
@@ -1229,9 +2133,7 @@
           const ms = toDateMs(it.pubDate);
           return ms >= startMs && ms < endExclusiveMs;
         });
-        const windowOrAll = inWindow.length ? inWindow : items || [];
-        const withoutPromo = windowOrAll.filter((it) => !isPromotionalSelfPost(it));
-        const deduped = dedupeItems(withoutPromo);
+        const deduped = dedupeItems(inWindow.length ? inWindow : items || []);
         const { sorted, sortBasis } = sortHotItems(deduped);
         const rangeStart = new Date(startMs).toLocaleDateString(getLocale(), { month: "2-digit", day: "2-digit" });
         const rangeEnd = new Date(endExclusiveMs - 1).toLocaleDateString(getLocale(), { month: "2-digit", day: "2-digit" });
@@ -1258,80 +2160,6 @@
         return { meta: latest.meta || {}, items: bundle.items, windowLabel: bundle.windowLabel, sortBasis: bundle.sortBasis };
       }
 
-      function stableHashNumber(input) {
-        const text = String(input || "");
-        let hash = 2166136261 >>> 0;
-        for (let i = 0; i < text.length; i++) {
-          hash ^= text.charCodeAt(i);
-          hash = Math.imul(hash, 16777619) >>> 0;
-        }
-        return hash >>> 0;
-      }
-
-      function seededShuffle(list, seedInput) {
-        const out = Array.isArray(list) ? list.slice() : [];
-        let seed = stableHashNumber(seedInput) || 1;
-        const nextRand = () => {
-          seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
-          return seed / 4294967296;
-        };
-        for (let i = out.length - 1; i > 0; i--) {
-          const j = Math.floor(nextRand() * (i + 1));
-          [out[i], out[j]] = [out[j], out[i]];
-        }
-        return out;
-      }
-
-      function normalizeImageCompareKey(url) {
-        return String(url || "").trim().toLowerCase();
-      }
-
-      function pickUniqueFallbackThumb(pool, usedKeys, avoidKey, cursor) {
-        if (!Array.isArray(pool) || !pool.length) return { rawUrl: "", nextCursor: cursor };
-        const start = Math.max(0, Number(cursor) || 0) % pool.length;
-        for (let offset = 0; offset < pool.length; offset++) {
-          const index = (start + offset) % pool.length;
-          const candidate = String(pool[index] || "").trim();
-          const key = normalizeImageCompareKey(candidate);
-          if (!key) continue;
-          if (avoidKey && key === avoidKey) continue;
-          if (usedKeys.has(key)) continue;
-          usedKeys.add(key);
-          return { rawUrl: candidate, nextCursor: (index + 1) % pool.length };
-        }
-        return { rawUrl: "", nextCursor: start };
-      }
-
-      function buildHotThumbAssignments(items) {
-        const entries = Array.isArray(items) ? items : [];
-        const seedBase = entries.map((it) => it?.guid || it?.link || it?.title || "").join("|");
-        const fallbackPool = seededShuffle(HOT_THUMB_FALLBACKS, `${hotThumbShuffleSalt}|${seedBase}`);
-        const usedKeys = new Set();
-        let fallbackCursor = 0;
-        return entries.map((it) => {
-          const primaryRaw = String(it?.imgUrl || "").trim();
-          const primary = normalizeImageUrl(primaryRaw);
-          const primaryKey = normalizeImageCompareKey(primary);
-          if (primary && primaryKey && !usedKeys.has(primaryKey)) {
-            usedKeys.add(primaryKey);
-            return { rawUrl: primary, isFallback: false };
-          }
-
-          const fallback = pickUniqueFallbackThumb(fallbackPool, usedKeys, primaryKey, fallbackCursor);
-          fallbackCursor = fallback.nextCursor;
-          if (fallback.rawUrl) return { rawUrl: fallback.rawUrl, isFallback: true };
-
-          if (primary) return { rawUrl: primary, isFallback: false };
-          return { rawUrl: "", isFallback: true };
-        });
-      }
-
-      function buildHotThumbImageUrl(rawUrl) {
-        const raw = String(rawUrl || "").trim();
-        if (!raw) return "";
-        return /^https?:\/\//i.test(raw) ? buildImageUrl(raw, "low") : raw;
-      }
-
       function render(items) {
         const q = (elQ.value || "").trim().toLowerCase();
         const filtered = !q
@@ -1349,60 +2177,35 @@
 
         log("render-hot", { total: filtered.length });
 
-        const thumbAssignments = buildHotThumbAssignments(filtered);
-
         const cards = filtered.map((it, idx) => {
-          const date = it.pubDate ? new Date(it.pubDate) : null;
-          const dateText =
-            date && !Number.isNaN(date.valueOf())
-              ? date.toLocaleString(getLocale(), { year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" })
-              : it.pubDate || "";
-          const viewCount = getItemViewCount(it);
-          const metricText =
-            viewCount !== null
-              ? `${t("hot_metric_views")} ${viewCount.toLocaleString(getLocale())}`
-              : t("hot_metric_recent");
+          const summaryText = buildSummaryText(it.summaryText);
+          const sourceText = getArticleSource(it.link || it.creator);
+          const sourceMarkup = it.link
+            ? `<a class="hotSourceLink" href="${escapeHtml(it.link)}" target="_blank" rel="noopener noreferrer">${escapeHtml(sourceText)}</a>`
+            : `<span class="hotSourceText">${escapeHtml(sourceText)}</span>`;
           const cats = (it.categories || [])
             .slice(0, 3)
             .map((c) => `<span class="pill">${escapeHtml(c)}</span>`)
             .join("");
-          const thumbInfo = thumbAssignments[idx] || { rawUrl: "", isFallback: true };
-          const thumbImageUrl = buildHotThumbImageUrl(thumbInfo.rawUrl);
-          const thumbClass = thumbInfo.isFallback ? "hotThumb hotThumbFallback" : "hotThumb";
-          let thumb = `
-            <div class="hotThumb hotThumbFallback">
-              <span class="hotRank">${t("hot_rank")} ${idx + 1}</span>
-              <span>${t("no_image")}</span>
-            </div>
-          `;
-          if (thumbImageUrl) {
-            thumb = it.link
-              ? `
-                <a class="${thumbClass}" href="${escapeHtml(it.link)}" target="_blank" rel="noopener noreferrer"
-                   style="background-image:url('${escapeHtml(thumbImageUrl)}')">
-                  <span class="hotRank">${t("hot_rank")} ${idx + 1}</span>
-                </a>
-              `
-              : `
-                <div class="${thumbClass}" style="background-image:url('${escapeHtml(thumbImageUrl)}')">
-                  <span class="hotRank">${t("hot_rank")} ${idx + 1}</span>
-                </div>
-              `;
-          }
+          const bgStyle = it.imgUrl ? `--card-bg:url('${escapeHtml(buildImageUrl(it.imgUrl, "high"))}');` : "";
           return `
-            <article class="hotCard">
-              ${thumb}
+            <article class="hotCard hotCardBg ${it.imgUrl ? "hasImage" : "noImage"}" style="--delay:${idx * 70}ms;${bgStyle}">
+              <div class="hotCardOverlay"></div>
+              <span class="hotRank">${t("hot_rank")} ${idx + 1}</span>
               <div class="hotBody">
                 <h3 class="hotHeadline">
                   <a href="${escapeHtml(it.link)}" target="_blank" rel="noopener noreferrer">${escapeHtml(it.title)}</a>
                 </h3>
                 <div class="hotMeta">
                   ${it.creator ? `<span>${escapeHtml(it.creator)}</span>` : ""}
-                  ${dateText ? `<span>${escapeHtml(dateText)}</span>` : ""}
-                  <span class="hotMetric">${escapeHtml(metricText)}</span>
                 </div>
-                <p class="hotDesc">${escapeHtml(it.summaryText)}</p>
+                <p class="summaryLabel">${t("summary_label")}</p>
+                <p class="hotDesc">${escapeHtml(summaryText)}</p>
                 <div class="hotCats">${cats}</div>
+                <div class="hotSource">
+                  <span class="hotSourceLabel">${t("source_label")}</span>
+                  ${sourceMarkup}
+                </div>
               </div>
             </article>
           `;
@@ -1475,8 +2278,7 @@
         const selected = FEEDS.find((f) => f.key === elCategory.value) || FEEDS[0];
         const dateStr = (elDatePick.value || "").trim();
         hotWindowLabel = "";
-        hotSortBasis = "recent";
-        hotThumbShuffleSalt = Date.now();
+        hotSortBasis = "issue";
 
         setStatus("warn", t("status_loading"), "status_loading");
         elGrid.innerHTML = `<div class="note" style="grid-column: 1 / -1;">${t("status_loading")}</div>`;
@@ -1489,7 +2291,7 @@
               lastFeedMeta = weekly.meta || { title: "", link: "", updated: "" };
               lastItems = weekly.items || [];
               hotWindowLabel = weekly.windowLabel || "";
-              hotSortBasis = weekly.sortBasis || "recent";
+              hotSortBasis = weekly.sortBasis || "issue";
             } catch (backendErr) {
               log("backend-fallback", { error: String(backendErr?.message || backendErr) });
               const xmlText = await fetchRssXml(selected.url);
@@ -1537,14 +2339,9 @@
         applyI18n();
         // Options
         elCategory.innerHTML = FEEDS.map((f) => `<option value="${f.key}">${f.label}</option>`).join("");
+        elCategory.value = "ai";
         elDatePick.value = new Date().toISOString().slice(0, 10);
-
-        // URL param for category ?cat=ai
-        const params = new URLSearchParams(location.search);
-        const cat = (params.get("cat") || "").toLowerCase();
-        if (cat && FEEDS.some((f) => f.key === cat)) {
-          elCategory.value = cat;
-        }
+        elQ.value = "";
 
         elCategory.addEventListener("change", loadCurrentFeed);
         elDatePick.addEventListener("change", loadCurrentFeed);

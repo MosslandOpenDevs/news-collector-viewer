@@ -420,22 +420,16 @@
         border: 1px solid rgba(255, 255, 255, 0.14);
         background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03));
         scroll-snap-align: start;
-        align-items: stretch;
       }
 
       .hotThumb {
         position: relative;
-        display: block;
-        width: 100%;
         min-height: 132px;
-        height: 100%;
-        align-self: stretch;
         border-radius: 10px;
         overflow: hidden;
         border: 1px solid rgba(255, 255, 255, 0.14);
         background-size: cover;
         background-position: center;
-        background-repeat: no-repeat;
       }
 
       .hotThumbFallback {
@@ -443,23 +437,9 @@
         place-items: center;
         color: rgba(255, 255, 255, 0.82);
         font-size: 12px;
-        background-color: rgba(10, 14, 24, 0.44);
-      }
-
-      .hotThumbFallback::after {
-        content: "";
-        position: absolute;
-        inset: 0;
-        z-index: 0;
         background:
-          radial-gradient(190px 120px at 0% 0%, rgba(53, 197, 240, 0.2), transparent 70%),
-          linear-gradient(180deg, rgba(0, 0, 0, 0.08), rgba(0, 0, 0, 0.34));
-        pointer-events: none;
-      }
-
-      .hotThumbFallback > span {
-        position: relative;
-        z-index: 1;
+          radial-gradient(190px 120px at 0% 0%, rgba(53, 197, 240, 0.26), transparent 70%),
+          linear-gradient(150deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.03));
       }
 
       .hotRank {
@@ -667,20 +647,6 @@
       const IMG_PRELOAD_CONCURRENCY = 2;
       const HOT_WINDOW_DAYS = 7;
       const HOT_LIMIT = 10;
-      const HOT_THUMB_FALLBACKS = [
-        "https://images.pexels.com/photos/6153354/pexels-photo-6153354.jpeg?auto=compress&cs=tinysrgb&w=1800",
-        "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&w=1800&q=80",
-        "https://source.unsplash.com/1800x1100/?artificial-intelligence,robotics&sig=101",
-        "https://source.unsplash.com/1800x1100/?ai,chip,server&sig=102",
-        "https://source.unsplash.com/1800x1100/?humanoid,robot,technology&sig=103",
-        "https://source.unsplash.com/1800x1100/?future,ai,interface&sig=104",
-        "https://source.unsplash.com/1800x1100/?ai,neural-network,lab&sig=105",
-        "https://source.unsplash.com/1800x1100/?technology,robot,city&sig=106",
-        "https://source.unsplash.com/1800x1100/?machine-learning,vision&sig=107",
-        "https://source.unsplash.com/1800x1100/?data-center,ai,hardware&sig=108",
-        "https://source.unsplash.com/1800x1100/?cybernetics,android&sig=109",
-        "./HUMAN-AI.jpg",
-      ];
 
       const elCategory = document.getElementById("category");
       const elGrid = document.getElementById("grid");
@@ -701,7 +667,7 @@
       const I18N = {
         ko: {
           title: "뉴스 수집 뷰어",
-          subtitle: "아래에서 카테고리를 선택하면 RSS 피드를 카드 형태로TMXK 보여줍니다.",
+          subtitle: "아래에서 카테고리를 선택하면 RSS 피드를 카드 형태로 보여줍니다.",
           label_category: "카테고리",
           label_date: "날짜 (UTC)",
           label_query: "검색어 (옵션)",
@@ -801,7 +767,6 @@
       const imagePreloadCache = new Map();
       let hotWindowLabel = "";
       let hotSortBasis = "recent";
-      let hotThumbShuffleSalt = Date.now();
 
       function loadOgCacheFromStorage() {
         try {
@@ -893,7 +858,6 @@
 
       function buildImageUrl(rawUrl, quality) {
         if (!rawUrl) return "";
-        if (!/^https?:\/\//i.test(rawUrl)) return rawUrl;
         const base =
           quality === "low"
             ? `${IMG_PROXY}${encodeURIComponent(rawUrl)}&w=${IMG_LOW_W}&q=${IMG_QUALITY_LOW}&fit=cover`
@@ -1150,50 +1114,6 @@
         return Number.isNaN(d.valueOf()) ? 0 : d.valueOf();
       }
 
-      const PROMO_SELF_PATTERNS = [
-        /\btechcrunch\s+disrupt\b/i,
-        /\bdisrupt\s+20\d{2}\b/i,
-        /\b(?:ticket|tickets|pass)\b.*\b(?:price|prices|pricing|sale)\b/i,
-        /\b(?:price|prices)\s+(?:go|goes)\s+up\b/i,
-        /\b\d+\s+days?\s+left\b/i,
-        /\bearly[-\s]?bird\b/i,
-        /\b(?:buy|get)\s+(?:your\s+)?tickets?\b/i,
-        /\bregister\s+now\b/i,
-        /\bsave\s+your\s+spot\b/i,
-        /\bjoin\s+us\s+at\b/i,
-        /\bsubscribe\b/i,
-        /\bsubscription\b/i,
-        /\bsubscriber\b/i,
-        /\bsign[\s-]?up\b/i,
-        /\bjoin\s+(?:now|today)\b/i,
-        /\bmembership\b/i,
-        /\bnewsletter\b/i,
-        /(?:가입|회원가입|구독|뉴스레터\s*신청|알림\s*신청)/,
-        /티켓.*(?:가격|인상|할인)/,
-        /가격\s*인상(?:까지)?\s*\d+\s*일/,
-        /(?:얼리버드|사전\s*등록|지금\s*등록|참가\s*신청)/,
-      ];
-
-      function isPromotionalSelfPost(item) {
-        const title = stripHtml(decodeHtmlEntitiesText(item?.title || ""));
-        const summary = stripHtml(decodeHtmlEntitiesText(item?.summaryText || ""));
-        const cats = (item?.categories || []).map((c) => decodeHtmlEntitiesText(c)).join(" ");
-        const link = String(item?.link || "");
-        const merged = `${title} ${summary} ${cats}`.replace(/\s+/g, " ").trim();
-        if (!merged) return false;
-
-        if (PROMO_SELF_PATTERNS.some((re) => re.test(merged))) return true;
-
-        const isTechCrunch = /(?:^|\/\/)(?:www\.)?techcrunch\.com/i.test(link);
-        if (!isTechCrunch) return false;
-        const tcPromoSignals = [/\bdisrupt\b/i, /\bsessions?\b/i, /\bevent\b/i, /\bconference\b/i, /\btickets?\b/i, /\bregister\b/i];
-        let hits = 0;
-        for (const re of tcPromoSignals) {
-          if (re.test(merged) || re.test(link)) hits++;
-        }
-        return hits >= 2;
-      }
-
       function dedupeItems(items) {
         const seen = new Set();
         const out = [];
@@ -1229,9 +1149,7 @@
           const ms = toDateMs(it.pubDate);
           return ms >= startMs && ms < endExclusiveMs;
         });
-        const windowOrAll = inWindow.length ? inWindow : items || [];
-        const withoutPromo = windowOrAll.filter((it) => !isPromotionalSelfPost(it));
-        const deduped = dedupeItems(withoutPromo);
+        const deduped = dedupeItems(inWindow.length ? inWindow : items || []);
         const { sorted, sortBasis } = sortHotItems(deduped);
         const rangeStart = new Date(startMs).toLocaleDateString(getLocale(), { month: "2-digit", day: "2-digit" });
         const rangeEnd = new Date(endExclusiveMs - 1).toLocaleDateString(getLocale(), { month: "2-digit", day: "2-digit" });
@@ -1258,80 +1176,6 @@
         return { meta: latest.meta || {}, items: bundle.items, windowLabel: bundle.windowLabel, sortBasis: bundle.sortBasis };
       }
 
-      function stableHashNumber(input) {
-        const text = String(input || "");
-        let hash = 2166136261 >>> 0;
-        for (let i = 0; i < text.length; i++) {
-          hash ^= text.charCodeAt(i);
-          hash = Math.imul(hash, 16777619) >>> 0;
-        }
-        return hash >>> 0;
-      }
-
-      function seededShuffle(list, seedInput) {
-        const out = Array.isArray(list) ? list.slice() : [];
-        let seed = stableHashNumber(seedInput) || 1;
-        const nextRand = () => {
-          seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
-          return seed / 4294967296;
-        };
-        for (let i = out.length - 1; i > 0; i--) {
-          const j = Math.floor(nextRand() * (i + 1));
-          [out[i], out[j]] = [out[j], out[i]];
-        }
-        return out;
-      }
-
-      function normalizeImageCompareKey(url) {
-        return String(url || "").trim().toLowerCase();
-      }
-
-      function pickUniqueFallbackThumb(pool, usedKeys, avoidKey, cursor) {
-        if (!Array.isArray(pool) || !pool.length) return { rawUrl: "", nextCursor: cursor };
-        const start = Math.max(0, Number(cursor) || 0) % pool.length;
-        for (let offset = 0; offset < pool.length; offset++) {
-          const index = (start + offset) % pool.length;
-          const candidate = String(pool[index] || "").trim();
-          const key = normalizeImageCompareKey(candidate);
-          if (!key) continue;
-          if (avoidKey && key === avoidKey) continue;
-          if (usedKeys.has(key)) continue;
-          usedKeys.add(key);
-          return { rawUrl: candidate, nextCursor: (index + 1) % pool.length };
-        }
-        return { rawUrl: "", nextCursor: start };
-      }
-
-      function buildHotThumbAssignments(items) {
-        const entries = Array.isArray(items) ? items : [];
-        const seedBase = entries.map((it) => it?.guid || it?.link || it?.title || "").join("|");
-        const fallbackPool = seededShuffle(HOT_THUMB_FALLBACKS, `${hotThumbShuffleSalt}|${seedBase}`);
-        const usedKeys = new Set();
-        let fallbackCursor = 0;
-        return entries.map((it) => {
-          const primaryRaw = String(it?.imgUrl || "").trim();
-          const primary = normalizeImageUrl(primaryRaw);
-          const primaryKey = normalizeImageCompareKey(primary);
-          if (primary && primaryKey && !usedKeys.has(primaryKey)) {
-            usedKeys.add(primaryKey);
-            return { rawUrl: primary, isFallback: false };
-          }
-
-          const fallback = pickUniqueFallbackThumb(fallbackPool, usedKeys, primaryKey, fallbackCursor);
-          fallbackCursor = fallback.nextCursor;
-          if (fallback.rawUrl) return { rawUrl: fallback.rawUrl, isFallback: true };
-
-          if (primary) return { rawUrl: primary, isFallback: false };
-          return { rawUrl: "", isFallback: true };
-        });
-      }
-
-      function buildHotThumbImageUrl(rawUrl) {
-        const raw = String(rawUrl || "").trim();
-        if (!raw) return "";
-        return /^https?:\/\//i.test(raw) ? buildImageUrl(raw, "low") : raw;
-      }
-
       function render(items) {
         const q = (elQ.value || "").trim().toLowerCase();
         const filtered = !q
@@ -1349,8 +1193,6 @@
 
         log("render-hot", { total: filtered.length });
 
-        const thumbAssignments = buildHotThumbAssignments(filtered);
-
         const cards = filtered.map((it, idx) => {
           const date = it.pubDate ? new Date(it.pubDate) : null;
           const dateText =
@@ -1366,29 +1208,19 @@
             .slice(0, 3)
             .map((c) => `<span class="pill">${escapeHtml(c)}</span>`)
             .join("");
-          const thumbInfo = thumbAssignments[idx] || { rawUrl: "", isFallback: true };
-          const thumbImageUrl = buildHotThumbImageUrl(thumbInfo.rawUrl);
-          const thumbClass = thumbInfo.isFallback ? "hotThumb hotThumbFallback" : "hotThumb";
-          let thumb = `
-            <div class="hotThumb hotThumbFallback">
-              <span class="hotRank">${t("hot_rank")} ${idx + 1}</span>
-              <span>${t("no_image")}</span>
-            </div>
-          `;
-          if (thumbImageUrl) {
-            thumb = it.link
-              ? `
-                <a class="${thumbClass}" href="${escapeHtml(it.link)}" target="_blank" rel="noopener noreferrer"
-                   style="background-image:url('${escapeHtml(thumbImageUrl)}')">
-                  <span class="hotRank">${t("hot_rank")} ${idx + 1}</span>
-                </a>
-              `
-              : `
-                <div class="${thumbClass}" style="background-image:url('${escapeHtml(thumbImageUrl)}')">
-                  <span class="hotRank">${t("hot_rank")} ${idx + 1}</span>
-                </div>
-              `;
-          }
+          const thumb = it.imgUrl
+            ? `
+              <a class="hotThumb" href="${escapeHtml(it.link)}" target="_blank" rel="noopener noreferrer"
+                 style="background-image:url('${escapeHtml(buildImageUrl(it.imgUrl, "low"))}')">
+                <span class="hotRank">${t("hot_rank")} ${idx + 1}</span>
+              </a>
+            `
+            : `
+              <div class="hotThumb hotThumbFallback">
+                <span class="hotRank">${t("hot_rank")} ${idx + 1}</span>
+                <span>${t("no_image")}</span>
+              </div>
+            `;
           return `
             <article class="hotCard">
               ${thumb}
@@ -1476,7 +1308,6 @@
         const dateStr = (elDatePick.value || "").trim();
         hotWindowLabel = "";
         hotSortBasis = "recent";
-        hotThumbShuffleSalt = Date.now();
 
         setStatus("warn", t("status_loading"), "status_loading");
         elGrid.innerHTML = `<div class="note" style="grid-column: 1 / -1;">${t("status_loading")}</div>`;

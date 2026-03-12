@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" role="img" aria-label="Futuristic AI network scene">
+  <defs>
+    <linearGradient id="bgA" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#5f89d7"/>
+      <stop offset="45%" stop-color="#6b62c8"/>
+      <stop offset="100%" stop-color="#3c8fb2"/>
+    </linearGradient>
+    <radialGradient id="glowCyan" cx="0.22" cy="0.2" r="0.55">
+      <stop offset="0%" stop-color="#9af2ff" stop-opacity="0.95"/>
+      <stop offset="100%" stop-color="#9af2ff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glowCoral" cx="0.8" cy="0.72" r="0.5">
+      <stop offset="0%" stop-color="#ffb28f" stop-opacity="0.85"/>
+      <stop offset="100%" stop-color="#ffb28f" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="lineGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#d3f4ff" stop-opacity="0.75"/>
+      <stop offset="100%" stop-color="#ffe0d0" stop-opacity="0.65"/>
+    </linearGradient>
+    <filter id="softBlur">
+      <feGaussianBlur stdDeviation="8"/>
+    </filter>
+    <filter id="hardGlow">
+      <feGaussianBlur stdDeviation="2.6" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <rect width="1920" height="1080" fill="url(#bgA)"/>
+  <rect width="1920" height="1080" fill="url(#glowCyan)"/>
+  <rect width="1920" height="1080" fill="url(#glowCoral)"/>
+
+  <g opacity="0.22">
+    <path d="M0 890 Q320 760 620 810 T1320 830 T1920 780" stroke="#dbedff" stroke-width="2" fill="none"/>
+    <path d="M0 930 Q360 820 690 870 T1390 900 T1920 860" stroke="#dbedff" stroke-width="1.5" fill="none"/>
+  </g>
+
+  <g fill="none" stroke="url(#lineGrad)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" filter="url(#hardGlow)" opacity="0.88">
+    <path d="M140 260 L430 330 L620 245 L840 330 L1030 230 L1270 330 L1510 250 L1770 360"/>
+    <path d="M840 330 L840 530 L650 640 L470 730"/>
+    <path d="M840 530 L1040 650 L1290 770 L1620 850"/>
+    <path d="M430 330 L350 470 L320 610"/>
+    <path d="M1270 330 L1350 470 L1430 600"/>
+    <path d="M620 245 L570 120 L640 70"/>
+    <path d="M1030 230 L1100 120 L1200 90"/>
+    <path d="M650 640 L760 740 L890 790"/>
+    <path d="M1040 650 L940 740 L860 820"/>
+  </g>
+
+  <g fill="#ecf8ff" filter="url(#hardGlow)">
+    <circle cx="140" cy="260" r="11"/>
+    <circle cx="430" cy="330" r="10"/>
+    <circle cx="620" cy="245" r="12"/>
+    <circle cx="840" cy="330" r="14"/>
+    <circle cx="1030" cy="230" r="11"/>
+    <circle cx="1270" cy="330" r="12"/>
+    <circle cx="1510" cy="250" r="11"/>
+    <circle cx="1770" cy="360" r="13"/>
+    <circle cx="840" cy="530" r="13"/>
+    <circle cx="650" cy="640" r="10"/>
+    <circle cx="470" cy="730" r="11"/>
+    <circle cx="1040" cy="650" r="10"/>
+    <circle cx="1290" cy="770" r="11"/>
+    <circle cx="1620" cy="850" r="12"/>
+    <circle cx="320" cy="610" r="9"/>
+    <circle cx="1430" cy="600" r="9"/>
+    <circle cx="640" cy="70" r="8"/>
+    <circle cx="1200" cy="90" r="8"/>
+    <circle cx="890" cy="790" r="9"/>
+    <circle cx="860" cy="820" r="9"/>
+  </g>
+
+  <g opacity="0.5">
+    <path d="M960 210c120 0 210 96 210 215 0 120-90 215-210 215s-210-95-210-215c0-119 90-215 210-215z" fill="#ffffff" fill-opacity="0.08"/>
+    <path d="M960 255c95 0 170 77 170 170s-75 170-170 170-170-77-170-170 75-170 170-170z" fill="none" stroke="#d7edff" stroke-opacity="0.55" stroke-width="2.4"/>
+    <path d="M960 305 L960 545 M870 425 L1050 425 M905 355 L1015 495 M1015 355 L905 495" stroke="#d7edff" stroke-opacity="0.45" stroke-width="2"/>
+  </g>
+
+  <g filter="url(#softBlur)" opacity="0.26">
+    <ellipse cx="420" cy="860" rx="240" ry="70" fill="#7be2ff"/>
+    <ellipse cx="1450" cy="870" rx="290" ry="90" fill="#ffba9f"/>
+  </g>
+</svg>

@@ -1,0 +1,3699 @@
+﻿<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>WEEKLY AI HOT 15 - Medium Layout</title>
+    <style>
+      :root {
+        --bg: #0b0d12;
+        --panel: #121625;
+        --card: #151a2b;
+        --text: #e8ecff;
+        --muted: #a8b1d9;
+        --border: rgba(255, 255, 255, 0.1);
+        --accent: #35c5f0;
+        --shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        --radius: 16px;
+        --radius-sm: 12px;
+        --glass: rgba(255, 255, 255, 0.08);
+        --shadow-strong: 0 20px 60px rgba(0, 0, 0, 0.45);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family:
+          ui-sans-serif,
+          system-ui,
+          -apple-system,
+          Segoe UI,
+          Roboto,
+          "Noto Sans KR",
+          Arial,
+          "Apple SD Gothic Neo",
+          "Malgun Gothic",
+          sans-serif;
+        background:
+          radial-gradient(1200px 700px at 30% -10%, rgba(53, 197, 240, 0.18), transparent 55%),
+          radial-gradient(900px 500px at 90% 10%, rgba(124, 92, 255, 0.12), transparent 55%), var(--bg);
+        color: var(--text);
+        line-height: 1.45;
+      }
+
+      header {
+        padding: 20px 16px 8px;
+        max-width: 640px;
+        margin: 0 auto;
+      }
+
+      .title {
+        display: flex;
+        gap: 14px;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: 20px;
+        letter-spacing: -0.2px;
+      }
+
+      .subtitle {
+        margin: 6px 0 0;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      main {
+        max-width: 640px;
+        margin: 0 auto;
+        padding: 10px 16px 30px;
+      }
+
+      .panel {
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02));
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        padding: 14px;
+      }
+
+      .controls {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 10px;
+        align-items: center;
+      }
+
+      label {
+        display: block;
+        font-size: 12px;
+        color: var(--muted);
+        margin-bottom: 6px;
+      }
+
+      select,
+      input {
+        width: 100%;
+        padding: 11px 12px;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        background: rgba(0, 0, 0, 0.18);
+        color: var(--text);
+        outline: none;
+      }
+
+      select:focus,
+      input:focus {
+        border-color: rgba(53, 197, 240, 0.55);
+        box-shadow: 0 0 0 4px rgba(53, 197, 240, 0.12);
+      }
+
+      button {
+        padding: 11px 14px;
+        border-radius: 12px;
+        border: 1px solid rgba(53, 197, 240, 0.35);
+        background: rgba(53, 197, 240, 0.15);
+        color: var(--text);
+        cursor: pointer;
+        transition:
+          transform 120ms ease,
+          background 120ms ease;
+        white-space: nowrap;
+      }
+
+      button:hover {
+        background: rgba(53, 197, 240, 0.22);
+      }
+
+      button:active {
+        transform: translateY(1px);
+      }
+
+      .metaRow {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        margin-top: 12px;
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .status {
+        display: inline-flex;
+        gap: 8px;
+        align-items: center;
+      }
+
+      .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.25);
+      }
+
+      .dot.ok {
+        background: rgba(38, 208, 124, 0.85);
+      }
+      .dot.warn {
+        background: rgba(255, 196, 46, 0.9);
+      }
+      .dot.err {
+        background: rgba(255, 78, 78, 0.9);
+      }
+
+      .stage {
+        margin-top: 16px;
+        position: relative;
+        border-radius: 26px;
+        overflow: hidden;
+        min-height: 62vh;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        box-shadow: var(--shadow-strong);
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.02));
+      }
+
+      .stageBg {
+        position: absolute;
+        inset: 0;
+        background-size: cover;
+        background-position: center;
+        filter: saturate(1.05);
+        transform: scale(1.02);
+        pointer-events: none;
+      }
+
+      .stageBg.loading {
+        background-image:
+          linear-gradient(110deg, rgba(255, 255, 255, 0.08) 8%, rgba(255, 255, 255, 0.18) 18%, rgba(255, 255, 255, 0.08) 33%),
+          linear-gradient(180deg, rgba(20, 24, 38, 0.9), rgba(10, 12, 20, 0.9));
+        background-size:
+          200% 100%,
+          100% 100%;
+        animation: shimmer 1.2s ease-in-out infinite;
+      }
+
+      .stageBg.ready {
+        animation: none;
+      }
+
+      .stageBg.noimage {
+        background-image:
+          radial-gradient(180px 180px at 20% 10%, rgba(53, 197, 240, 0.15), transparent 60%),
+          radial-gradient(260px 260px at 90% 20%, rgba(124, 92, 255, 0.18), transparent 60%),
+          linear-gradient(180deg, rgba(10, 12, 20, 0.9), rgba(7, 9, 16, 0.98));
+        animation: none;
+      }
+
+      @keyframes shimmer {
+        0% {
+          background-position:
+            200% 0,
+            0 0;
+        }
+        100% {
+          background-position:
+            -200% 0,
+            0 0;
+        }
+      }
+
+      .stageShade {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, rgba(8, 10, 16, 0.05) 0%, rgba(8, 10, 16, 0.35) 50%, rgba(8, 10, 16, 0.78) 100%);
+        pointer-events: none;
+      }
+
+      .stageContent {
+        position: relative;
+        z-index: 2;
+        display: grid;
+        grid-template-rows: 1fr auto;
+        min-height: 62vh;
+        padding: 18px;
+      }
+
+      .chipRow {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      .pill {
+        display: inline-flex;
+        padding: 6px 10px;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        background: rgba(0, 0, 0, 0.2);
+        color: rgba(255, 255, 255, 0.88);
+        font-size: 12px;
+        backdrop-filter: blur(6px);
+      }
+
+      .headline {
+        margin: 10px 0 0;
+        font-size: 22px;
+        letter-spacing: -0.4px;
+        line-height: 1.25;
+      }
+
+      .headline a {
+        color: #ffffff;
+        text-decoration: none;
+      }
+
+      .headline a:hover {
+        text-decoration: underline;
+        text-decoration-color: rgba(255, 255, 255, 0.65);
+      }
+
+      .byline {
+        margin-top: 8px;
+        font-size: 13px;
+        color: rgba(255, 255, 255, 0.75);
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+
+      .desc {
+        margin: 10px 0 0;
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 14px;
+        display: block;
+        overflow: visible;
+      }
+
+      .footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        color: rgba(255, 255, 255, 0.78);
+        font-size: 12px;
+        margin-top: 10px;
+      }
+
+      .footer a {
+        color: #ffffff;
+        text-decoration: none;
+      }
+
+      .footer a:hover {
+        text-decoration: underline;
+      }
+
+      .noImageBadge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 10px;
+        border-radius: 999px;
+        background: rgba(0, 0, 0, 0.45);
+        color: rgba(255, 255, 255, 0.85);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        font-size: 12px;
+        margin-top: 10px;
+        backdrop-filter: blur(6px);
+      }
+
+      .navBtn {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 3;
+        width: 42px;
+        height: 42px;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.35);
+        background: rgba(0, 0, 0, 0.35);
+        color: #fff;
+        display: grid;
+        place-items: center;
+        font-size: 20px;
+        cursor: pointer;
+        backdrop-filter: blur(6px);
+        touch-action: manipulation;
+      }
+
+      .navBtn:hover {
+        background: rgba(0, 0, 0, 0.5);
+      }
+      .navPrev {
+        left: 12px;
+      }
+      .navNext {
+        right: 12px;
+      }
+
+      .counter {
+        position: absolute;
+        right: 12px;
+        top: 12px;
+        z-index: 3;
+        padding: 6px 10px;
+        border-radius: 999px;
+        background: rgba(0, 0, 0, 0.35);
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(6px);
+      }
+
+      .stage.hotList {
+        min-height: 72vh;
+        padding: 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .hotHeader {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        gap: 10px;
+        padding: 4px 2px 0;
+      }
+
+      .hotTitle {
+        margin: 0;
+        font-size: 18px;
+        line-height: 1.2;
+        letter-spacing: -0.25px;
+      }
+
+      .hotSub {
+        margin: 3px 0 0;
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .hotScroller {
+        flex: 1;
+        min-height: 0;
+        overflow-y: auto;
+        padding-right: 2px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        scroll-snap-type: y proximity;
+      }
+
+      .hotCard {
+        display: grid;
+        grid-template-columns: 220px minmax(0, 1fr);
+        gap: 12px;
+        padding: 10px;
+        border-radius: 14px;
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03));
+        scroll-snap-align: start;
+      }
+
+      .hotThumb {
+        position: relative;
+        min-height: 132px;
+        border-radius: 10px;
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        background-size: cover;
+        background-position: center;
+      }
+
+      .hotThumbFallback {
+        display: grid;
+        place-items: center;
+        color: rgba(255, 255, 255, 0.82);
+        font-size: 12px;
+        background:
+          radial-gradient(190px 120px at 0% 0%, rgba(53, 197, 240, 0.26), transparent 70%),
+          linear-gradient(150deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.03));
+      }
+
+      .hotRank {
+        position: absolute;
+        left: 8px;
+        top: 8px;
+        z-index: 2;
+        padding: 5px 8px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 600;
+        color: #fff;
+        background: rgba(0, 0, 0, 0.5);
+        border: 1px solid rgba(255, 255, 255, 0.26);
+      }
+
+      .hotBody {
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .hotHeadline {
+        margin: 0;
+        font-size: 16px;
+        line-height: 1.33;
+        letter-spacing: -0.2px;
+      }
+
+      .hotHeadline a {
+        color: #fff;
+        text-decoration: none;
+      }
+
+      .hotHeadline a:hover {
+        text-decoration: underline;
+        text-decoration-color: rgba(255, 255, 255, 0.68);
+      }
+
+      .hotMeta {
+        margin-top: 7px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: center;
+        color: rgba(255, 255, 255, 0.74);
+        font-size: 12px;
+      }
+
+      .hotMetric {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 4px 8px;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        background: rgba(0, 0, 0, 0.3);
+        color: rgba(255, 255, 255, 0.9);
+      }
+
+      .hotDesc {
+        margin: 7px 0 0;
+        color: rgba(255, 255, 255, 0.88);
+        font-size: 13px;
+        display: block;
+        overflow: visible;
+      }
+
+      .hotCats {
+        margin-top: 8px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+
+      .hotCard .pill {
+        font-size: 11px;
+        padding: 4px 8px;
+      }
+
+      @media (max-width: 700px) {
+        .hotCard {
+          grid-template-columns: 148px minmax(0, 1fr);
+          gap: 10px;
+        }
+        .hotThumb {
+          min-height: 110px;
+        }
+        .hotHeadline {
+          font-size: 15px;
+        }
+      }
+
+      .note {
+        margin-top: 14px;
+        padding: 12px 12px;
+        border-radius: 12px;
+        border: 1px dashed rgba(255, 255, 255, 0.18);
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      code {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        font-size: 0.95em;
+        color: rgba(232, 236, 255, 0.9);
+      }
+
+      /* Trend UI overrides */
+      @import url("https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap");
+
+      body {
+        font-family: "Sora", "Noto Sans KR", "Segoe UI", sans-serif;
+        background:
+          radial-gradient(900px 500px at 0% 0%, rgba(253, 181, 102, 0.24), transparent 68%),
+          radial-gradient(720px 460px at 100% 0%, rgba(60, 181, 205, 0.2), transparent 66%),
+          linear-gradient(180deg, #f3f0e9 0%, #f7f6f4 100%);
+        color: #1d2128;
+      }
+
+      body::before,
+      body::after {
+        content: "";
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+      }
+
+      body::before {
+        background-image: radial-gradient(rgba(14, 22, 36, 0.06) 1px, transparent 1px);
+        background-size: 22px 22px;
+        opacity: 0.18;
+      }
+
+      body::after {
+        background:
+          radial-gradient(380px 200px at 8% 18%, rgba(255, 177, 100, 0.24), transparent 70%),
+          radial-gradient(320px 180px at 92% 22%, rgba(67, 157, 210, 0.2), transparent 72%);
+        animation: auraShift 12s ease-in-out infinite alternate;
+      }
+
+      @keyframes auraShift {
+        0% {
+          transform: translate3d(0, 0, 0) scale(1);
+        }
+        100% {
+          transform: translate3d(0, -14px, 0) scale(1.05);
+        }
+      }
+
+      .blogShell {
+        width: min(1060px, 92vw);
+        margin: 28px auto 50px;
+        position: relative;
+        z-index: 1;
+      }
+
+      .heroSection {
+        max-width: none;
+        margin: 0;
+        padding: 0;
+      }
+
+      .heroThumb {
+        position: relative;
+        border-radius: 28px;
+        overflow: hidden;
+        min-height: 320px;
+        border: 1px solid rgba(19, 20, 24, 0.2);
+        background:
+          radial-gradient(760px 360px at -6% -8%, rgba(255, 178, 109, 0.58), transparent 66%),
+          radial-gradient(760px 380px at 102% 120%, rgba(88, 188, 210, 0.38), transparent 70%),
+          linear-gradient(130deg, #171a22 0%, #2a2f39 45%, #1d2f43 100%);
+        box-shadow:
+          0 30px 70px rgba(18, 27, 45, 0.22),
+          inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        animation: heroIntro 700ms cubic-bezier(0.2, 0.9, 0.18, 1) both;
+      }
+
+      @keyframes heroIntro {
+        from {
+          opacity: 0;
+          transform: translateY(16px) scale(0.985);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+        }
+      }
+
+      .heroThumb::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        border: 1px solid rgba(255, 255, 255, 0.24);
+        mix-blend-mode: screen;
+        pointer-events: none;
+      }
+
+      .heroShade {
+        position: absolute;
+        inset: 0;
+        background:
+          linear-gradient(120deg, rgba(0, 0, 0, 0.62) 8%, rgba(0, 0, 0, 0.18) 54%),
+          linear-gradient(180deg, rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.45));
+      }
+
+      .heroContent {
+        position: relative;
+        z-index: 1;
+        padding: 30px 34px;
+        color: #fff;
+      }
+
+      .heroKicker {
+        margin: 0;
+        letter-spacing: 1.3px;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        opacity: 0.92;
+      }
+
+      .heroContent h1 {
+        margin: 11px 0 0;
+        font-family: "Fraunces", Georgia, serif;
+        font-size: clamp(40px, 6vw, 76px);
+        line-height: 0.92;
+        letter-spacing: -1.3px;
+      }
+
+      .heroDesc {
+        margin: 16px 0 0;
+        max-width: 560px;
+        font-size: 15px;
+        color: rgba(255, 255, 255, 0.92);
+      }
+
+      .heroPills {
+        margin-top: 18px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .heroPill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 7px 12px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 600;
+        color: rgba(255, 255, 255, 0.95);
+        border: 1px solid rgba(255, 255, 255, 0.34);
+        background: rgba(255, 255, 255, 0.14);
+        backdrop-filter: blur(8px);
+      }
+
+      .blogMain {
+        max-width: none;
+        padding: 18px 0 0;
+      }
+
+      .blogPanel {
+        padding: 0;
+        border: 0;
+        box-shadow: none;
+        background: transparent;
+      }
+
+      .metaLine {
+        margin: 0 0 12px;
+        padding: 12px 16px;
+        border-radius: 14px;
+        font-size: 12px;
+        color: #4f5662;
+        border: 1px solid rgba(24, 31, 45, 0.11);
+        background: rgba(255, 255, 255, 0.72);
+        backdrop-filter: blur(8px);
+      }
+
+      .srOnlyControls {
+        display: none;
+      }
+
+      .stage {
+        border: 0;
+        border-radius: 0;
+        overflow: visible;
+        min-height: auto;
+        box-shadow: none;
+        background: transparent;
+      }
+
+      .stage.hotList {
+        min-height: auto;
+        padding: 0;
+        gap: 12px;
+      }
+
+      .hotHeader {
+        align-items: center;
+        margin-bottom: 2px;
+      }
+
+      .hotTitle {
+        color: #1a1f28;
+        font-family: "Fraunces", Georgia, serif;
+        font-size: 27px;
+        letter-spacing: -0.4px;
+      }
+
+      .hotSub {
+        color: #646d7b;
+        font-size: 13px;
+      }
+
+      .hotScroller {
+        overflow: visible;
+        min-height: auto;
+        max-height: none;
+        scroll-snap-type: none;
+        gap: 14px;
+      }
+
+      .hotCard {
+        grid-template-columns: 274px minmax(0, 1fr);
+        border-radius: 18px;
+        border: 1px solid rgba(24, 31, 45, 0.13);
+        background:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.88), rgba(255, 255, 255, 0.8)),
+          linear-gradient(120deg, rgba(250, 252, 255, 0.75), rgba(253, 247, 240, 0.8));
+        box-shadow:
+          0 18px 42px rgba(21, 26, 38, 0.08),
+          0 3px 10px rgba(21, 26, 38, 0.06);
+        padding: 12px;
+        transition:
+          transform 220ms ease,
+          box-shadow 220ms ease,
+          border-color 220ms ease;
+        opacity: 0;
+        transform: translateY(12px);
+        animation: cardRise 540ms cubic-bezier(0.19, 0.9, 0.25, 1) both;
+        animation-delay: var(--delay, 0ms);
+      }
+
+      .hotCard:hover {
+        transform: translateY(-3px);
+        border-color: rgba(39, 97, 158, 0.34);
+        box-shadow:
+          0 24px 46px rgba(21, 28, 42, 0.14),
+          0 6px 16px rgba(21, 28, 42, 0.1);
+      }
+
+      @keyframes cardRise {
+        from {
+          opacity: 0;
+          transform: translateY(14px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .hotThumb {
+        border: 1px solid rgba(28, 34, 43, 0.09);
+        border-radius: 12px;
+        min-height: 164px;
+      }
+
+      .hotThumb::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.26));
+      }
+
+      .hotThumbFallback {
+        color: #3d4450;
+        background:
+          radial-gradient(200px 120px at 0% 0%, rgba(255, 186, 122, 0.4), transparent 75%),
+          linear-gradient(150deg, rgba(197, 220, 247, 0.7), rgba(245, 246, 248, 0.9));
+      }
+
+      .hotRank {
+        background: rgba(10, 16, 28, 0.78);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+      }
+
+      .hotBody {
+        padding-right: 4px;
+      }
+
+      .hotHeadline a,
+      .hotHeadline {
+        color: #1f2430;
+      }
+
+      .hotHeadline a:hover {
+        text-decoration-thickness: 2px;
+        text-decoration-color: rgba(46, 101, 158, 0.44);
+      }
+
+      .hotMeta {
+        color: #606978;
+      }
+
+      .hotMetric {
+        color: #194967;
+        background: linear-gradient(90deg, #eaf7ff, #eef7ec);
+        border-color: rgba(63, 146, 177, 0.34);
+      }
+
+      .hotDesc {
+        color: #3f4958;
+      }
+
+      .pill {
+        border-color: rgba(24, 31, 45, 0.15);
+        background: #f2f5fa;
+        color: #4c5668;
+      }
+
+      @media (max-width: 900px) {
+        .blogShell {
+          width: min(95vw, 1060px);
+        }
+
+        .heroThumb {
+          min-height: 270px;
+        }
+
+        .heroContent {
+          padding: 24px 22px;
+        }
+
+        .heroContent h1 {
+          font-size: clamp(34px, 12vw, 62px);
+        }
+
+        .hotCard {
+          grid-template-columns: 1fr;
+        }
+
+        .hotThumb {
+          min-height: 188px;
+        }
+      }
+
+      /* Neo Magazine refresh */
+      body {
+        font-family: "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", "Segoe UI", sans-serif;
+        background:
+          radial-gradient(1200px 600px at 10% -10%, rgba(77, 226, 255, 0.2), transparent 60%),
+          radial-gradient(900px 540px at 98% -12%, rgba(255, 142, 116, 0.22), transparent 62%),
+          linear-gradient(180deg, #eef4ff 0%, #f7fbff 100%);
+        color: #1c2538;
+        line-height: 1.64;
+      }
+
+      .blogShell {
+        --content-width: min(88%, 900px);
+        width: min(1120px, 93vw);
+        position: relative;
+        z-index: 2;
+      }
+
+      .heroThumb {
+        position: relative;
+        width: var(--content-width);
+        margin-inline: auto;
+        min-height: 430px;
+        isolation: isolate;
+        border-radius: 30px;
+        border: 1px solid rgba(128, 191, 255, 0.46);
+        background:
+          linear-gradient(rgba(12, 22, 42, 0.12), rgba(12, 22, 42, 0.12)),
+          radial-gradient(820px 330px at -5% 10%, rgba(86, 226, 255, 0.18), transparent 65%),
+          radial-gradient(920px 360px at 95% 90%, rgba(255, 103, 103, 0.12), transparent 68%),
+          linear-gradient(128deg, #0c1423 0%, #16233f 44%, #2a205f 100%);
+        background-repeat: no-repeat;
+        background-size: cover, auto, auto;
+        background-position: center, center, center;
+        background-blend-mode: normal, normal, normal;
+        filter: saturate(1.04) contrast(1.02);
+        box-shadow:
+          0 0 0 1px rgba(123, 192, 255, 0.2) inset,
+          0 34px 78px rgba(10, 16, 34, 0.72),
+          0 22px 56px rgba(47, 30, 95, 0.2),
+          inset 0 1px 0 rgba(255, 255, 255, 0.18),
+          inset 0 -38px 68px rgba(3, 11, 32, 0.54);
+      }
+
+      .heroThumb::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: transparent;
+        opacity: 0.08;
+        pointer-events: none;
+        animation: heroGloss 16s ease-in-out infinite;
+        mix-blend-mode: normal;
+      }
+
+      @keyframes heroGloss {
+        0% {
+          transform: translateX(-8px) translateY(0px) scale(1);
+          opacity: 0.22;
+        }
+        50% {
+          transform: translateX(8px) translateY(4px) scale(1.01);
+          opacity: 0.35;
+        }
+        100% {
+          transform: translateX(-8px) translateY(0px) scale(1);
+          opacity: 0.22;
+        }
+      }
+
+      @keyframes heroGrain {
+        0% {
+          background-position: 0 0, 0 0;
+        }
+        100% {
+          background-position: 38px 38px, 20px 20px;
+        }
+      }
+
+      .heroThumb::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+          radial-gradient(circle at 15% 16%, rgba(255, 255, 255, 0.05), transparent 42%),
+          radial-gradient(circle at 88% 84%, rgba(93, 214, 255, 0.06), transparent 48%);
+        opacity: 0.1;
+        background-size: auto, auto;
+        mix-blend-mode: normal;
+        animation: heroGrain 6.5s steps(2) infinite;
+      }
+
+      .heroShade {
+        position: absolute;
+        inset: 0;
+        overflow: hidden;
+        background:
+          linear-gradient(120deg, rgba(11, 24, 49, 0.06) 10%, rgba(36, 14, 63, 0.09) 54%, rgba(8, 16, 34, 0.22) 100%),
+          linear-gradient(180deg, rgba(4, 9, 21, 0.01), rgba(4, 9, 21, 0.16) 72%, rgba(19, 30, 58, 0.28)),
+          radial-gradient(circle at 84% 18%, rgba(255, 117, 211, 0.2), transparent 45%);
+        backdrop-filter: blur(0.6px);
+      }
+
+      .heroShade::after {
+        content: "";
+        position: absolute;
+        inset: -20%;
+        background:
+          radial-gradient(500px 220px at 22% 38%, rgba(255, 255, 255, 0.18), transparent 62%),
+          radial-gradient(620px 260px at 82% 66%, rgba(120, 214, 255, 0.16), transparent 64%);
+        mix-blend-mode: soft-light;
+        opacity: 0.32;
+        animation: heroSweep 14s linear infinite;
+        pointer-events: none;
+      }
+
+      @keyframes heroSweep {
+        0% {
+          transform: translate3d(-2%, -1%, 0) rotate(0deg);
+        }
+        50% {
+          transform: translate3d(2%, 1%, 0) rotate(1.4deg);
+        }
+        100% {
+          transform: translate3d(-2%, -1%, 0) rotate(0deg);
+        }
+      }
+
+      .heroContent::before {
+        display: none;
+      }
+
+      .heroContent {
+        position: absolute;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        text-align: center;
+        padding: 0 40px;
+        position: absolute;
+        z-index: 2;
+        overflow: hidden;
+      }
+
+      .heroContent > * {
+        position: relative;
+        z-index: 2;
+      }
+
+      .heroContent h1 {
+        margin: 0;
+        font-family: "Segoe UI Semibold", "Noto Sans KR", "Malgun Gothic", sans-serif;
+        font-size: clamp(43px, 6.3vw, 76px);
+        font-weight: 700;
+        letter-spacing: -0.4px;
+        text-transform: none;
+        color: #f3f8ff;
+        text-shadow:
+          0 2px 0 rgba(255, 255, 255, 0.45),
+          0 0 26px rgba(80, 203, 255, 0.62),
+          0 10px 24px rgba(32, 8, 73, 0.48);
+      }
+
+      .heroImage {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: 48% 38%;
+        z-index: 0;
+        transform: scale(1.03);
+        animation: heroDrift 18s ease-in-out infinite alternate;
+      }
+
+      @keyframes heroDrift {
+        0% {
+          transform: scale(1.03) translate3d(0, 0, 0);
+        }
+        100% {
+          transform: scale(1.06) translate3d(-8px, -5px, 0);
+        }
+      }
+
+      .heroDesc {
+        color: rgba(244, 249, 255, 0.94);
+      }
+
+      .heroPill {
+        border-color: rgba(162, 228, 255, 0.42);
+        background: rgba(11, 18, 28, 0.42);
+      }
+
+      .metaLine {
+        width: var(--content-width);
+        margin-inline: auto;
+        color: #364b71;
+        border-color: rgba(110, 163, 237, 0.24);
+        background: rgba(255, 255, 255, 0.82);
+        font-size: 15px;
+      }
+
+      .sourceToggleWrap {
+        width: var(--content-width);
+        margin: 10px auto 6px;
+        padding: 12px 14px;
+        display: none;
+        border-radius: 14px;
+        border: 1px solid rgba(110, 163, 237, 0.2);
+        background: rgba(255, 255, 255, 0.72);
+        box-shadow: 0 8px 18px rgba(56, 96, 148, 0.08);
+      }
+
+      .sourceToggleHeader {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 8px;
+      }
+
+      .sourceToggleTitle {
+        margin: 0;
+        font-size: 13px;
+        font-weight: 700;
+        color: #2d4f7d;
+      }
+
+      .sourceToggleHint {
+        margin: 0;
+        font-size: 11px;
+        color: #6a7f9f;
+      }
+
+      .sourceToggles {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .sourceChip {
+        border: 1px solid rgba(117, 180, 255, 0.34);
+        border-radius: 999px;
+        padding: 7px 11px;
+        background: rgba(242, 248, 255, 0.92);
+        color: #2b578e;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 160ms ease;
+      }
+
+      .sourceChip.active {
+        background: linear-gradient(135deg, #dff0ff, #e8f7ef);
+        border-color: rgba(62, 154, 198, 0.55);
+        color: #1f4f7f;
+      }
+
+      .sourceChip:not(.active) {
+        background: rgba(246, 250, 255, 0.62);
+        color: #7990b2;
+      }
+
+      .hotTitle {
+        color: #253d63;
+        font-family: "Bahnschrift", "Segoe UI", sans-serif;
+        font-size: 32px;
+        letter-spacing: -0.9px;
+      }
+
+      .hotSub {
+        color: #5f739a;
+        font-size: 13px;
+      }
+
+      .hotScroller {
+        width: var(--content-width);
+        margin-inline: auto;
+        gap: 16px;
+        align-items: stretch;
+      }
+
+      .hotHeader {
+        width: var(--content-width);
+        margin-inline: auto;
+      }
+
+      .hotCard {
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        overflow: hidden;
+        min-height: 428px;
+        padding: 39px 44px;
+        border-radius: 21px;
+        border: 1px solid rgba(137, 178, 235, 0.35);
+        box-shadow: 0 16px 34px rgba(55, 95, 156, 0.16);
+        width: 100%;
+        margin-inline: 0;
+      }
+
+      .hotCardBg {
+        background:
+          var(--card-bg),
+          linear-gradient(140deg, rgba(229, 239, 255, 0.96), rgba(236, 244, 255, 0.94));
+        background-size: 100% 100%, 100% 100%;
+        background-repeat: no-repeat, no-repeat;
+        background-position: center, center;
+      }
+
+      .hotCardBg.noImage {
+        background:
+          radial-gradient(580px 220px at 0% 0%, rgba(72, 203, 232, 0.22), transparent 70%),
+          radial-gradient(420px 240px at 100% 100%, rgba(255, 133, 103, 0.2), transparent 72%),
+          linear-gradient(140deg, rgba(232, 242, 255, 0.98), rgba(241, 247, 255, 0.95));
+      }
+
+      .hotCardOverlay {
+        position: absolute;
+        inset: 0;
+        background:
+          linear-gradient(180deg, rgba(247, 251, 255, 0.28), rgba(240, 247, 255, 0.58)),
+          linear-gradient(90deg, rgba(247, 251, 255, 0.48) 0%, rgba(240, 247, 255, 0.3) 58%, rgba(240, 247, 255, 0.46) 100%);
+      }
+
+      .hotBody {
+        position: relative;
+        z-index: 2;
+        padding-right: 15px;
+        width: 100%;
+        max-width: none;
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        min-height: 0;
+      }
+
+      .hotRank {
+        z-index: 3;
+        top: 18px;
+        left: 20px;
+        background: rgba(31, 66, 117, 0.84);
+        border-color: rgba(232, 244, 255, 0.75);
+        font-size: 13px;
+        padding: 8px 12px;
+      }
+
+      .hotHeadline {
+        margin-top: 44px;
+        font-size: 30px;
+        line-height: 1.18;
+        letter-spacing: -0.45px;
+        font-family: "Georgia", "Times New Roman", "Noto Serif KR", serif;
+      }
+
+      .hotHeadline,
+      .hotHeadline a {
+        color: #1a2f57;
+      }
+
+      .hotHeadline a {
+        display: inline;
+        overflow: visible;
+        text-overflow: clip;
+      }
+
+      .hotHeadline a:hover {
+        text-decoration-color: rgba(37, 82, 153, 0.62);
+      }
+
+      .hotMeta {
+        color: #546b92;
+        font-size: 15px;
+        gap: 10px;
+        margin-top: 15px;
+      }
+
+      .hotMetric {
+        color: #204f83;
+        border-color: rgba(127, 191, 255, 0.5);
+        background: rgba(236, 248, 255, 0.95);
+        font-size: 12px;
+        padding: 6px 10px;
+      }
+
+      .hotDesc {
+        color: #2f3f5a;
+        font-size: 18px;
+        line-height: 1.62;
+        margin-top: 18px;
+        display: block;
+        overflow: visible;
+        -webkit-line-clamp: unset;
+        font-family: "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+        font-weight: 500;
+      }
+
+      .summaryLabel {
+        margin: 18px 0 0;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.3px;
+        color: #2f5f95;
+      }
+
+      .hotCats {
+        margin-top: 18px;
+        gap: 8px;
+      }
+
+      .hotSource {
+        margin-top: auto;
+        padding-top: 12px;
+        border-top: 1px solid rgba(47, 79, 132, 0.15);
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 8px;
+        font-size: 12px;
+        color: #4a678f;
+      }
+
+      .hotSourceLabel {
+        font-weight: 700;
+        color: #375986;
+      }
+
+      .hotSourceText {
+        color: #4a678f;
+      }
+
+      .hotSourceLink {
+        color: #2a5c95;
+        text-decoration: none;
+        word-break: break-all;
+      }
+
+      .hotSourceLink:hover {
+        text-decoration: underline;
+        text-decoration-color: rgba(37, 82, 153, 0.62);
+      }
+
+      .pill {
+        color: #285280;
+        border-color: rgba(119, 186, 255, 0.38);
+        background: rgba(236, 248, 255, 0.92);
+        font-size: 12px;
+        padding: 6px 10px;
+      }
+
+      @media (max-width: 900px) {
+        .blogShell {
+          --content-width: 100%;
+        }
+
+        .heroThumb {
+          min-height: 360px;
+        }
+
+        .heroContent h1 {
+          font-size: clamp(35px, 9.4vw, 56px);
+        }
+
+        .hotTitle {
+          font-size: 24px;
+        }
+
+        .hotSub {
+          font-size: 11px;
+        }
+
+        .sourceToggleWrap {
+          margin-top: 8px;
+          padding: 10px 10px;
+        }
+
+        .sourceChip {
+          font-size: 11px;
+          padding: 6px 9px;
+        }
+
+        .hotCard {
+          min-height: 268px;
+          padding: 26px 21px;
+          width: 100%;
+          margin-inline: 0;
+        }
+
+        .hotRank {
+          top: 14px;
+          left: 14px;
+          font-size: 10px;
+          padding: 8px 12px;
+        }
+
+        .hotHeadline {
+          margin-top: 34px;
+          font-size: 21px;
+        }
+
+        .hotMeta {
+          font-size: 11px;
+          margin-top: 12px;
+        }
+
+        .hotDesc {
+          font-size: 14px;
+          margin-top: 12px;
+          -webkit-line-clamp: unset;
+        }
+
+        .summaryLabel {
+          margin-top: 12px;
+          font-size: 10px;
+        }
+
+        .hotCats {
+          margin-top: 12px;
+          gap: 6px;
+        }
+
+        .hotSource {
+          margin-top: auto;
+          padding-top: 9px;
+          font-size: 11px;
+          gap: 6px;
+        }
+
+        .pill {
+          font-size: 10px;
+          padding: 5px 8px;
+        }
+
+        .hotScroller {
+          gap: 12px;
+        }
+
+      }
+    </style>
+  </head>
+  <body>
+    <div class="blogShell">
+      <header class="heroSection">
+        <div class="heroThumb" role="img" aria-label="WEEKLY AI HOT 15">
+          <img
+            class="heroImage"
+            src="https://upload.wikimedia.org/wikipedia/commons/b/b7/HUMAN-AI.jpg"
+            alt="AI and human collaboration"
+            onerror="const fb=document.getElementById('heroImageFallback'); if(fb){fb.style.display='block';} this.style.display='none';"
+          />
+          <img
+            id="heroImageFallback"
+            class="heroImage"
+            src="./ai-hero-3d-scene.svg"
+            alt="AI concept fallback"
+            style="display: none;"
+          />
+          <div class="heroShade"></div>
+          <div class="heroContent">
+            <h1>WEEKLY AI HOT 15</h1>
+          </div>
+        </div>
+      </header>
+
+      <main class="blogMain">
+        <section class="blogPanel">
+          <div id="metaText" class="metaLine" aria-live="polite"></div>
+          <div id="sourceToggleWrap" class="sourceToggleWrap">
+            <div class="sourceToggleHeader">
+              <p class="sourceToggleTitle" data-i18n="source_toggle_title">Sources</p>
+              <p class="sourceToggleHint" data-i18n="source_toggle_hint">Click to include or exclude</p>
+            </div>
+            <div id="sourceToggles" class="sourceToggles"></div>
+          </div>
+          <div id="grid" class="stage" aria-live="polite"></div>
+        </section>
+      </main>
+    </div>
+
+    <div class="srOnlyControls" aria-hidden="true">
+      <select id="category"></select>
+      <input id="datePick" type="date" />
+      <input id="q" />
+      <button id="reload" type="button">reload</button>
+      <span id="dot"></span>
+      <span id="statusText"></span>
+    </div>
+
+    <script>
+      // =========================
+      // 1) 카테고리별 RSS URL
+      // =========================
+      const FEEDS = [
+        { key: "all_ai", label: "ALL AI (Aggregated)", url: "https://techcrunch.com/category/artificial-intelligence/feed/" },
+        { key: "openai_news", label: "OpenAI News", url: "https://openai.com/news/rss.xml" },
+        { key: "google_ai", label: "Google AI", url: "https://blog.google/technology/ai/rss/" },
+        { key: "deepmind_blog", label: "DeepMind Blog", url: "https://deepmind.google/blog/rss.xml" },
+        { key: "ms_research", label: "Microsoft Research", url: "https://www.microsoft.com/en-us/research/feed/" },
+        { key: "nvidia_ai", label: "NVIDIA AI Blog", url: "https://blogs.nvidia.com/feed/" },
+        { key: "tc_ai", label: "TechCrunch AI", url: "https://techcrunch.com/category/artificial-intelligence/feed/" },
+        { key: "theverge_ai", label: "The Verge AI", url: "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml" },
+        { key: "mittr_ai", label: "MIT Technology Review AI", url: "https://www.technologyreview.com/topic/artificial-intelligence/feed/" },
+      ];
+
+      const AGGREGATE_SOURCE_KEYS = [
+        "openai_news",
+        "google_ai",
+        "deepmind_blog",
+        "ms_research",
+        "nvidia_ai",
+        "tc_ai",
+        "theverge_ai",
+        "mittr_ai",
+      ];
+      const SOURCE_TOGGLE_STORAGE_KEY = "ai2_active_sources_v1";
+
+      // =========================
+      // 2) CORS 프록시(예시)
+      // =========================
+      // AllOrigins raw endpoint는 CORS 헤더가 붙은 "raw" 응답을 제공합니다.
+      // 臾몄꽌: https://allorigins.win/
+      const USE_BACKEND = true;
+      const BACKEND_API = "http://localhost:3000/api/feed";
+      const BACKEND_TRANSLATE_API = BACKEND_API.replace(/\/feed$/i, "/translate");
+      const CORS_PROXY = "https://api.allorigins.win/raw?url=";
+      const CORS_PROXIES = [
+        (url) => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+        (url) => `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`,
+        (url) => `https://corsproxy.io/?${encodeURIComponent(url)}`,
+        (url) => `https://cors.isomorphic-git.org/${url}`,
+      ];
+      const IMG_PROXY = "https://images.weserv.nl/?url=";
+      const IMG_PROXY_ALT = "https://wsrv.nl/?url=";
+      const IMG_LOW_W = 520;
+      const IMG_HIGH_W = 1400;
+      const IMG_QUALITY_LOW = 55;
+      const IMG_QUALITY_HIGH = 90;
+      const PREFETCH_RANGE = 6;
+      const OG_FETCH_LIMIT = 20;
+      const OG_CACHE_KEY = "tc_og_cache_v1";
+      const OG_CACHE_MAX = 80;
+      const OG_CACHE_TTL_MS = 1000 * 60 * 60 * 24 * 7;
+      const IMG_PRELOAD_CONCURRENCY = 2;
+      const HOT_WINDOW_DAYS = 7;
+      const HOT_LIMIT = 15;
+      const KO_TRANSLATE_CACHE_KEY = "ai3_ko_translate_cache_v4";
+      const KO_TRANSLATE_MAX_TEXT = 900;
+      const KO_TRANSLATE_CONCURRENCY = 4;
+      const MIN_PRODUCT_TECH_ITEMS = 6;
+      const ISSUE_TOKEN_MIN_LEN = 3;
+      const OFFICIAL_TECH_SOURCES = new Set(["openai_news", "google_ai", "deepmind_blog", "ms_research", "nvidia_ai"]);
+      const TITLE_CLUSTER_EXCLUDE = new Set([
+        "openai",
+        "google",
+        "microsoft",
+        "nvidia",
+        "startup",
+        "startups",
+        "product",
+        "products",
+        "update",
+        "updates",
+        "release",
+        "releases",
+        "launch",
+        "launches",
+        "news",
+        "today",
+      ]);
+      const PRODUCT_NEWS_KEYWORDS = [
+        "launch",
+        "launched",
+        "launches",
+        "release",
+        "released",
+        "releases",
+        "unveil",
+        "unveiled",
+        "unveils",
+        "introduce",
+        "introduced",
+        "introduces",
+        "debut",
+        "debuts",
+        "announce",
+        "announced",
+        "announces",
+        "rollout",
+        "ships",
+        "shipping",
+        "preview",
+        "beta",
+        "update",
+        "updated",
+        "feature",
+        "features",
+        "availability",
+      ];
+      const TECH_DEPTH_KEYWORDS = [
+        "model",
+        "models",
+        "gpt",
+        "gemini",
+        "api",
+        "sdk",
+        "framework",
+        "inference",
+        "training",
+        "architecture",
+        "benchmark",
+        "chip",
+        "chipset",
+        "gpu",
+        "npu",
+        "compute",
+        "acceleration",
+        "open source",
+      ];
+      const NON_PRODUCT_NEWS_KEYWORDS = [
+        "funding",
+        "fundraise",
+        "investment",
+        "valuation",
+        "lawsuit",
+        "policy",
+        "regulation",
+        "government",
+        "election",
+      ];
+      const OVERREP_TOPIC_LIMITS = { india: 1, indian: 1 };
+      const OVERREP_COMPOSITE_TOPIC_LIMITS = {
+        openai_india: 1,
+        pine_labs_india: 1,
+        openai_pine_labs: 1,
+      };
+      const LOW_SIGNAL_CONTENT_KEYWORDS = [
+        "design",
+        "designing",
+        "visual",
+        "branding",
+        "brand identity",
+        "logo",
+        "typography",
+        "style guide",
+        "creative direction",
+        "opinion",
+        "editorial",
+        "podcast",
+        "interview",
+        "newsletter",
+        "sponsored",
+      ];
+      const TOPIC_DIVERSITY_EXCLUDE = new Set([
+        "ai",
+        "openai",
+        "google",
+        "microsoft",
+        "nvidia",
+        "startup",
+        "startups",
+        "cloud",
+        "model",
+        "models",
+        "data",
+        "research",
+        "technology",
+        "tech",
+      ]);
+      const ISSUE_STOPWORDS = new Set([
+        "a",
+        "an",
+        "the",
+        "and",
+        "or",
+        "for",
+        "to",
+        "of",
+        "in",
+        "on",
+        "at",
+        "by",
+        "with",
+        "from",
+        "is",
+        "are",
+        "was",
+        "were",
+        "be",
+        "been",
+        "being",
+        "this",
+        "that",
+        "these",
+        "those",
+        "as",
+        "it",
+        "its",
+        "into",
+        "about",
+        "after",
+        "before",
+        "over",
+        "under",
+        "between",
+        "within",
+        "through",
+        "via",
+        "than",
+        "then",
+        "their",
+        "they",
+        "you",
+        "your",
+        "we",
+        "our",
+        "new",
+        "now",
+        "will",
+        "would",
+        "can",
+        "could",
+        "should",
+        "may",
+        "might",
+        "관련",
+        "대한",
+        "에서",
+        "으로",
+        "하는",
+        "했다",
+        "있는",
+        "없는",
+        "최근",
+        "이번",
+      ]);
+
+      const elCategory = document.getElementById("category");
+      const elGrid = document.getElementById("grid");
+      const elQ = document.getElementById("q");
+      const elDatePick = document.getElementById("datePick");
+      const elReload = document.getElementById("reload");
+      const elDot = document.getElementById("dot");
+      const elStatusText = document.getElementById("statusText");
+      const elMetaText = document.getElementById("metaText");
+      const elSourceToggleWrap = document.getElementById("sourceToggleWrap");
+      const elSourceToggles = document.getElementById("sourceToggles");
+      const elLangToggle = document.getElementById("langToggle");
+      const DEBUG = true;
+      const log = (...args) => {
+        if (DEBUG) console.log("[FE]", ...args);
+      };
+      const navHandlers = { prev: null, next: null };
+      let lastStatus = { kind: "", key: "status_idle" };
+
+      const I18N = {
+        ko: {
+          title: "WEEKLY AI HOT 15",
+          subtitle: "미디엄 블로그용 AI 카드뉴스 뷰어",
+          label_category: "카테고리",
+          label_date: "날짜 (UTC)",
+          label_query: "검색어 (옵션)",
+          placeholder_query: "예: OpenAI, funding, iPhone...",
+          btn_reload: "새로고침",
+          status_idle: "대기 중",
+          status_loading: "불러오는 중...",
+          status_done: "완료",
+          status_failed: "실패",
+          meta_count_suffix: "개",
+          meta_hot_window: "최근 7일",
+          meta_basis_views: "조회수 우선",
+          meta_basis_issue: "이슈 점수 우선",
+          meta_basis_recent: "최신 발행순",
+          meta_sources: "소스",
+          no_items: "표시할 항목이 없습니다. (검색어를 지우거나 다른 카테고리를 선택해보세요)",
+          no_image: "이미지 없음",
+          footer_source: "RSS",
+          footer_link: "원문 보기",
+          nav_prev: "이전 기사",
+          nav_next: "다음 기사",
+          hot_title: "최근 7일 핫이슈 TOP 15",
+          hot_subtitle: "아래로 스크롤하며 주간 이슈를 확인하세요.",
+          hot_metric_views: "조회수",
+          hot_metric_issue: "이슈 점수",
+          hot_metric_recent: "최신 발행순",
+          hot_rank: "순위",
+          summary_label: "요약",
+          source_label: "출처",
+          source_toggle_title: "집계 소스 선택",
+          source_toggle_hint: "클릭해서 포함/제외",
+          summary_empty: "요약 정보가 없습니다.",
+          note_title: "중요:",
+          note_body_1: "브라우저에서 외부 RSS를 직접 <code>fetch</code>하면 CORS 때문에 실패할 수 있습니다.",
+          note_body_2: "예시는 공개 CORS 프록시(<code>api.allorigins.win</code>)를 사용합니다. 안정성이 필요하면 자체 서버나 서버리스(Cloudflare Workers, Vercel, Netlify)로 RSS를 프록시하는 방식을 권장합니다.",
+          err_title: "가져오기에 실패했습니다.",
+          err_label: "에러:",
+          err_tip1: "공개 CORS 프록시(AllOrigins)가 일시적으로 느리거나 차단되었을 수 있어요.",
+          err_tip2: "안정성이 필요하면 서버/서버리스에서 RSS를 받아 JSON으로 내려주는 방식을 권장합니다.",
+          err_tip3: "또는 <code>CORS_PROXY</code>를 다른 프록시로 교체해 보세요.",
+        },
+        en: {
+          title: "WEEKLY AI HOT 15",
+          subtitle: "Medium-ready AI card news viewer",
+          label_category: "Category",
+          label_date: "Date (UTC)",
+          label_query: "Query (optional)",
+          placeholder_query: "e.g. OpenAI, funding, iPhone...",
+          btn_reload: "Reload",
+          status_idle: "Idle",
+          status_loading: "Loading...",
+          status_done: "Done",
+          status_failed: "Failed",
+          meta_count_suffix: " items",
+          meta_hot_window: "Last 7 days",
+          meta_basis_views: "Views first",
+          meta_basis_issue: "Issue score first",
+          meta_basis_recent: "Newest first",
+          meta_sources: "sources",
+          no_items: "No items to display. (Clear the query or choose another category)",
+          no_image: "No image",
+          footer_source: "RSS",
+          footer_link: "Open article",
+          nav_prev: "Previous",
+          nav_next: "Next",
+          hot_title: "Weekly Hot Issues TOP 15",
+          hot_subtitle: "Scroll down to browse weekly issues.",
+          hot_metric_views: "Views",
+          hot_metric_issue: "Issue score",
+          hot_metric_recent: "Newest first",
+          hot_rank: "Rank",
+          summary_label: "Summary",
+          source_label: "Source",
+          source_toggle_title: "Aggregation Sources",
+          source_toggle_hint: "Click to include or exclude",
+          summary_empty: "No summary available.",
+          note_title: "Note:",
+          note_body_1: "Fetching external RSS feeds directly in the browser may fail due to CORS.",
+          note_body_2: "This demo uses the public CORS proxy (<code>api.allorigins.win</code>). For stability, proxy RSS with your own server/serverless (Cloudflare Workers, Vercel, Netlify).",
+          err_title: "Failed to load feed.",
+          err_label: "Error:",
+          err_tip1: "The public CORS proxy (AllOrigins) may be slow or temporarily blocked.",
+          err_tip2: "For stability, proxy RSS on a server/serverless and return JSON.",
+          err_tip3: "Or replace <code>CORS_PROXY</code> with another proxy.",
+        },
+      };
+      let currentLang = "ko";
+      const t = (key) => I18N[currentLang]?.[key] ?? I18N.en[key] ?? key;
+      const getLocale = () => (currentLang === "ko" ? "ko-KR" : "en-US");
+
+      function applyI18n() {
+        document.documentElement.lang = currentLang;
+        document.title = t("title");
+        document.querySelectorAll("[data-i18n]").forEach((el) => {
+          el.textContent = t(el.getAttribute("data-i18n"));
+        });
+        document.querySelectorAll("[data-i18n-placeholder]").forEach((el) => {
+          el.setAttribute("placeholder", t(el.getAttribute("data-i18n-placeholder")));
+        });
+        document.querySelectorAll("[data-i18n-html]").forEach((el) => {
+          el.innerHTML = t(el.getAttribute("data-i18n-html"));
+        });
+        if (elLangToggle) elLangToggle.textContent = currentLang === "ko" ? "EN" : "KR";
+      }
+
+/** @type {Array<ReturnType<typeof mapItem>>} */
+      let lastItems = [];
+      let lastFeedMeta = { title: "", link: "", updated: "" };
+      const ogImageCache = new Map();
+      let currentIndex = 0;
+      let preloadQueueRunning = false;
+      let imageRefreshPending = false;
+      const imagePreloadCache = new Map();
+      const koTranslateCache = new Map();
+      let hotWindowLabel = "";
+      let hotSortBasis = "issue";
+      let activeAggregateSourceKeys = new Set(AGGREGATE_SOURCE_KEYS);
+
+      function loadOgCacheFromStorage() {
+        try {
+          const raw = localStorage.getItem(OG_CACHE_KEY);
+          if (!raw) return;
+          const parsed = JSON.parse(raw);
+          const now = Date.now();
+          Object.entries(parsed).forEach(([k, v]) => {
+            if (!v || !v.url || !v.ts) return;
+            if (now - v.ts > OG_CACHE_TTL_MS) return;
+            ogImageCache.set(k, v.url);
+          });
+        } catch (e) {}
+      }
+
+      function saveOgCacheToStorage() {
+        try {
+          const entries = Array.from(ogImageCache.entries()).slice(-OG_CACHE_MAX);
+          const obj = {};
+          entries.forEach(([k, v]) => {
+            obj[k] = { url: v, ts: Date.now() };
+          });
+          localStorage.setItem(OG_CACHE_KEY, JSON.stringify(obj));
+        } catch (e) {}
+      }
+
+      function setStatus(kind, text, key) {
+        elDot.className = "dot" + (kind ? ` ${kind}` : "");
+        elStatusText.textContent = text;
+        if (key) lastStatus = { kind, key };
+        log("status", { kind, text });
+      }
+
+      function getFeedLabelByKey(key) {
+        return FEEDS.find((f) => f.key === key)?.label || key;
+      }
+
+      function loadActiveSourcesFromStorage() {
+        try {
+          const raw = localStorage.getItem(SOURCE_TOGGLE_STORAGE_KEY);
+          if (!raw) return;
+          const arr = JSON.parse(raw);
+          if (!Array.isArray(arr)) return;
+          const filtered = AGGREGATE_SOURCE_KEYS.filter((k) => arr.includes(k));
+          if (filtered.length) activeAggregateSourceKeys = new Set(filtered);
+        } catch (e) {}
+      }
+
+      function makeKoTranslateCacheKey(text, kind) {
+        const safeKind = kind === "title" ? "title" : "summary";
+        return `${safeKind}|${decodeHtmlEntitiesText(text)
+          .slice(0, KO_TRANSLATE_MAX_TEXT)
+          .toLowerCase()}`;
+      }
+
+      function loadKoTranslateCacheFromStorage() {
+        try {
+          const raw = localStorage.getItem(KO_TRANSLATE_CACHE_KEY);
+          if (!raw) return;
+          const parsed = JSON.parse(raw);
+          if (!parsed || typeof parsed !== "object") return;
+          Object.entries(parsed).forEach(([k, v]) => {
+            if (!k || typeof v !== "string") return;
+            koTranslateCache.set(k, v);
+          });
+        } catch (e) {}
+      }
+
+      function saveKoTranslateCacheToStorage() {
+        try {
+          const entries = Array.from(koTranslateCache.entries()).slice(-600);
+          const obj = {};
+          entries.forEach(([k, v]) => {
+            obj[k] = v;
+          });
+          localStorage.setItem(KO_TRANSLATE_CACHE_KEY, JSON.stringify(obj));
+        } catch (e) {}
+      }
+
+      async function translateTextToKo(text, kind) {
+        const safeKind = kind === "title" ? "title" : "summary";
+        const normalized = decodeHtmlEntitiesText(text)
+          .replace(/\s+/g, " ")
+          .trim();
+        if (!normalized) return "";
+        const clipped = normalized.slice(0, KO_TRANSLATE_MAX_TEXT);
+        if (/[가-힣]/.test(clipped) && !/[A-Za-z]/.test(clipped)) return clipped;
+
+        const cacheKey = makeKoTranslateCacheKey(clipped, safeKind);
+        const cached = koTranslateCache.get(cacheKey);
+        // Retry if cached value is identical to source text (likely fallback from prior failure).
+        if (cached && cached !== clipped) return cached;
+
+        try {
+          const from = /[A-Za-z]/.test(clipped) ? "en" : "auto";
+          const params = new URLSearchParams({
+            text: clipped,
+            to: "ko",
+            from,
+            kind: safeKind,
+          });
+          const res = await fetch(`${BACKEND_TRANSLATE_API}?${params.toString()}`, {
+            method: "GET",
+            cache: "no-store",
+          });
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          const json = await res.json();
+          const translated = decodeHtmlEntitiesText(json?.translated || clipped) || clipped;
+          koTranslateCache.set(cacheKey, translated);
+          return translated;
+        } catch (e) {
+          // Do not cache failures as source text; allow retry on next load.
+          return clipped;
+        }
+      }
+
+      function saveActiveSourcesToStorage() {
+        try {
+          const arr = AGGREGATE_SOURCE_KEYS.filter((k) => activeAggregateSourceKeys.has(k));
+          localStorage.setItem(SOURCE_TOGGLE_STORAGE_KEY, JSON.stringify(arr));
+        } catch (e) {}
+      }
+
+      function getSelectedAggregateSourceKeys() {
+        return AGGREGATE_SOURCE_KEYS.slice();
+      }
+
+      function renderSourceToggles() {
+        if (!elSourceToggleWrap || !elSourceToggles) return;
+        const isAggregate = (elCategory?.value || "") === "all_ai";
+        elSourceToggleWrap.style.display = "none";
+        if (!isAggregate) return;
+
+        const html = AGGREGATE_SOURCE_KEYS.map((key) => {
+          const active = activeAggregateSourceKeys.has(key);
+          return `<button type="button" class="sourceChip ${active ? "active" : ""}" data-source-key="${escapeHtml(key)}" aria-pressed="${active ? "true" : "false"}">${escapeHtml(getFeedLabelByKey(key))}</button>`;
+        }).join("");
+        elSourceToggles.innerHTML = html;
+      }
+
+      function setMetaText() {
+        const now = new Date();
+        const ts = now.toLocaleString(getLocale(), { hour12: false });
+        const feedTitle = lastFeedMeta.title ? ` - ${lastFeedMeta.title}` : "";
+        const count = lastItems.length ? ` - ${lastItems.length}${t("meta_count_suffix")}` : "";
+        const hotWindow = hotWindowLabel ? ` - ${hotWindowLabel}` : "";
+        const sourceText =
+          (elCategory?.value || "") === "all_ai"
+            ? ` - ${t("meta_sources")} ${getSelectedAggregateSourceKeys().length}/${AGGREGATE_SOURCE_KEYS.length}`
+            : "";
+        elMetaText.textContent = `${ts}${feedTitle}${count}${hotWindow}${sourceText}`;
+      }
+
+      function escapeHtml(s) {
+        return (s ?? "").replace(
+          /[&<>"]/g,
+          (c) =>
+            ({
+              "&": "&amp;",
+              "<": "&lt;",
+              ">": "&gt;",
+              '"': "&quot;",
+            })[c],
+        );
+      }
+
+      function stripHtml(html) {
+        const div = document.createElement("div");
+        div.innerHTML = html || "";
+        return (div.textContent || "").trim();
+      }
+
+      function firstImageUrlFromHtml(html) {
+        if (!html) return "";
+        // 단순 img src/data-src/srcset 추출
+        const src = html.match(/<img[^>]+src=["']([^"']+)["']/i);
+        if (src && src[1]) return src[1];
+        const dataSrc = html.match(/<img[^>]+data-src=["']([^"']+)["']/i);
+        if (dataSrc && dataSrc[1]) return dataSrc[1];
+        const dataOrig = html.match(/<img[^>]+data-original=["']([^"']+)["']/i);
+        if (dataOrig && dataOrig[1]) return dataOrig[1];
+        const srcset = html.match(/<img[^>]+srcset=["']([^"']+)["']/i);
+        if (srcset && srcset[1]) {
+          const first = srcset[1].split(",")[0]?.trim()?.split(" ")[0];
+          if (first) return first;
+        }
+        return "";
+      }
+
+      function normalizeImageUrl(url) {
+        if (!url) return "";
+        let u = url.trim();
+        if (u.startsWith("//")) u = "https:" + u;
+        if (!/^https?:\/\//i.test(u)) return "";
+        return u;
+      }
+
+      function buildImageUrl(rawUrl, quality) {
+        if (!rawUrl) return "";
+        const base =
+          quality === "low"
+            ? `${IMG_PROXY}${encodeURIComponent(rawUrl)}&w=${IMG_LOW_W}&q=${IMG_QUALITY_LOW}&fit=contain`
+            : `${IMG_PROXY}${encodeURIComponent(rawUrl)}&w=${IMG_HIGH_W}&q=${IMG_QUALITY_HIGH}&fit=contain`;
+        return base;
+      }
+
+      function shouldLoadHighRes() {
+        const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+        if (!conn || !conn.effectiveType) return true;
+        const type = conn.effectiveType;
+        return type === "4g";
+      }
+
+      async function fetchTextWithProxyRetry(url, timeoutMs = 12000) {
+        const attempts = [];
+        for (const makeProxyUrl of CORS_PROXIES) {
+          const target = makeProxyUrl(url);
+          const controller = new AbortController();
+          const timer = setTimeout(() => controller.abort(), timeoutMs);
+          try {
+            const res = await fetch(target, { method: "GET", cache: "no-store", signal: controller.signal });
+            clearTimeout(timer);
+            if (!res.ok) {
+              attempts.push(`${res.status} ${target}`);
+              continue;
+            }
+            if (target.includes("/get?url=")) {
+              const j = await res.json();
+              const body = j?.contents || "";
+              if (body) return body;
+              attempts.push(`empty-body ${target}`);
+              continue;
+            }
+            return await res.text();
+          } catch (e) {
+            clearTimeout(timer);
+            attempts.push(`${String(e?.message || e)} ${target}`);
+          }
+        }
+        throw new Error(`proxy_fetch_failed: ${attempts.slice(0, 3).join(" | ") || "unknown"}`);
+      }
+
+      function setStageBg(bgEl, url) {
+        if (!bgEl || !url) return;
+        bgEl.style.backgroundImage = `url('${url}')`;
+      }
+
+      function upgradeStageBg(bgEl, rawUrl) {
+        if (!bgEl || !rawUrl) return;
+        setStageBg(bgEl, buildImageUrl(rawUrl, "low"));
+        if (shouldLoadHighRes()) {
+          preloadImage(buildImageUrl(rawUrl, "high")).then(() => {
+            setStageBg(bgEl, buildImageUrl(rawUrl, "high"));
+          });
+        }
+      }
+
+      async function fetchOgImageUrl(pageUrl) {
+        if (!pageUrl) return "";
+        if (ogImageCache.has(pageUrl)) return ogImageCache.get(pageUrl);
+        try {
+          const html = await fetchTextWithProxyRetry(pageUrl);
+          const m =
+            html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i) ||
+            html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:image["']/i);
+          const url = m && m[1] ? normalizeImageUrl(m[1]) : "";
+          ogImageCache.set(pageUrl, url);
+          saveOgCacheToStorage();
+          return url;
+        } catch (e) {
+          ogImageCache.set(pageUrl, "");
+          saveOgCacheToStorage();
+          return "";
+        }
+      }
+
+      function preloadImage(url) {
+        if (!url) return Promise.resolve(false);
+        if (imagePreloadCache.get(url) === "done") return Promise.resolve(true);
+        if (imagePreloadCache.get(url) === "loading") return Promise.resolve(false);
+        imagePreloadCache.set(url, "loading");
+        const load = (u, triedAlt) =>
+          new Promise((resolve) => {
+            const img = new Image();
+            img.onload = () => {
+              imagePreloadCache.set(url, "done");
+              resolve(true);
+            };
+            img.onerror = () => {
+              if (!triedAlt && u.includes(IMG_PROXY)) {
+                const altUrl = u.replace(IMG_PROXY, IMG_PROXY_ALT);
+                load(altUrl, true).then(resolve);
+                return;
+              }
+              imagePreloadCache.set(url, "error");
+              resolve(false);
+            };
+            img.src = u;
+          });
+        return load(url, false);
+      }
+
+      async function ensureImageForItem(item) {
+        if (!item) return "";
+        if (item.imgUrl) {
+          await preloadImage(buildImageUrl(item.imgUrl, "low"));
+          if (shouldLoadHighRes()) {
+            await preloadImage(buildImageUrl(item.imgUrl, "high"));
+          }
+          return item.imgUrl;
+        }
+        if (!item.link) return "";
+        const ogUrl = await fetchOgImageUrl(item.link);
+        if (ogUrl) {
+          item.imgUrl = ogUrl;
+          await preloadImage(buildImageUrl(ogUrl, "low"));
+          if (shouldLoadHighRes()) {
+            await preloadImage(buildImageUrl(ogUrl, "high"));
+          }
+          return ogUrl;
+        }
+        return "";
+      }
+
+      async function preloadAllImagesInOrder(items, startIndex) {
+        if (!items.length) return;
+        if (preloadQueueRunning) return;
+        preloadQueueRunning = true;
+        const total = items.length;
+        let cursor = startIndex;
+        let inFlight = 0;
+
+        const nextIndex = () => {
+          const idx = cursor;
+          cursor = (cursor + 1) % total;
+          return idx;
+        };
+
+        const runOne = async () => {
+          const idx = nextIndex();
+          const item = items[idx];
+          await ensureImageForItem(item);
+        };
+
+        const runners = [];
+        for (let i = 0; i < Math.min(IMG_PRELOAD_CONCURRENCY, total); i++) {
+          runners.push(
+            (async function loop() {
+              while (true) {
+                await runOne();
+                if (cursor === startIndex) break;
+              }
+            })(),
+          );
+        }
+
+        await Promise.all(runners);
+        preloadQueueRunning = false;
+      }
+
+      function hydrateMissingImages(filteredItems, sourceItems) {
+        if (imageRefreshPending) return;
+        const targets = (filteredItems || []).filter((it) => !it.imgUrl && it.link).slice(0, OG_FETCH_LIMIT);
+        if (!targets.length) return;
+        imageRefreshPending = true;
+        Promise.allSettled(targets.map((it) => ensureImageForItem(it)))
+          .then(() => {
+            const hasFilled = targets.some((it) => !!it.imgUrl);
+            if (hasFilled) render(sourceItems);
+          })
+          .finally(() => {
+            imageRefreshPending = false;
+          });
+      }
+
+      function textFromNode(parent, selector) {
+        const n = parent.querySelector(selector);
+        return n?.textContent?.trim?.() ?? "";
+      }
+
+      function attrFromNode(parent, selector, attr) {
+        const n = parent.querySelector(selector);
+        return n?.getAttribute?.(attr) ?? "";
+      }
+
+      function mapItem(itemEl) {
+        const title = textFromNode(itemEl, "title") || "(No title)";
+        const link = textFromNode(itemEl, "link");
+        const guid = textFromNode(itemEl, "guid") || link || title;
+        const pubDate = textFromNode(itemEl, "pubDate");
+
+        // author: dc:creator / author
+        const creator = textFromNode(itemEl, "dc\\:creator") || textFromNode(itemEl, "creator") || textFromNode(itemEl, "author");
+
+        // categories
+        const categories = Array.from(itemEl.querySelectorAll("category"))
+          .map((x) => x.textContent.trim())
+          .filter(Boolean);
+
+        // description / content
+        const descHtml = textFromNode(itemEl, "description");
+        const contentHtml = textFromNode(itemEl, "content\\:encoded");
+        const summaryHtml = contentHtml || descHtml;
+        const summaryText = stripHtml(summaryHtml);
+
+        // image
+        // RSS 사례: enclosure / media:content / media:thumbnail / img in html
+        const enclosureUrl = attrFromNode(itemEl, "enclosure", "url");
+        const mediaUrl = attrFromNode(itemEl, "media\\:content", "url") || attrFromNode(itemEl, "media\\:thumbnail", "url");
+        const imgUrl = mediaUrl || enclosureUrl || firstImageUrlFromHtml(summaryHtml);
+
+        return { title, link, guid, pubDate, creator, categories, summaryText, imgUrl: normalizeImageUrl(imgUrl) };
+      }
+
+      function utcDateKey(date) {
+        if (!(date instanceof Date) || Number.isNaN(date.valueOf())) return "";
+        return date.toISOString().slice(0, 10);
+      }
+
+      function parseDateInputToUtc(dateStr) {
+        const raw = (dateStr || "").trim();
+        if (!raw) return new Date();
+        const parsed = new Date(`${raw}T00:00:00Z`);
+        return Number.isNaN(parsed.valueOf()) ? new Date() : parsed;
+      }
+
+      function buildWindowDates(endDate, days) {
+        const d = endDate instanceof Date ? endDate : new Date();
+        const baseUtc = Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate());
+        const out = [];
+        for (let i = 0; i < days; i++) {
+          out.push(utcDateKey(new Date(baseUtc - i * 24 * 60 * 60 * 1000)));
+        }
+        return out;
+      }
+
+      function toMetricNumber(value) {
+        if (typeof value === "number" && Number.isFinite(value)) return value;
+        if (typeof value === "string") {
+          const n = Number(value.replace(/[^\d.-]/g, ""));
+          return Number.isFinite(n) ? n : null;
+        }
+        return null;
+      }
+
+      function getMetricByAliases(item, aliases) {
+        if (!item || typeof item !== "object") return null;
+        const aliasSet = new Set((aliases || []).map((k) => String(k).toLowerCase()));
+        const containers = [item, item.metrics, item.stats, item.engagement, item.social, item.meta];
+        for (const obj of containers) {
+          if (!obj || typeof obj !== "object") continue;
+          for (const alias of aliases || []) {
+            const direct = toMetricNumber(obj[alias]);
+            if (direct !== null) return direct;
+          }
+          for (const [k, v] of Object.entries(obj)) {
+            if (!aliasSet.has(String(k).toLowerCase())) continue;
+            const n = toMetricNumber(v);
+            if (n !== null) return n;
+          }
+        }
+        return null;
+      }
+
+      function getItemViewCount(item) {
+        return getMetricByAliases(item, ["viewCount", "views", "hits", "readCount", "impressions", "popularity", "score"]);
+      }
+
+      function getItemLikeCount(item) {
+        return getMetricByAliases(item, ["likes", "likeCount", "hearts", "applause", "applauds", "claps", "upvotes"]);
+      }
+
+      function getItemCommentCount(item) {
+        return getMetricByAliases(item, ["comments", "commentCount", "replies", "replyCount"]);
+      }
+
+      function getItemShareCount(item) {
+        return getMetricByAliases(item, ["shares", "shareCount", "reposts", "repostCount", "retweets"]);
+      }
+
+      function buildIssueTokens(item) {
+        const raw = `${item?.title || ""} ${item?.summaryText || ""} ${((item?.categories || []).join(" ") || "").toLowerCase()}`.toLowerCase();
+        const normalized = raw.replace(/[^0-9a-zA-Z\u00C0-\u024F\uAC00-\uD7A3]+/g, " ");
+        const tokens = normalized
+          .split(/\s+/)
+          .filter((tok) => tok.length >= ISSUE_TOKEN_MIN_LEN && !ISSUE_STOPWORDS.has(tok));
+        return Array.from(new Set(tokens)).slice(0, 18);
+      }
+
+      function buildIssueTokenFrequency(items) {
+        const freq = new Map();
+        for (const it of items || []) {
+          const tokens = buildIssueTokens(it);
+          tokens.forEach((tok) => {
+            freq.set(tok, (freq.get(tok) || 0) + 1);
+          });
+        }
+        return freq;
+      }
+
+      function getEngagementScore(item) {
+        const views = getItemViewCount(item) || 0;
+        const likes = getItemLikeCount(item) || 0;
+        const comments = getItemCommentCount(item) || 0;
+        const shares = getItemShareCount(item) || 0;
+        const v = views > 0 ? Math.log10(views + 1) * 100 : 0;
+        const l = likes > 0 ? Math.log10(likes + 1) * 78 : 0;
+        const c = comments > 0 ? Math.log10(comments + 1) * 88 : 0;
+        const s = shares > 0 ? Math.log10(shares + 1) * 92 : 0;
+        return v + l + c + s;
+      }
+
+      function getIssueFrequencyScore(item, tokenFreq) {
+        const tokens = buildIssueTokens(item);
+        if (!tokens.length) return 0;
+        let score = 0;
+        for (const tok of tokens) {
+          const f = tokenFreq.get(tok) || 0;
+          if (f > 1) score += (f - 1) * 9;
+        }
+        const categoryBoost = Math.min(8, (item?.categories || []).length * 1.2);
+        return score + categoryBoost;
+      }
+
+      function countKeywordHits(text, keywords) {
+        const t = String(text || "");
+        if (!t) return 0;
+        let hits = 0;
+        for (const kw of keywords || []) {
+          if (kw.includes(" ")) {
+            if (t.includes(kw)) hits++;
+            continue;
+          }
+          const re = new RegExp(`\\b${kw.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`, "i");
+          if (re.test(t)) hits++;
+        }
+        return hits;
+      }
+
+      function getProductTechBoost(item) {
+        const text = normalizeCompareText(`${item?.title || ""} ${item?.summaryText || ""} ${(item?.categories || []).join(" ")}`);
+        if (!text) return 0;
+        const productHits = countKeywordHits(text, PRODUCT_NEWS_KEYWORDS);
+        const techHits = countKeywordHits(text, TECH_DEPTH_KEYWORDS);
+        const nonProductHits = countKeywordHits(text, NON_PRODUCT_NEWS_KEYWORDS);
+        const productBoost = Math.min(180, productHits * 42);
+        const techBoost = Math.min(130, techHits * 24);
+        const sourceBoost = OFFICIAL_TECH_SOURCES.has(item?.sourceFeed || "") ? 36 : 0;
+        const nonProductPenalty = Math.min(96, nonProductHits * 24);
+        return productBoost + techBoost + sourceBoost - nonProductPenalty;
+      }
+
+      function isProductTechNews(item) {
+        const text = normalizeCompareText(`${item?.title || ""} ${item?.summaryText || ""} ${(item?.categories || []).join(" ")}`);
+        if (!text) return false;
+        const productHits = countKeywordHits(text, PRODUCT_NEWS_KEYWORDS);
+        const techHits = countKeywordHits(text, TECH_DEPTH_KEYWORDS);
+        const fromOfficial = OFFICIAL_TECH_SOURCES.has(item?.sourceFeed || "");
+        if (fromOfficial && (productHits >= 1 || techHits >= 1)) return true;
+        return productHits >= 1 || techHits >= 2;
+      }
+
+      function getLowSignalPenalty(item) {
+        const text = normalizeCompareText(`${item?.title || ""} ${item?.summaryText || ""} ${(item?.categories || []).join(" ")}`);
+        if (!text) return 0;
+
+        const lowSignalHits = countKeywordHits(text, LOW_SIGNAL_CONTENT_KEYWORDS);
+        let penalty = Math.min(180, lowSignalHits * 34);
+
+        const summary = getNormalizedSummaryForItem(item);
+        if (isSummaryEmptyText(summary)) penalty += 64;
+        if (isKeywordFallbackSummary(summary)) penalty += 52;
+        if (isSummarySameAsTitle(summary, item?.title || "")) penalty += 38;
+
+        // Keep strong product/tech releases from being over-penalized.
+        if (isProductTechNews(item)) penalty = Math.max(0, penalty - 56);
+        return penalty;
+      }
+
+      function toDateMs(pubDate) {
+        const d = new Date(pubDate || "");
+        return Number.isNaN(d.valueOf()) ? 0 : d.valueOf();
+      }
+
+      function decodeHtmlEntitiesText(input) {
+        const raw = String(input || "");
+        if (!raw) return "";
+        const ta = document.createElement("textarea");
+        let out = raw;
+        for (let i = 0; i < 2; i++) {
+          ta.innerHTML = out;
+          const next = ta.value || ta.textContent || "";
+          if (next === out) break;
+          out = next;
+        }
+        return out.replace(/\s+/g, " ").trim();
+      }
+
+      function normalizeCompareText(input) {
+        return decodeHtmlEntitiesText(input)
+          .toLowerCase()
+          .replace(/https?:\/\/\S+/gi, " ")
+          .replace(/[^0-9a-z\u00C0-\u024F\uAC00-\uD7A3]+/g, " ")
+          .replace(/\s+/g, " ")
+          .trim();
+      }
+
+      function tokenSetFromNormalizedText(text) {
+        return new Set(
+          String(text || "")
+            .split(/\s+/)
+            .filter((tok) => tok && tok.length >= 3 && !ISSUE_STOPWORDS.has(tok)),
+        );
+      }
+
+      function contentTokenSet(item) {
+        const merged = normalizeCompareText(`${item?.title || ""} ${item?.summaryText || ""} ${(item?.categories || []).join(" ")}`);
+        return new Set(
+          String(merged || "")
+            .split(/\s+/)
+            .filter((tok) => tok && tok.length >= 4 && !ISSUE_STOPWORDS.has(tok)),
+        );
+      }
+
+      function titleTokenSet(item) {
+        const t = normalizeCompareText(item?.title || "");
+        return new Set(
+          String(t || "")
+            .split(/\s+/)
+            .filter((tok) => tok && tok.length >= 3 && !ISSUE_STOPWORDS.has(tok)),
+        );
+      }
+
+      function jaccardSimilarity(setA, setB) {
+        if (!setA.size || !setB.size) return 0;
+        let inter = 0;
+        setA.forEach((v) => {
+          if (setB.has(v)) inter++;
+        });
+        const union = setA.size + setB.size - inter;
+        return union ? inter / union : 0;
+      }
+
+      function isNearDuplicateByTitle(a, b) {
+        const ta = normalizeCompareText(a?.title || "");
+        const tb = normalizeCompareText(b?.title || "");
+        if (!ta || !tb) return false;
+        if (ta === tb) return true;
+        if (ta.length >= 24 && tb.length >= 24 && (ta.includes(tb) || tb.includes(ta))) return true;
+
+        const sa = tokenSetFromNormalizedText(ta);
+        const sb = tokenSetFromNormalizedText(tb);
+        let inter = 0;
+        sa.forEach((v) => {
+          if (sb.has(v)) inter++;
+        });
+        const j = jaccardSimilarity(sa, sb);
+        return inter >= 4 && j >= 0.62;
+      }
+
+      function isNearDuplicateByContent(a, b) {
+        const sa = contentTokenSet(a);
+        const sb = contentTokenSet(b);
+        if (!sa.size || !sb.size) return false;
+        let inter = 0;
+        sa.forEach((v) => {
+          if (sb.has(v)) inter++;
+        });
+        const j = jaccardSimilarity(sa, sb);
+        if (inter >= 7) return true;
+        return inter >= 5 && j >= 0.46;
+      }
+
+      function canonicalLinkKey(link) {
+        if (!link) return "";
+        try {
+          const u = new URL(String(link));
+          u.hash = "";
+          const drop = [];
+          u.searchParams.forEach((_v, k) => {
+            if (/^(utm_|fbclid|gclid|mc_|ref$)/i.test(k)) drop.push(k);
+          });
+          drop.forEach((k) => u.searchParams.delete(k));
+          return `${u.hostname}${u.pathname}`.toLowerCase().replace(/\/+$/g, "");
+        } catch (e) {
+          return String(link || "").toLowerCase().trim();
+        }
+      }
+
+      function isSummarySameAsTitle(summary, title) {
+        const s = normalizeCompareText(summary);
+        const t0 = normalizeCompareText(title);
+        if (!s || !t0) return false;
+        if (s === t0) return true;
+        if (s.length >= 28 && (t0.includes(s) || s.includes(t0))) return true;
+        return false;
+      }
+
+      function isKeywordFallbackSummary(summary) {
+        const s = decodeHtmlEntitiesText(summary);
+        return s.startsWith("핵심 키워드:") || s.startsWith("Key topics:");
+      }
+
+      function isSummaryEmptyText(summary) {
+        const s = decodeHtmlEntitiesText(summary || "").trim();
+        if (!s) return true;
+        return s === I18N.ko.summary_empty || s === I18N.en.summary_empty;
+      }
+
+      function getNormalizedSummaryForItem(item, scoringLang = "en") {
+        const titleText = decodeHtmlEntitiesText(item?.title || "");
+        const prevLang = currentLang;
+        if (scoringLang && prevLang !== scoringLang) currentLang = scoringLang;
+        try {
+          return buildSummaryText(item?.summaryText, titleText, item?.categories || []);
+        } finally {
+          if (currentLang !== prevLang) currentLang = prevLang;
+        }
+      }
+
+      function isGoodSummaryItem(item) {
+        const summary = getNormalizedSummaryForItem(item);
+        if (isSummaryEmptyText(summary)) return false;
+        if (isKeywordFallbackSummary(summary)) return false;
+        return normalizeCompareText(summary).length >= 48;
+      }
+
+      function buildSummaryText(raw, titleText, categories) {
+        const txt = decodeHtmlEntitiesText(raw);
+        if (!txt) return t("summary_empty");
+
+        const stripTitlePrefix = (summary, title) => {
+          let out = String(summary || "").trim();
+          const cleanTitle = decodeHtmlEntitiesText(title || "")
+            .replace(/\s+/g, " ")
+            .replace(/[.?!]+$/g, "")
+            .trim();
+          if (!out || !cleanTitle || cleanTitle.length < 10) return out;
+
+          const escapeRegExp = (value) => String(value || "").replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+          const pref = new RegExp(`^${escapeRegExp(cleanTitle)}\\s*[:：\\-–—,]\\s*`, "i");
+          if (pref.test(out)) {
+            const stripped = out.replace(pref, "").trim();
+            if (stripped.length >= 34) out = stripped;
+          }
+
+          const normTitle = normalizeCompareText(cleanTitle);
+          const sentences = out.split(/(?<=[.!?。！？])\s+/).filter(Boolean);
+          if (sentences.length > 1) {
+            const first = sentences[0];
+            const normFirst = normalizeCompareText(first);
+            const overlap =
+              normFirst &&
+              normTitle &&
+              (normFirst === normTitle ||
+                normFirst.startsWith(normTitle.slice(0, Math.min(34, normTitle.length))) ||
+                normTitle.startsWith(normFirst.slice(0, Math.min(26, normFirst.length))));
+            if (overlap) {
+              const rest = sentences.slice(1).join(" ").trim();
+              if (rest.length >= 34) out = rest;
+            }
+          }
+
+          return out.trim();
+        };
+
+        // Remove RSS trailing ellipsis and keep a compact, image-friendly summary.
+        const cleaned = txt
+          .replace(/https?:\/\/\S+/gi, " ")
+          .replace(/\b\S+\.(png|jpe?g|gif|webp|svg)\b/gi, " ")
+          .replace(/\b\d{2,4}x\d{2,4}\b/g, " ")
+          .replace(/\[\s*(?:\.\.\.|…)\s*\]/g, " ")
+          .replace(/\(\s*(?:\.\.\.|…)\s*\)/g, " ")
+          .replace(/\s*(\.\.\.|…)+\s*$/g, "")
+          .replace(/\s+/g, " ")
+          .trim();
+        if (!cleaned || !/[A-Za-z0-9\uAC00-\uD7A3]/.test(cleaned)) return t("summary_empty");
+        const mergedForDetail = normalizeCompareText(`${titleText || ""} ${cleaned} ${(categories || []).join(" ")}`);
+        const productHits = countKeywordHits(mergedForDetail, PRODUCT_NEWS_KEYWORDS);
+        const techHits = countKeywordHits(mergedForDetail, TECH_DEPTH_KEYWORDS);
+        const isProductDetail = productHits >= 1 || techHits >= 2;
+        const MAX_SUMMARY_CHARS = isProductDetail
+          ? currentLang === "ko"
+            ? 780
+            : 920
+          : currentLang === "ko"
+            ? 520
+            : 620;
+        let result = cleaned;
+        if (cleaned.length > MAX_SUMMARY_CHARS) {
+          // Prefer full sentences that fit within the target length.
+          const sentences = cleaned.split(/(?<=[.!?。！？])\s+/).filter(Boolean);
+          let compact = "";
+          for (const s of sentences) {
+            const next = compact ? `${compact} ${s}` : s;
+            if (next.length > MAX_SUMMARY_CHARS) break;
+            compact = next;
+          }
+          if (compact) result = compact.replace(/\s*(\.\.\.|…)+\s*$/g, "").trim();
+          else {
+            const sliced = cleaned.slice(0, MAX_SUMMARY_CHARS);
+            const cutAt = sliced.lastIndexOf(" ");
+            const safe = (cutAt > 120 ? sliced.slice(0, cutAt) : sliced).trim();
+            result = safe.replace(/\s*(\.\.\.|…)+\s*$/g, "").trim();
+          }
+        }
+
+        result = stripTitlePrefix(result, titleText);
+        if (currentLang === "ko") {
+          result = result.replace(/\s+/g, " ").trim();
+          if (result && !/[.!?]$/.test(result)) result += ".";
+        } else {
+          result = result.replace(/\s+/g, " ").trim();
+          if (result && !/[.!?]$/.test(result)) result += ".";
+        }
+
+        if (isProductDetail) {
+          const minLen = currentLang === "ko" ? 180 : 220;
+          if (normalizeCompareText(result).length < minLen) {
+            const catText = (categories || [])
+              .map((c) => decodeHtmlEntitiesText(c))
+              .filter(Boolean)
+              .slice(0, 3)
+              .join(", ");
+            const detailLine =
+              currentLang === "ko"
+                ? `${catText ? `${catText} 중심으로 ` : ""}공개 배경과 적용 범위, 핵심 기능 변화가 함께 다뤄집니다.`
+                : `${catText ? `It focuses on ${catText}, ` : ""}covering launch context, scope, and key capability changes.`;
+            if (detailLine && !result.includes(detailLine)) {
+              result = `${result} ${detailLine}`.replace(/\s+/g, " ").trim();
+            }
+          }
+        }
+
+        if (isSummarySameAsTitle(result, titleText)) {
+          const sentences = cleaned.split(/(?<=[.!?。！？])\s+/).filter(Boolean);
+          if (sentences.length > 1) {
+            const alt = sentences.slice(1).join(" ").trim();
+            if (alt && normalizeCompareText(alt).length >= 24) {
+              return alt;
+            }
+          }
+          if (isProductDetail) {
+            const catText = (categories || [])
+              .map((c) => decodeHtmlEntitiesText(c))
+              .filter(Boolean)
+              .slice(0, 3)
+              .join(", ");
+            return currentLang === "ko"
+              ? `${catText ? `${catText} 중심으로 ` : ""}신규 공개 내용과 업데이트 핵심 포인트를 정리한 기사입니다.`
+              : `${catText ? `Focused on ${catText}, ` : ""}this article summarizes key launch and update points.`;
+          }
+          return t("summary_empty");
+        }
+        return result;
+      }
+
+      function buildHeadlineText(rawTitle, fallbackText = "") {
+        const original = decodeHtmlEntitiesText(rawTitle || "")
+          .replace(/\s+/g, " ")
+          .trim();
+        if (!original) return "";
+
+        const trimByWord = (input, maxChars) => {
+          const src = String(input || "").trim();
+          if (src.length <= maxChars) return src;
+          const sliced = src.slice(0, maxChars + 1);
+          const cut = sliced.lastIndexOf(" ");
+          return (cut > Math.floor(maxChars * 0.62) ? sliced.slice(0, cut) : sliced.slice(0, maxChars)).trim();
+        };
+
+        const clean = (value) =>
+          decodeHtmlEntitiesText(value || "")
+            .replace(/&#\d+;?/g, " ")
+            .replace(/&#x[0-9a-f]+;?/gi, " ")
+            .replace(/&[a-z]+;/gi, " ")
+            .replace(/https?:\/\/\S+/gi, " ")
+            .replace(/\b\S+\.(?:png|jpe?g|gif|webp|svg)\b/gi, " ")
+            .replace(/\s+/g, " ")
+            .trim();
+
+        const stripSourceSuffix = (value) =>
+          String(value || "")
+            .replace(
+              /\s+[|｜]\s+(techcrunch|the verge|mit technology review|openai|google ai|google deepmind|deepmind|microsoft research|nvidia blog)\b.*$/i,
+              "",
+            )
+            .replace(
+              /\s+-\s+(techcrunch|the verge|mit technology review|openai|google ai|google deepmind|deepmind|microsoft research|nvidia blog)\b.*$/i,
+              "",
+            )
+            .replace(
+              /\s*\((techcrunch|the verge|mit technology review|openai|google ai|google deepmind|deepmind|microsoft research|nvidia blog)[^)]*\)\s*$/i,
+              "",
+            )
+            .trim();
+
+        const stripSentenceEnding = (value) =>
+          String(value || "")
+            .replace(/\s*(?:입니다|합니다|했습니다|하였다|했다|한다|됩니다|됐다|되었다|밝혔다|설명했다|전했다)\s*$/g, "")
+            .replace(/\s*(?:라고|라며)\s+.*$/g, "")
+            .replace(/[.?!]+$/g, "")
+            .replace(/\s+/g, " ")
+            .trim();
+
+        let base = stripSourceSuffix(clean(original));
+        if (!base) base = clean(original);
+
+        const firstSentence = base.split(/(?<=[.!?。！？])\s+/).filter(Boolean)[0] || base;
+        let headline = stripSentenceEnding(firstSentence);
+
+        if (!headline || headline.length < 8) {
+          const fb = stripSourceSuffix(clean(fallbackText || ""));
+          const fbFirst = fb.split(/(?<=[.!?。！？])\s+/).filter(Boolean)[0] || fb;
+          headline = stripSentenceEnding(fbFirst) || stripSentenceEnding(base) || original;
+        }
+
+        const maxChars = currentLang === "ko" ? 110 : 120;
+        return trimByWord(headline, maxChars);
+      }
+
+      async function localizeItemsToKorean(items) {
+        if (!Array.isArray(items) || !items.length) return;
+
+        const queue = items.slice();
+        let cursor = 0;
+        const workerCount = Math.max(1, Math.min(KO_TRANSLATE_CONCURRENCY, queue.length));
+
+        async function worker() {
+          while (cursor < queue.length) {
+            const idx = cursor++;
+            const it = queue[idx];
+            if (!it) continue;
+
+            const titleBase = decodeHtmlEntitiesText(it.title || "");
+            const summarySource = decodeHtmlEntitiesText(it.summaryText || "")
+              .replace(/https?:\/\/\S+/gi, " ")
+              .replace(/\b\S+\.(png|jpe?g|gif|webp|svg)\b/gi, " ")
+              .replace(/\b\d{2,4}x\d{2,4}\b/g, " ")
+              .replace(/\s+/g, " ")
+              .trim();
+            const hasSummary = summarySource && /[A-Za-z0-9\uAC00-\uD7A3]/.test(summarySource);
+
+            const titlePromise = translateTextToKo(titleBase, "title");
+            const summaryPromise = hasSummary ? translateTextToKo(summarySource, "summary") : Promise.resolve("");
+            const [titleKo, summaryKo] = await Promise.all([titlePromise, summaryPromise]);
+
+            it.titleKo = titleKo || titleBase;
+            it.summaryKo = hasSummary ? summaryKo || summarySource : "";
+          }
+        }
+
+        const workers = [];
+        for (let i = 0; i < workerCount; i++) workers.push(worker());
+        await Promise.all(workers);
+        saveKoTranslateCacheToStorage();
+      }
+
+      function getArticleSource(link) {
+        if (!link) return t("footer_source");
+        try {
+          const host = new URL(link).hostname.replace(/^www\./i, "").trim();
+          return host || t("footer_source");
+        } catch (e) {
+          return t("footer_source");
+        }
+      }
+
+      function summaryQualityScore(item) {
+        const titleText = decodeHtmlEntitiesText(item?.title || "");
+        const summary = getNormalizedSummaryForItem(item);
+        if (isSummaryEmptyText(summary)) return 0;
+        if (isKeywordFallbackSummary(summary)) {
+          const lenFallback = normalizeCompareText(summary).length;
+          return Math.min(24, lenFallback);
+        }
+        let score = 0;
+        const len = normalizeCompareText(summary).length;
+        score += Math.min(170, len);
+        if (!isSummarySameAsTitle(summary, titleText)) score += 180;
+        if (!/https?:\/\//i.test(summary)) score += 40;
+        if ((item?.categories || []).length) score += 14;
+        if (item?.imgUrl) score += 8;
+        return score;
+      }
+
+      function pickBetterDuplicateItem(a, b) {
+        const qa = summaryQualityScore(a);
+        const qb = summaryQualityScore(b);
+        if (qb !== qa) return qb > qa ? b : a;
+        const ae = getEngagementScore(a);
+        const be = getEngagementScore(b);
+        if (be !== ae) return be > ae ? b : a;
+        return toDateMs(b?.pubDate) > toDateMs(a?.pubDate) ? b : a;
+      }
+
+      function dedupeItems(items) {
+        const map = new Map();
+        for (const it of items || []) {
+          const titleKey = normalizeCompareText(it?.title || "").slice(0, 140);
+          const linkKey = canonicalLinkKey(it?.link || "");
+          const summaryKey = normalizeCompareText(getNormalizedSummaryForItem(it)).slice(0, 140);
+          const keys = [
+            it?.guid ? `g:${it.guid}` : "",
+            linkKey ? `l:${linkKey}` : "",
+            titleKey ? `t:${titleKey}` : "",
+            titleKey && summaryKey ? `ts:${titleKey}|${summaryKey}` : "",
+          ].filter(Boolean);
+          if (!keys.length) continue;
+
+          let picked = it;
+          for (const k of keys) {
+            if (!map.has(k)) continue;
+            picked = pickBetterDuplicateItem(map.get(k), picked);
+          }
+          keys.forEach((k) => map.set(k, picked));
+        }
+        const unique = Array.from(new Set(map.values()));
+        const merged = [];
+        for (const it of unique) {
+          let hit = -1;
+          for (let i = 0; i < merged.length; i++) {
+            if (isNearDuplicateByTitle(it, merged[i]) || isNearDuplicateByContent(it, merged[i])) {
+              hit = i;
+              break;
+            }
+          }
+          if (hit === -1) merged.push(it);
+          else merged[hit] = pickBetterDuplicateItem(merged[hit], it);
+        }
+        const preferred = merged.filter((it) => summaryQualityScore(it) >= 160);
+        const rest = merged.filter((it) => !preferred.includes(it));
+        return preferred.concat(rest);
+      }
+
+      function sortHotItems(items) {
+        const all = (items || []).slice();
+        const tokenFreq = buildIssueTokenFrequency(all);
+        const hasEngagementData = all.some((it) => getEngagementScore(it) > 0);
+        const sorted = all.sort((a, b) => {
+          const avEng = getEngagementScore(a);
+          const bvEng = getEngagementScore(b);
+          const avIssue = getIssueFrequencyScore(a, tokenFreq);
+          const bvIssue = getIssueFrequencyScore(b, tokenFreq);
+          const avSummary = summaryQualityScore(a);
+          const bvSummary = summaryQualityScore(b);
+          const avTech = getProductTechBoost(a);
+          const bvTech = getProductTechBoost(b);
+          const avLowSignal = getLowSignalPenalty(a);
+          const bvLowSignal = getLowSignalPenalty(b);
+          const avTotal = avIssue + avEng * 1.8 + avSummary * 1.28 + avTech * 1.42 - avLowSignal * 1.22;
+          const bvTotal = bvIssue + bvEng * 1.8 + bvSummary * 1.28 + bvTech * 1.42 - bvLowSignal * 1.22;
+          if (bvTotal !== avTotal) return bvTotal - avTotal;
+          if (bvTech !== avTech) return bvTech - avTech;
+          if (avLowSignal !== bvLowSignal) return avLowSignal - bvLowSignal;
+          if (bvSummary !== avSummary) return bvSummary - avSummary;
+          if (bvEng !== avEng) return bvEng - avEng;
+          if (bvIssue !== avIssue) return bvIssue - avIssue;
+          return toDateMs(b.pubDate) - toDateMs(a.pubDate);
+        });
+        return { sorted, sortBasis: hasEngagementData ? "views" : "issue" };
+      }
+
+      function buildHotBundleFromItems(items, endDateStr, selectionLimit = HOT_LIMIT) {
+        const endDate = parseDateInputToUtc(endDateStr);
+        const endExclusiveMs = Date.UTC(endDate.getUTCFullYear(), endDate.getUTCMonth(), endDate.getUTCDate() + 1);
+        const startMs = endExclusiveMs - HOT_WINDOW_DAYS * 24 * 60 * 60 * 1000;
+        const inWindow = (items || []).filter((it) => {
+          const ms = toDateMs(it.pubDate);
+          return ms >= startMs && ms < endExclusiveMs;
+        });
+        const hasEnoughInWindow = inWindow.length >= HOT_LIMIT;
+        const deduped = dedupeItems(hasEnoughInWindow ? inWindow : items || []);
+        const { sorted, sortBasis } = sortHotItems(deduped);
+        const preferred = sorted.filter((it) => isGoodSummaryItem(it));
+        const cap = Math.max(HOT_LIMIT, Number(selectionLimit) || HOT_LIMIT);
+        const picked = preferred.slice(0, cap);
+        const selected = fillHotItems(picked, sorted, cap);
+        const rangeStart = new Date(startMs).toLocaleDateString(getLocale(), { month: "2-digit", day: "2-digit" });
+        const rangeEnd = new Date(endExclusiveMs - 1).toLocaleDateString(getLocale(), { month: "2-digit", day: "2-digit" });
+        const windowLabel = `${t("meta_hot_window")} ${rangeStart}~${rangeEnd}`;
+        return { items: selected, sortBasis, windowLabel };
+      }
+
+      function diversifyBySource(items, limit, perSourceMax) {
+        const out = [];
+        const bySource = new Map();
+        for (const it of items || []) {
+          if (out.length >= limit) break;
+          const source = it?.sourceFeed || "default";
+          const used = bySource.get(source) || 0;
+          if (used >= perSourceMax) continue;
+          out.push(it);
+          bySource.set(source, used + 1);
+        }
+        if (out.length >= limit) return out.slice(0, limit);
+        for (const it of items || []) {
+          if (out.length >= limit) break;
+          if (out.includes(it)) continue;
+          out.push(it);
+        }
+        return out.slice(0, limit);
+      }
+
+      function getTopicCandidateTokens(item, tokenFreq) {
+        const tokens = buildIssueTokens(item)
+          .filter((tok) => (tokenFreq.get(tok) || 0) >= 2)
+          .filter((tok) => !TOPIC_DIVERSITY_EXCLUDE.has(tok));
+        if (!tokens.length) return [];
+        // Prefer more specific tokens first: lower global frequency first.
+        tokens.sort((a, b) => (tokenFreq.get(a) || 0) - (tokenFreq.get(b) || 0));
+        return tokens.slice(0, 3);
+      }
+
+      function diversifyByTopic(items, limit, perTopicMax) {
+        const out = [];
+        const tokenFreq = buildIssueTokenFrequency(items || []);
+        const byTopic = new Map();
+        const consume = (it, maxPerTopic) => {
+          const topics = getTopicCandidateTokens(it, tokenFreq);
+          if (topics.length) {
+            for (const topic of topics) {
+              const used = byTopic.get(topic) || 0;
+              if (used >= maxPerTopic) return false;
+            }
+          }
+          out.push(it);
+          topics.forEach((topic) => byTopic.set(topic, (byTopic.get(topic) || 0) + 1));
+          return true;
+        };
+
+        for (const it of items || []) {
+          if (out.length >= limit) break;
+          consume(it, perTopicMax);
+        }
+        if (out.length >= limit) return out.slice(0, limit);
+
+        for (const it of items || []) {
+          if (out.length >= limit) break;
+          if (out.includes(it)) continue;
+          consume(it, perTopicMax + 1);
+        }
+        if (out.length >= limit) return out.slice(0, limit);
+
+        for (const it of items || []) {
+          if (out.length >= limit) break;
+          if (out.includes(it)) continue;
+          out.push(it);
+        }
+        return out.slice(0, limit);
+      }
+
+      function containsTopicToken(text, token) {
+        if (!text || !token) return false;
+        return text.includes(` ${token} `) || text.startsWith(`${token} `) || text.endsWith(` ${token}`) || text === token;
+      }
+
+      function detectOverrepTopicKeys(item) {
+        const text = normalizeCompareText(`${item?.title || ""} ${item?.summaryText || ""} ${(item?.categories || []).join(" ")}`);
+        if (!text) return [];
+
+        const keys = [];
+        const hasOpenAI = containsTopicToken(text, "openai");
+        const hasIndia = containsTopicToken(text, "india") || containsTopicToken(text, "indian");
+        const hasPine = containsTopicToken(text, "pine");
+        const hasLabs = containsTopicToken(text, "labs");
+
+        if (hasOpenAI && hasIndia) keys.push("openai_india");
+        if (hasIndia && hasPine && hasLabs) keys.push("pine_labs_india");
+        if (hasOpenAI && hasPine && hasLabs) keys.push("openai_pine_labs");
+
+        for (const key of Object.keys(OVERREP_TOPIC_LIMITS)) {
+          if (containsTopicToken(text, key)) keys.push(key);
+        }
+        return Array.from(new Set(keys));
+      }
+
+      function diversifyOverrepTopics(items, limit, strict = false) {
+        const out = [];
+        const byKey = new Map();
+        const topicLimits = { ...OVERREP_TOPIC_LIMITS, ...OVERREP_COMPOSITE_TOPIC_LIMITS };
+        const tryPush = (it, relaxed) => {
+          const keys = detectOverrepTopicKeys(it);
+          if (!keys.length) {
+            out.push(it);
+            return true;
+          }
+
+          for (const key of keys) {
+            const max = (topicLimits[key] || 99) + (relaxed ? 1 : 0);
+            const used = byKey.get(key) || 0;
+            if (used >= max) return false;
+          }
+
+          out.push(it);
+          keys.forEach((key) => byKey.set(key, (byKey.get(key) || 0) + 1));
+          return true;
+        };
+
+        for (const it of items || []) {
+          if (out.length >= limit) break;
+          tryPush(it, false);
+        }
+        if (out.length >= limit) return out.slice(0, limit);
+        if (strict) return out.slice(0, limit);
+
+        for (const it of items || []) {
+          if (out.length >= limit) break;
+          if (out.includes(it)) continue;
+          tryPush(it, true);
+        }
+        if (out.length >= limit) return out.slice(0, limit);
+
+        for (const it of items || []) {
+          if (out.length >= limit) break;
+          if (out.includes(it)) continue;
+          out.push(it);
+        }
+        return out.slice(0, limit);
+      }
+
+      function getItemIdentityKey(item) {
+        const linkKey = canonicalLinkKey(item?.link || "");
+        if (linkKey) return `l:${linkKey}`;
+        const titleKey = normalizeCompareText(item?.title || "").slice(0, 120);
+        const dateKey = utcDateKey(item?.pubDate || "") || String(toDateMs(item?.pubDate || ""));
+        return `t:${titleKey}|d:${dateKey}`;
+      }
+
+      function fillHotItems(baseItems, candidatePool, limit) {
+        const out = [];
+        const seen = new Set();
+        const byTopic = new Map();
+        const topicLimits = { ...OVERREP_TOPIC_LIMITS, ...OVERREP_COMPOSITE_TOPIC_LIMITS };
+
+        const canUseTopic = (item, relaxed) => {
+          const keys = detectOverrepTopicKeys(item);
+          for (const key of keys) {
+            const cap = (topicLimits[key] || 99) + (relaxed ? 1 : 0);
+            const used = byTopic.get(key) || 0;
+            if (used >= cap) return false;
+          }
+          return true;
+        };
+
+        const markTopic = (item) => {
+          const keys = detectOverrepTopicKeys(item);
+          keys.forEach((key) => byTopic.set(key, (byTopic.get(key) || 0) + 1));
+        };
+
+        const isDistinct = (item, relaxed) => {
+          const contentCap = relaxed ? 0.58 : 0.48;
+          const titleCap = relaxed ? 0.6 : 0.5;
+          return !out.some(
+            (picked) =>
+              isNearDuplicateByTitle(item, picked) ||
+              isNearDuplicateByContent(item, picked) ||
+              contentSimilarity(item, picked) >= contentCap ||
+              titleSimilarity(item, picked) >= titleCap,
+          );
+        };
+
+        const tryPush = (item, relaxedTopic, relaxedSimilarity) => {
+          if (!item) return false;
+          if (!isGoodSummaryItem(item)) return false;
+          const key = getItemIdentityKey(item);
+          if (seen.has(key)) return false;
+          if (!canUseTopic(item, relaxedTopic)) return false;
+          if (!isDistinct(item, relaxedSimilarity)) return false;
+          out.push(item);
+          seen.add(key);
+          markTopic(item);
+          return true;
+        };
+
+        const passes = [
+          { list: baseItems || [], relaxedTopic: false, relaxedSimilarity: false },
+          { list: candidatePool || [], relaxedTopic: false, relaxedSimilarity: false },
+          { list: candidatePool || [], relaxedTopic: true, relaxedSimilarity: false },
+          { list: candidatePool || [], relaxedTopic: true, relaxedSimilarity: true },
+        ];
+
+        for (const pass of passes) {
+          for (const item of pass.list) {
+            if (out.length >= limit) break;
+            tryPush(item, pass.relaxedTopic, pass.relaxedSimilarity);
+          }
+          if (out.length >= limit) break;
+        }
+
+        return out.slice(0, limit);
+      }
+
+      function getTitleClusterKey(item) {
+        const tokens = normalizeCompareText(item?.title || "")
+          .split(/\s+/)
+          .filter((tok) => tok && tok.length >= 4 && !ISSUE_STOPWORDS.has(tok) && !TITLE_CLUSTER_EXCLUDE.has(tok));
+        const uniq = Array.from(new Set(tokens));
+        if (!uniq.length) return "";
+        if (uniq.length === 1) return uniq[0];
+        return `${uniq[0]}|${uniq[1]}`;
+      }
+
+      function diversifyByTitleCluster(items, limit, maxPerCluster) {
+        const out = [];
+        const byCluster = new Map();
+        const consume = (it, relaxed) => {
+          const key = getTitleClusterKey(it);
+          if (!key) {
+            out.push(it);
+            return true;
+          }
+          const cap = (Number.isFinite(maxPerCluster) ? maxPerCluster : 1) + (relaxed ? 1 : 0);
+          const used = byCluster.get(key) || 0;
+          if (used >= cap) return false;
+          out.push(it);
+          byCluster.set(key, used + 1);
+          return true;
+        };
+
+        for (const it of items || []) {
+          if (out.length >= limit) break;
+          consume(it, false);
+        }
+        if (out.length >= limit) return out.slice(0, limit);
+
+        for (const it of items || []) {
+          if (out.length >= limit) break;
+          if (out.includes(it)) continue;
+          consume(it, true);
+        }
+        if (out.length >= limit) return out.slice(0, limit);
+
+        for (const it of items || []) {
+          if (out.length >= limit) break;
+          if (out.includes(it)) continue;
+          out.push(it);
+        }
+        return out.slice(0, limit);
+      }
+
+      function diversifyBySimilarity(items, limit, similarityThreshold) {
+        const out = [];
+        const deferred = [];
+        const threshold = Number.isFinite(similarityThreshold) ? similarityThreshold : 0.5;
+        for (const it of items || []) {
+          if (out.length >= limit) break;
+          const tooSimilar = out.some(
+            (picked) =>
+              isNearDuplicateByTitle(it, picked) ||
+              isNearDuplicateByContent(it, picked) ||
+              contentSimilarity(it, picked) >= threshold ||
+              titleSimilarity(it, picked) >= 0.44,
+          );
+          if (tooSimilar) deferred.push(it);
+          else out.push(it);
+        }
+        if (out.length >= limit) return out.slice(0, limit);
+        for (const it of deferred) {
+          if (out.length >= limit) break;
+          const tooSimilar = out.some(
+            (picked) => contentSimilarity(it, picked) >= threshold + 0.06 || titleSimilarity(it, picked) >= 0.56,
+          );
+          if (!tooSimilar) out.push(it);
+        }
+        if (out.length >= limit) return out.slice(0, limit);
+        for (const it of items || []) {
+          if (out.length >= limit) break;
+          if (out.includes(it)) continue;
+          out.push(it);
+        }
+        return out.slice(0, limit);
+      }
+
+      function contentSimilarity(a, b) {
+        const sa = contentTokenSet(a);
+        const sb = contentTokenSet(b);
+        return jaccardSimilarity(sa, sb);
+      }
+
+      function titleSimilarity(a, b) {
+        const sa = titleTokenSet(a);
+        const sb = titleTokenSet(b);
+        return jaccardSimilarity(sa, sb);
+      }
+
+      function rebalanceForProductTech(selectedItems, candidatePool, limit, minProductCount) {
+        const out = (selectedItems || []).slice(0, limit);
+        const pool = Array.isArray(candidatePool) ? candidatePool : [];
+        let productCount = out.filter((it) => isProductTechNews(it)).length;
+        if (productCount >= minProductCount) return out;
+
+        for (const cand of pool) {
+          if (productCount >= minProductCount) break;
+          if (!cand || out.includes(cand)) continue;
+          if (!isProductTechNews(cand)) continue;
+
+          let replaceIdx = -1;
+          for (let i = out.length - 1; i >= 0; i--) {
+            if (!isProductTechNews(out[i])) {
+              replaceIdx = i;
+              break;
+            }
+          }
+          if (replaceIdx === -1) break;
+          out[replaceIdx] = cand;
+          productCount++;
+        }
+        return out.slice(0, limit);
+      }
+
+      async function fetchWeeklyHotItemsSingle(feedKey, endDateStr) {
+        const latest = await fetchFeedJson(feedKey, "");
+
+        const endDate = parseDateInputToUtc(endDateStr);
+        const dateKeys = buildWindowDates(endDate, HOT_WINDOW_DAYS);
+        const snapshots = await Promise.allSettled(dateKeys.map((d) => fetchFeedJson(feedKey, d)));
+        const weeklyItems = [];
+        snapshots.forEach((r) => {
+          if (r.status === "fulfilled" && Array.isArray(r.value?.items)) {
+            weeklyItems.push(...r.value.items);
+          }
+        });
+
+        const sourceItems = weeklyItems.length ? weeklyItems : latest.items || [];
+        const bundle = buildHotBundleFromItems(sourceItems, endDateStr);
+
+        return { meta: latest.meta || {}, items: bundle.items, windowLabel: bundle.windowLabel, sortBasis: bundle.sortBasis };
+      }
+
+      async function fetchWeeklyHotItems(feedKey, endDateStr) {
+        if (feedKey !== "all_ai") {
+          return await fetchWeeklyHotItemsSingle(feedKey, endDateStr);
+        }
+
+        const sourceKeys = getSelectedAggregateSourceKeys();
+        const settled = await Promise.allSettled(sourceKeys.map((k) => fetchWeeklyHotItemsSingle(k, endDateStr)));
+        const mergedItems = [];
+        const activeSources = [];
+        let windowLabel = "";
+        let sortBasis = "issue";
+
+        settled.forEach((r, idx) => {
+          if (r.status !== "fulfilled") return;
+          const key = sourceKeys[idx];
+          const feedMetaTitle = r.value?.meta?.title || FEEDS.find((f) => f.key === key)?.label || key;
+          const items = Array.isArray(r.value?.items) ? r.value.items : [];
+          if (!items.length) return;
+          activeSources.push(feedMetaTitle);
+          items.forEach((it) => {
+            mergedItems.push({ ...it, sourceFeed: key, sourceFeedTitle: feedMetaTitle });
+          });
+          if (!windowLabel && r.value?.windowLabel) windowLabel = r.value.windowLabel;
+          if (sortBasis !== "views" && r.value?.sortBasis === "views") sortBasis = "views";
+        });
+
+        const bundle = buildHotBundleFromItems(mergedItems, endDateStr, HOT_LIMIT * 12);
+        const sourceDiversified = diversifyBySource(bundle.items, HOT_LIMIT * 8, 6);
+        const topicDiversified = diversifyByTopic(sourceDiversified, HOT_LIMIT * 6, 2);
+        const similarityDiversified = diversifyBySimilarity(topicDiversified, HOT_LIMIT * 5, 0.42);
+        const topicLimited = diversifyOverrepTopics(similarityDiversified, HOT_LIMIT * 4);
+        const clusterLimited = diversifyByTitleCluster(topicLimited, HOT_LIMIT * 3, 1);
+        const productBalanced = rebalanceForProductTech(clusterLimited, similarityDiversified, HOT_LIMIT * 2, MIN_PRODUCT_TECH_ITEMS);
+        const strictFinal = diversifyOverrepTopics(
+          diversifyByTitleCluster(diversifyBySimilarity(productBalanced, HOT_LIMIT * 2, 0.46), HOT_LIMIT, 1),
+          HOT_LIMIT,
+          true,
+        );
+        const fallbackPool = dedupeItems([
+          ...productBalanced,
+          ...clusterLimited,
+          ...topicLimited,
+          ...similarityDiversified,
+          ...topicDiversified,
+          ...sourceDiversified,
+          ...bundle.items,
+        ]);
+        const finalItems = fillHotItems(strictFinal, fallbackPool, HOT_LIMIT);
+        return {
+          meta: { title: `AI Aggregated (${activeSources.length} sources)`, link: "", updated: "" },
+          items: finalItems,
+          windowLabel: windowLabel || bundle.windowLabel,
+          sortBasis: sortBasis === "views" ? "views" : bundle.sortBasis,
+        };
+      }
+
+      function render(items) {
+        const q = (elQ.value || "").trim().toLowerCase();
+        let filtered = !q
+          ? items
+          : items.filter((it) => {
+              const hay = `${it.titleKo || it.title} ${it.summaryKo || it.summaryText} ${it.creator} ${(it.categories || []).join(" ")}`.toLowerCase();
+              return hay.includes(q);
+            });
+
+        if (!filtered.length && q && Array.isArray(items) && items.length) {
+          filtered = items;
+          if (elQ) elQ.value = "";
+        }
+
+        elGrid.classList.add("hotList");
+        if (!filtered.length) {
+          elGrid.innerHTML = `<div class="note">${t("no_items")}</div>`;
+          return;
+        }
+
+        log("render-hot", { total: filtered.length });
+
+        const cardHtml = [];
+        const renderItems = [];
+        filtered.forEach((it, idx) => {
+          const rawTitleText = decodeHtmlEntitiesText(it.titleKo || it.title);
+          const titleText = buildHeadlineText(rawTitleText, it.summaryKo || it.summaryText) || rawTitleText;
+          const summaryRaw = it.summaryKo || it.summaryText;
+          let summaryText = buildSummaryText(summaryRaw, rawTitleText, it.categories || []);
+          if (isKeywordFallbackSummary(summaryText) || summaryText === t("summary_empty")) {
+            const fallbackTitle = decodeHtmlEntitiesText(it.title || "");
+            const fallbackSummary = buildSummaryText(it.summaryText, fallbackTitle, it.categories || []);
+            if (!isKeywordFallbackSummary(fallbackSummary) && fallbackSummary !== t("summary_empty")) {
+              summaryText = fallbackSummary;
+            } else {
+              const rawFallback = decodeHtmlEntitiesText(it.summaryKo || it.summaryText || "")
+                .replace(/https?:\/\/\S+/gi, " ")
+                .replace(/\b\S+\.(png|jpe?g|gif|webp|svg)\b/gi, " ")
+                .replace(/\b\d{2,4}x\d{2,4}\b/g, " ")
+                .replace(/\s*(\.\.\.|…)+\s*$/g, "")
+                .replace(/\s+/g, " ")
+                .trim();
+              const catText = (it.categories || [])
+                .map((c) => decodeHtmlEntitiesText(c))
+                .filter(Boolean)
+                .slice(0, 2)
+                .join(", ");
+              if (rawFallback && !isSummarySameAsTitle(rawFallback, rawTitleText)) {
+                summaryText = rawFallback;
+              } else if (catText) {
+                summaryText = isProductTechNews(it)
+                  ? currentLang === "ko"
+                    ? `${catText} 중심으로 공개 내용, 기능 변화, 적용 범위를 정리한 기사입니다.`
+                    : `Focused on ${catText}, this article outlines the launch scope and key feature changes.`
+                  : currentLang === "ko"
+                    ? `${catText} 관련 소식입니다.`
+                    : `News related to ${catText}.`;
+              } else {
+                summaryText = t("summary_empty");
+              }
+            }
+          }
+          const creatorText = decodeHtmlEntitiesText(it.creator);
+          const date = it.pubDate ? new Date(it.pubDate) : null;
+          const dateText =
+            date && !Number.isNaN(date.valueOf())
+              ? date.toLocaleDateString(getLocale(), { year: "numeric", month: "2-digit", day: "2-digit" })
+              : "";
+          const rank = cardHtml.length + 1;
+          const sourceText = getArticleSource(it.link || it.creator);
+          const sourceMarkup = it.link
+            ? `<a class="hotSourceLink" href="${escapeHtml(it.link)}" target="_blank" rel="noopener noreferrer">${escapeHtml(sourceText)}</a>`
+            : `<span class="hotSourceText">${escapeHtml(sourceText)}</span>`;
+          const cats = (it.categories || [])
+            .slice(0, 3)
+            .map((c) => `<span class="pill">${escapeHtml(decodeHtmlEntitiesText(c))}</span>`)
+            .join("");
+          const fallbackCardBg = "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&w=1800&q=80";
+          const fallbackCardBgSecondary = "./ai-hero-highquality.svg";
+          const primaryCardBg = it.imgUrl ? buildImageUrl(it.imgUrl, "high") : "";
+          const cardBgLayer = primaryCardBg
+            ? `url('${escapeHtml(primaryCardBg)}'), url('${escapeHtml(fallbackCardBg)}'), url('${escapeHtml(fallbackCardBgSecondary)}')`
+            : `url('${escapeHtml(fallbackCardBg)}'), url('${escapeHtml(fallbackCardBgSecondary)}')`;
+          const bgStyle = `--card-bg:${cardBgLayer};`;
+          cardHtml.push(`
+            <article class="hotCard hotCardBg hasImage" style="--delay:${idx * 70}ms;${bgStyle}">
+              <div class="hotCardOverlay"></div>
+              <span class="hotRank">${t("hot_rank")} ${rank}</span>
+              <div class="hotBody">
+                <h3 class="hotHeadline">
+                  <a href="${escapeHtml(it.link)}" target="_blank" rel="noopener noreferrer">${escapeHtml(titleText)}</a>
+                </h3>
+                <div class="hotMeta">
+                  ${creatorText ? `<span>${escapeHtml(creatorText)}</span>` : ""}
+                  ${dateText ? `<span>${escapeHtml(dateText)}</span>` : ""}
+                </div>
+                <p class="summaryLabel">${t("summary_label")}</p>
+                <p class="hotDesc">${escapeHtml(summaryText)}</p>
+                <div class="hotCats">${cats}</div>
+                <div class="hotSource">
+                  <span class="hotSourceLabel">${t("source_label")}</span>
+                  ${sourceMarkup}
+                </div>
+              </div>
+            </article>
+          `);
+          renderItems.push(it);
+        });
+
+        if (!cardHtml.length) {
+          elGrid.innerHTML = `<div class="note">${t("no_items")}</div>`;
+          return;
+        }
+
+        elGrid.innerHTML = `
+          <div class="hotHeader">
+            <div>
+              <h3 class="hotTitle">${t("hot_title")}</h3>
+              <p class="hotSub">${t("hot_subtitle")}</p>
+            </div>
+            <div class="pill">${cardHtml.length}/${HOT_LIMIT}</div>
+          </div>
+          <div class="hotScroller">${cardHtml.join("")}</div>
+        `;
+
+        preloadAllImagesInOrder(renderItems, 0);
+        hydrateMissingImages(renderItems, items);
+      }
+
+      async function fetchFeedJson(cat, dateStr) {
+        const params = new URLSearchParams({ cat });
+        if (dateStr) params.set("date", dateStr);
+        const url = `${BACKEND_API}?${params.toString()}`;
+        log("fetch-feed", { url });
+        const res = await fetch(url, { method: "GET", cache: "no-store" });
+        if (res.status === 404) {
+          log("fetch-feed-404", { url });
+          return { meta: { title: "", link: "", updated: "" }, items: [] };
+        }
+        if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText}`);
+        return await res.json();
+      }
+
+      async function fetchRssXml(url) {
+        // 브라우저 CORS 문제를 피하기 위해 프록시 사용
+        return await fetchTextWithProxyRetry(url);
+      }
+
+      function parseRss(xmlText) {
+        const parser = new DOMParser();
+        const xml = parser.parseFromString(xmlText, "text/xml");
+
+        // 파서 체크
+        const parserError = xml.querySelector("parsererror");
+        if (parserError) {
+          throw new Error("RSS XML 파싱 실패 (parsererror)");
+        }
+
+        const channel = xml.querySelector("channel");
+        const feedTitle = channel?.querySelector("title")?.textContent?.trim?.() ?? "";
+        const feedLink = channel?.querySelector("link")?.textContent?.trim?.() ?? "";
+        const updated = channel?.querySelector("lastBuildDate")?.textContent?.trim?.() ?? "";
+        lastFeedMeta = { title: feedTitle, link: feedLink, updated };
+
+        const items = Array.from(xml.querySelectorAll("item")).map(mapItem);
+
+        // 중복 제거(guid 기준)
+        const seen = new Set();
+        const deduped = [];
+        for (const it of items) {
+          if (seen.has(it.guid)) continue;
+          seen.add(it.guid);
+          deduped.push(it);
+        }
+        return deduped;
+      }
+
+      async function loadCurrentFeed() {
+        const selected = FEEDS.find((f) => f.key === elCategory.value) || FEEDS[0];
+        const dateStr = (elDatePick.value || "").trim();
+        hotWindowLabel = "";
+        hotSortBasis = "issue";
+
+        setStatus("warn", t("status_loading"), "status_loading");
+        elGrid.innerHTML = `<div class="note" style="grid-column: 1 / -1;">${t("status_loading")}</div>`;
+
+        try {
+          log("load-feed", { cat: selected.key, date: dateStr });
+          if (USE_BACKEND) {
+            try {
+              const weekly = await fetchWeeklyHotItems(selected.key, dateStr);
+              lastFeedMeta = weekly.meta || { title: "", link: "", updated: "" };
+              lastItems = weekly.items || [];
+              hotWindowLabel = weekly.windowLabel || "";
+              hotSortBasis = weekly.sortBasis || "issue";
+            } catch (backendErr) {
+              log("backend-fallback", { error: String(backendErr?.message || backendErr) });
+              let allItems = [];
+              if (selected.key === "all_ai") {
+                const sourceKeys = getSelectedAggregateSourceKeys();
+                const settled = await Promise.allSettled(
+                  sourceKeys.map(async (key) => {
+                    const src = FEEDS.find((f) => f.key === key);
+                    if (!src?.url) return [];
+                    const xml = await fetchRssXml(src.url);
+                    return parseRss(xml).map((it) => ({ ...it, sourceFeed: key }));
+                  }),
+                );
+                settled.forEach((r) => {
+                  if (r.status === "fulfilled" && Array.isArray(r.value)) allItems.push(...r.value);
+                });
+              } else {
+                const xmlText = await fetchRssXml(selected.url);
+                allItems = parseRss(xmlText);
+              }
+              const bundle = buildHotBundleFromItems(allItems, dateStr);
+              lastItems = bundle.items;
+              hotSortBasis = bundle.sortBasis;
+              hotWindowLabel = bundle.windowLabel;
+            }
+          } else {
+            let allItems = [];
+            if (selected.key === "all_ai") {
+              const sourceKeys = getSelectedAggregateSourceKeys();
+              const settled = await Promise.allSettled(
+                sourceKeys.map(async (key) => {
+                  const src = FEEDS.find((f) => f.key === key);
+                  if (!src?.url) return [];
+                  const xml = await fetchRssXml(src.url);
+                  return parseRss(xml).map((it) => ({ ...it, sourceFeed: key }));
+                }),
+              );
+              settled.forEach((r) => {
+                if (r.status === "fulfilled" && Array.isArray(r.value)) allItems.push(...r.value);
+              });
+            } else {
+              const xmlText = await fetchRssXml(selected.url);
+              allItems = parseRss(xmlText);
+            }
+            const bundle = buildHotBundleFromItems(allItems, dateStr);
+            lastItems = bundle.items;
+            hotSortBasis = bundle.sortBasis;
+            hotWindowLabel = bundle.windowLabel;
+          }
+          await localizeItemsToKorean(lastItems);
+          log("load-feed-done", { items: lastItems.length });
+          setStatus("ok", t("status_done"), "status_done");
+          setMetaText();
+          render(lastItems);
+        } catch (err) {
+          console.error(err);
+          log("load-feed-error", { error: String(err?.message || err) });
+          setStatus("err", t("status_failed"), "status_failed");
+          setMetaText();
+          elGrid.innerHTML = `
+            <div class="note" style="grid-column: 1 / -1;">
+              <div style="font-weight:600; color: rgba(255,255,255,0.92);">${t("err_title")}</div>
+              <div style="margin-top:6px;">${t("err_label")} <code>${escapeHtml(String(err?.message || err))}</code></div>
+              <div style="margin-top:8px;">
+                <ul style="margin: 0; padding-left: 18px;">
+                  <li>${t("err_tip1")}</li>
+                  <li>${t("err_tip2")}</li>
+                  <li>${t("err_tip3")}</li>
+                </ul>
+              </div>
+            </div>
+          `;
+        }
+      }
+
+      function init() {
+        loadOgCacheFromStorage();
+        loadKoTranslateCacheFromStorage();
+        loadActiveSourcesFromStorage();
+        applyI18n();
+        // Options
+        elCategory.innerHTML = FEEDS.map((f) => `<option value="${f.key}">${f.label}</option>`).join("");
+        elCategory.value = "all_ai";
+        elDatePick.value = new Date().toISOString().slice(0, 10);
+        elQ.value = "";
+        renderSourceToggles();
+
+        elCategory.addEventListener("change", () => {
+          renderSourceToggles();
+          setMetaText();
+          loadCurrentFeed();
+        });
+        elDatePick.addEventListener("change", loadCurrentFeed);
+        elReload.addEventListener("click", loadCurrentFeed);
+        elQ.addEventListener("input", () => render(lastItems));
+        elSourceToggles?.addEventListener("click", (e) => {
+          const btn = e.target && e.target.closest ? e.target.closest(".sourceChip") : null;
+          if (!btn) return;
+          const key = btn.getAttribute("data-source-key") || "";
+          if (!AGGREGATE_SOURCE_KEYS.includes(key)) return;
+
+          const next = new Set(activeAggregateSourceKeys);
+          if (next.has(key)) {
+            if (next.size === 1) return;
+            next.delete(key);
+          } else {
+            next.add(key);
+          }
+
+          activeAggregateSourceKeys = next;
+          saveActiveSourcesToStorage();
+          renderSourceToggles();
+          setMetaText();
+          loadCurrentFeed();
+        });
+        elLangToggle?.addEventListener("click", () => {
+          currentLang = currentLang === "ko" ? "en" : "ko";
+          localStorage.setItem("lang", currentLang);
+          applyI18n();
+          renderSourceToggles();
+          setStatus(lastStatus.kind, t(lastStatus.key), lastStatus.key);
+          loadCurrentFeed();
+        });
+        elGrid.addEventListener(
+          "click",
+          (e) => {
+            const btn = e.target && e.target.closest ? e.target.closest(".navBtn") : null;
+            if (!btn) return;
+            if (btn.id === "navPrev") {
+              if (navHandlers.prev) navHandlers.prev();
+              else log("nav-miss", { dir: "prev" });
+            } else if (btn.id === "navNext") {
+              if (navHandlers.next) navHandlers.next();
+              else log("nav-miss", { dir: "next" });
+            }
+          },
+          true,
+        );
+
+        setStatus("", t("status_idle"), "status_idle");
+        setMetaText();
+        loadCurrentFeed();
+      }
+
+init();
+    </script>
+  </body>
+</html>
+

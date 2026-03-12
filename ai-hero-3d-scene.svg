@@ -1,0 +1,154 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-label="AI 3D concept image">
+  <defs>
+    <linearGradient id="bgSky" x1="0.08" y1="0.05" x2="0.95" y2="0.98">
+      <stop offset="0%" stop-color="#0a1730" />
+      <stop offset="42%" stop-color="#121d3f" />
+      <stop offset="100%" stop-color="#0d2b48" />
+    </linearGradient>
+    <radialGradient id="bgGlowA" cx="0.18" cy="0.18" r="0.72">
+      <stop offset="0%" stop-color="#7fe6ff" stop-opacity="0.34" />
+      <stop offset="35%" stop-color="#7fe6ff" stop-opacity="0.08" />
+      <stop offset="100%" stop-color="#7fe6ff" stop-opacity="0" />
+    </radialGradient>
+    <radialGradient id="bgGlowB" cx="0.86" cy="0.82" r="0.65">
+      <stop offset="0%" stop-color="#ffad8a" stop-opacity="0.24" />
+      <stop offset="40%" stop-color="#ffad8a" stop-opacity="0.05" />
+      <stop offset="100%" stop-color="#ffad8a" stop-opacity="0" />
+    </radialGradient>
+    <linearGradient id="plateFace" x1="0.22" y1="0.05" x2="0.8" y2="0.98">
+      <stop offset="0%" stop-color="#d9ecff" />
+      <stop offset="52%" stop-color="#f4fdff" />
+      <stop offset="100%" stop-color="#d6e9ff" />
+    </linearGradient>
+    <linearGradient id="plateShell" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#9bb8ff" stop-opacity="0.95" />
+      <stop offset="45%" stop-color="#8ea7e2" stop-opacity="0.92" />
+      <stop offset="100%" stop-color="#6e7fd8" stop-opacity="0.95" />
+    </linearGradient>
+    <linearGradient id="plateShadow" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1f355e" />
+      <stop offset="52%" stop-color="#2f4478" />
+      <stop offset="100%" stop-color="#24345f" />
+    </linearGradient>
+    <linearGradient id="floorGlow" x1="0" y1="0.45" x2="0" y2="1">
+      <stop offset="0%" stop-color="#2a3a67" stop-opacity="0.55" />
+      <stop offset="100%" stop-color="#0e1a34" stop-opacity="0" />
+    </linearGradient>
+    <filter id="glassGlow" x="-30%" y="-35%" width="160%" height="180%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="glow" />
+      <feMerge>
+        <feMergeNode in="glow" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+    <filter id="ambientOcclusion" x="-30%" y="-45%" width="160%" height="190%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="8" result="shadow" />
+      <feColorMatrix type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.22 0" />
+      <feMerge>
+        <feMergeNode in="shadow" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+  </defs>
+
+  <rect width="1600" height="900" fill="url(#bgSky)" />
+  <rect width="1600" height="900" fill="url(#bgGlowA)" />
+  <rect width="1600" height="900" fill="url(#bgGlowB)" />
+
+  <ellipse cx="800" cy="760" rx="700" ry="150" fill="url(#floorGlow)" />
+  <ellipse cx="800" cy="762" rx="700" ry="150" fill="url(#floorGlow)" opacity="0.62" />
+
+  <g transform="translate(240 132)" filter="url(#ambientOcclusion)">
+    <g transform="translate(240 210) rotate(-10)">
+      <path
+        d="M-40 60 L420 60 Q440 60 440 80 L440 350 Q440 366 424 375 L-40 375 Q-56 375 -56 357 L-56 80 Q-56 60 -40 60 Z"
+        fill="url(#plateShell)"
+      />
+      <path
+        d="M-40 60 L420 60 Q440 60 440 80 L440 350 Q440 366 424 375 L-56 375 Q-56 350 -56 80 Z"
+        fill="url(#plateShadow)"
+        opacity="0.42"
+      />
+      <path
+        d="M-36 65 L416 65 L416 352 L-52 352 Z"
+        fill="rgba(255,255,255,0.16)"
+      />
+      <ellipse cx="190" cy="205" rx="182" ry="72" fill="rgba(255,255,255,0.08)" />
+      <ellipse cx="190" cy="205" rx="146" ry="46" fill="url(#plateFace)" opacity="0.42" />
+    </g>
+  </g>
+
+  <g transform="translate(560 300)">
+    <path
+      d="M220 84 C260 56 320 56 360 84 L560 232 C600 260 600 318 560 346 L360 494 C320 530 260 530 220 494 L20 346 C-20 318 -20 260 20 232 Z"
+      fill="url(#plateFace)"
+      opacity="0.75"
+    />
+    <path
+      d="M220 84 C260 56 320 56 360 84 L560 232 C600 260 600 318 560 346 L360 494 C320 530 260 530 220 494 L20 346 C-20 318 -20 260 20 232 Z"
+      fill="none"
+      stroke="rgba(255,255,255,0.5)"
+      stroke-width="2"
+      opacity="0.55"
+    />
+    <g filter="url(#glassGlow)">
+      <ellipse cx="190" cy="288" rx="128" ry="104" fill="rgba(255,255,255,0.18)" />
+      <ellipse cx="190" cy="286" rx="112" ry="82" fill="rgba(255,255,255,0.1)" />
+      <ellipse cx="190" cy="286" rx="88" ry="56" fill="rgba(230,247,255,0.4)" />
+      <circle cx="190" cy="270" r="22" fill="rgba(255,255,255,0.45)" />
+      <path d="M190 244 L190 226" stroke="rgba(255,255,255,0.5)" stroke-width="4" stroke-linecap="round" />
+      <path
+        d="M190 348 L190 388"
+        stroke="rgba(255,255,255,0.55)"
+        stroke-width="4"
+        stroke-linecap="round"
+      />
+      <path
+        d="M140 286 L108 286"
+        stroke="rgba(255,255,255,0.4)"
+        stroke-width="3"
+        stroke-linecap="round"
+      />
+      <path
+        d="M272 286 L304 286"
+        stroke="rgba(255,255,255,0.4)"
+        stroke-width="3"
+        stroke-linecap="round"
+      />
+    </g>
+  </g>
+
+  <g opacity="0.88" transform="translate(840 276)">
+    <rect x="-130" y="58" width="220" height="230" rx="24" fill="url(#plateShell)" />
+    <rect x="-124" y="64" width="208" height="217" rx="20" fill="rgba(255,255,255,0.08)" />
+    <rect x="-110" y="102" width="180" height="44" rx="14" fill="rgba(255,255,255,0.15)" />
+    <rect x="-110" y="170" width="180" height="82" rx="14" fill="rgba(255,255,255,0.12)" />
+    <ellipse cx="0" cy="280" rx="102" ry="26" fill="rgba(255,255,255,0.24)" />
+  </g>
+
+  <g fill="none" stroke="rgba(255,255,255,0.38)" stroke-width="2" opacity="0.8" transform="translate(240 170)">
+    <path d="M260 300 C430 214 590 214 760 300" />
+    <path d="M260 330 C430 244 590 244 760 330" />
+    <path d="M260 360 C430 274 590 274 760 360" />
+    <path d="M500 188 L560 140 L620 188" />
+    <path d="M500 430 L560 520 L620 430" />
+  </g>
+
+  <g opacity="0.7">
+    <circle cx="420" cy="210" r="4" fill="#ffffff" />
+    <circle cx="620" cy="170" r="3" fill="#83d9ff" />
+    <circle cx="790" cy="210" r="2.5" fill="#ffa8cf" />
+    <circle cx="980" cy="190" r="3" fill="#b8e3ff" />
+    <circle cx="1120" cy="238" r="2.6" fill="#7fe6ff" />
+    <circle cx="1360" cy="250" r="2.8" fill="#8dd7f4" />
+  </g>
+
+  <g stroke-linecap="round" opacity="0.42" transform="translate(0 0)">
+    <line x1="430" y1="178" x2="500" y2="232" stroke="rgba(255,255,255,0.5)" stroke-width="1.7" />
+    <line x1="1160" y1="188" x2="1224" y2="228" stroke="rgba(255,255,255,0.4)" stroke-width="1.6" />
+    <line x1="610" y1="540" x2="674" y2="592" stroke="rgba(255,255,255,0.46)" stroke-width="1.5" />
+    <line x1="1020" y1="535" x2="1080" y2="590" stroke="rgba(255,255,255,0.46)" stroke-width="1.5" />
+  </g>
+
+  <rect width="1600" height="900" fill="rgba(8, 17, 34, 0.31)" />
+</svg>
