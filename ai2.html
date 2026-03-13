@@ -313,21 +313,173 @@
       }
 
       .pageFooter {
-        margin: 18px auto 0;
-        padding: 14px 16px 18px;
-        max-width: 640px;
-        color: rgba(255, 255, 255, 0.74);
-        font-size: 12px;
-        line-height: 1.6;
+        width: var(--content-width);
+        margin: 28px auto 0;
+        padding: 0 0 26px;
+        display: grid;
+        gap: 22px;
       }
 
-      .pageFooterMeta {
+      .pageFooterCard {
+        padding: 20px 22px;
+        border-radius: 22px;
+        border: 1px solid rgba(86, 134, 220, 0.22);
+        background:
+          radial-gradient(320px 180px at 0% 0%, rgba(52, 120, 255, 0.16), transparent 74%),
+          radial-gradient(280px 180px at 100% 100%, rgba(74, 213, 255, 0.12), transparent 72%),
+          linear-gradient(180deg, #08152f 0%, #071126 100%);
+        box-shadow:
+          0 18px 36px rgba(10, 26, 60, 0.2),
+          inset 0 1px 0 rgba(255, 255, 255, 0.05);
+      }
+
+      .pageFooterCardTitle {
+        margin: 0;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        color: #f3f8ff;
+        font-size: 15px;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+      }
+
+      .pageFooterCardTitle::before {
+        content: "";
+        width: 10px;
+        height: 10px;
+        border-radius: 999px;
+        background: radial-gradient(circle at 35% 35%, #8fdcff, #4e7dff 62%, #2144bf 100%);
+        box-shadow: 0 0 0 4px rgba(91, 141, 255, 0.12);
+      }
+
+      .pageFooterCardDesc {
+        margin: 14px 0 0;
+        color: rgba(214, 228, 250, 0.84);
+        font-size: 13px;
+        line-height: 1.72;
+      }
+
+      .pageFooterChips {
+        margin-top: 16px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .pageFooterChip {
+        display: inline-flex;
+        align-items: center;
+        min-height: 28px;
+        padding: 0 11px;
+        border-radius: 8px;
+        border: 1px solid rgba(130, 167, 232, 0.18);
+        background: rgba(134, 172, 255, 0.08);
+        color: rgba(225, 237, 255, 0.92);
+        font-size: 12px;
+        letter-spacing: 0.01em;
+      }
+
+      .pageFooterBrand {
         display: grid;
-        gap: 6px;
-        padding: 14px 16px;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 16px;
-        background: rgba(255, 255, 255, 0.04);
+        justify-items: center;
+        gap: 16px;
+        text-align: center;
+      }
+
+      .pageFooterBrandTitle {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        color: #213c68;
+        font-size: 17px;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+      }
+
+      .pageFooterBrandTitle::before {
+        content: "";
+        width: 12px;
+        height: 12px;
+        border-radius: 999px;
+        background: radial-gradient(circle at 35% 35%, #6fbaff, #3b73ff 72%, #1f47ca 100%);
+        box-shadow: 0 0 16px rgba(62, 125, 255, 0.42);
+      }
+
+      .pageFooterBadgeRow {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+
+      .pageFooterTag {
+        display: inline-flex;
+        align-items: center;
+        gap: 9px;
+        min-height: 42px;
+        padding: 0 18px;
+        border-radius: 999px;
+        border: 1px solid rgba(101, 133, 196, 0.16);
+        background:
+          linear-gradient(180deg, rgba(15, 31, 61, 0.96), rgba(11, 22, 46, 0.98)),
+          linear-gradient(135deg, rgba(78, 141, 255, 0.14), rgba(98, 209, 255, 0.12));
+        color: #f6fbff;
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 0.01em;
+        box-shadow:
+          0 10px 22px rgba(14, 33, 70, 0.12),
+          inset 0 1px 0 rgba(255, 255, 255, 0.06);
+      }
+
+      .pageFooterTagMark {
+        color: #78d7ff;
+        font-size: 14px;
+        line-height: 1;
+      }
+
+      .pageFooterTagBrand {
+        color: #ffffff;
+        font-weight: 800;
+        letter-spacing: 0.04em;
+      }
+
+      .pageFooterDivider {
+        color: rgba(74, 100, 145, 0.42);
+        font-size: 15px;
+      }
+
+      .pageFooterCopyright {
+        color: rgba(84, 102, 136, 0.86);
+        font-size: 12px;
+      }
+
+      @media (max-width: 900px) {
+        .pageFooter {
+          gap: 18px;
+        }
+
+        .pageFooterCard {
+          padding: 16px 16px;
+        }
+
+        .pageFooterCardTitle {
+          font-size: 14px;
+        }
+
+        .pageFooterCardDesc,
+        .pageFooterChip,
+        .pageFooterTag,
+        .pageFooterCopyright {
+          font-size: 11px;
+        }
+
+        .pageFooterTag {
+          min-height: 38px;
+          padding: 0 14px;
+        }
       }
 
       .noImageBadge {
@@ -1060,6 +1212,75 @@
         margin: 0 auto 10px;
         display: flex;
         justify-content: flex-end;
+        align-items: center;
+      }
+
+      .heroTopControls {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      .aiProviderWrap {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        min-height: 38px;
+        padding: 0 12px;
+        border-radius: 999px;
+        border: 1px solid rgba(201, 231, 255, 0.56);
+        background: rgba(13, 27, 46, 0.46);
+        color: #f3f8ff;
+        backdrop-filter: blur(8px);
+        box-shadow:
+          0 8px 20px rgba(5, 10, 22, 0.28),
+          inset 0 1px 0 rgba(255, 255, 255, 0.22);
+      }
+
+      .globalAiStatus {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        min-height: 38px;
+        padding: 0 12px;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 199, 199, 0.46);
+        background: rgba(104, 24, 24, 0.46);
+        color: #fff1f1;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        backdrop-filter: blur(8px);
+        box-shadow:
+          0 8px 20px rgba(42, 10, 10, 0.24),
+          inset 0 1px 0 rgba(255, 255, 255, 0.16);
+      }
+
+      .globalAiStatus[hidden] {
+        display: none;
+      }
+
+      .aiProviderLabel {
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: rgba(236, 245, 255, 0.9);
+      }
+
+      .aiProviderSelect {
+        border: 0;
+        background: transparent;
+        color: #ffffff;
+        font-size: 12px;
+        font-weight: 700;
+        outline: none;
+      }
+
+      .aiProviderSelect option {
+        color: #10223e;
       }
 
       .langToggleBtn {
@@ -1268,12 +1489,12 @@
         position: relative;
         overflow: hidden;
         isolation: isolate;
-        min-height: 428px;
+        min-height: 441px;
         padding: 39px 44px;
         border-radius: 21px;
-        border: 1px solid rgba(255, 255, 255, 0.86);
+        border: 1px solid rgba(137, 178, 235, 0.35);
         background-clip: padding-box;
-        box-shadow: 0 6px 16px rgba(38, 58, 92, 0.1);
+        box-shadow: 0 16px 34px rgba(55, 95, 156, 0.16);
         width: 100%;
         margin-inline: 0;
       }
@@ -1281,31 +1502,31 @@
       .hotCardBg {
         background:
           var(--card-bg),
-          linear-gradient(140deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.9));
-        background-size: cover, cover, cover;
-        background-repeat: no-repeat, no-repeat, no-repeat;
-        background-position: center, center, center;
+          linear-gradient(140deg, rgba(229, 239, 255, 0.96), rgba(236, 244, 255, 0.94));
+        background-size: 100% 100%, 100% 100%;
+        background-repeat: no-repeat, no-repeat;
+        background-position: center, center;
       }
 
       .hotCardBg.noImage {
         background:
           var(--card-bg),
-          radial-gradient(620px 260px at 0% 0%, rgba(112, 185, 255, 0.24), transparent 72%),
-          radial-gradient(520px 280px at 100% 100%, rgba(82, 145, 255, 0.18), transparent 75%),
-          linear-gradient(145deg, rgba(8, 18, 32, 0.88), rgba(3, 8, 16, 0.94));
-        background-size: cover, auto, auto, auto;
+          radial-gradient(580px 220px at 0% 0%, rgba(72, 203, 232, 0.22), transparent 70%),
+          radial-gradient(420px 240px at 100% 100%, rgba(255, 133, 103, 0.2), transparent 72%),
+          linear-gradient(140deg, rgba(232, 242, 255, 0.98), rgba(241, 247, 255, 0.95));
+        background-size: cover, 100% 100%, 100% 100%, 100% 100%;
         background-repeat: no-repeat, no-repeat, no-repeat, no-repeat;
-        background-position: center, 0% 0%, 100% 100%, center;
+        background-position: center, center, center, center;
       }
 
       .hotCardOverlay {
         position: absolute;
         inset: 0;
+        background:
+          linear-gradient(180deg, rgba(247, 251, 255, 0.28), rgba(240, 247, 255, 0.58)),
+          linear-gradient(90deg, rgba(247, 251, 255, 0.48) 0%, rgba(240, 247, 255, 0.3) 58%, rgba(240, 247, 255, 0.46) 100%);
         border-radius: inherit;
         pointer-events: none;
-        background:
-          linear-gradient(180deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.32)),
-          linear-gradient(90deg, rgba(255, 255, 255, 0.34) 0%, rgba(255, 255, 255, 0.22) 58%, rgba(255, 255, 255, 0.3) 100%);
       }
 
       .hotBody {
@@ -1320,22 +1541,79 @@
         min-height: 0;
       }
 
-      .hotRank {
-        z-index: 3;
-        top: 18px;
-        left: 20px;
-        background: rgba(31, 66, 117, 0.84);
-        border-color: rgba(232, 244, 255, 0.75);
-        font-size: 13px;
-        padding: 8px 12px;
+      .hotTopline {
+        display: block;
+        margin: 0 0 16px;
+        font-size: 0;
+        line-height: 0;
       }
 
+      .hotRank {
+        z-index: 3;
+        display: inline-flex;
+        align-items: center;
+        position: relative;
+        vertical-align: top;
+        white-space: nowrap;
+        min-height: 34px;
+        margin: 0 8px 8px 0;
+        padding: 8px 12px;
+        border-radius: 999px;
+        background: rgba(31, 66, 117, 0.84);
+        border: 1px solid rgba(232, 244, 255, 0.75);
+        color: #f7fbff;
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 0;
+        line-height: 1;
+      }
+
+      .hotTopicPill {
+        display: inline-flex;
+        align-items: center;
+        position: relative;
+        vertical-align: top;
+        white-space: nowrap;
+        min-height: 30px;
+        margin: 2px 0 8px;
+        padding: 0 11px;
+        border-radius: 999px;
+        border: 1px solid rgba(119, 186, 255, 0.38);
+        background: rgba(236, 248, 255, 0.92);
+        color: #285280;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.03em;
+        text-transform: uppercase;
+      }
+
+      .hotAiStatus {
+        display: inline-flex;
+        align-items: center;
+        position: relative;
+        vertical-align: top;
+        white-space: nowrap;
+        min-height: 30px;
+        margin: 2px 0 8px 8px;
+        padding: 0 11px;
+        border-radius: 999px;
+        border: 1px solid rgba(196, 83, 83, 0.34);
+        background: rgba(255, 245, 245, 0.94);
+        color: #a43b3b;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+
       .hotHeadline {
-        margin-top: 44px;
-        font-size: 30px;
-        line-height: 1.18;
-        letter-spacing: -0.45px;
+        margin-top: 0;
+        font-size: 34px;
+        line-height: 1.22;
+        letter-spacing: -0.8px;
         font-family: "Georgia", "Times New Roman", "Noto Serif KR", serif;
+        font-weight: 700;
       }
 
       .hotHeadline,
@@ -1346,7 +1624,7 @@
       .hotHeadline a {
         display: -webkit-box;
         -webkit-box-orient: vertical;
-        -webkit-line-clamp: 4;
+        -webkit-line-clamp: 3;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: normal;
@@ -1359,6 +1637,9 @@
       }
 
       .hotMeta {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
         color: #546b92;
         font-size: 15px;
         gap: 10px;
@@ -1387,22 +1668,54 @@
       }
 
       .summaryLabel {
+        display: block;
         margin: 18px 0 0;
+        color: #2f5f95;
         font-size: 11px;
         font-weight: 700;
         letter-spacing: 0.3px;
-        color: #2f5f95;
+        text-transform: uppercase;
       }
 
       .hotCats {
+        display: none;
+      }
+
+      .hotInsight {
         margin-top: 18px;
+        padding-top: 14px;
+        border-top: 1px solid rgba(47, 79, 132, 0.15);
+      }
+
+      .hotInsightLabel {
+        margin: 0;
+        color: #375986;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .hotInsightText {
+        margin: 10px 0 0;
+        color: #2f3f5a;
+        font-size: 15px;
+        line-height: 1.62;
+        font-weight: 600;
+      }
+
+      .hotFoot {
+        margin-top: auto;
+        padding-top: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
         gap: 8px;
+        flex-wrap: wrap;
+        border-top: 1px solid rgba(47, 79, 132, 0.15);
       }
 
       .hotSource {
-        margin-top: auto;
-        padding-top: 12px;
-        border-top: 1px solid rgba(47, 79, 132, 0.15);
         display: flex;
         align-items: center;
         justify-content: flex-start;
@@ -1414,6 +1727,8 @@
       .hotSourceLabel {
         font-weight: 700;
         color: #375986;
+        letter-spacing: 0;
+        text-transform: uppercase;
       }
 
       .hotSourceText {
@@ -1452,6 +1767,26 @@
           font-size: clamp(35px, 9.4vw, 56px);
         }
 
+        .heroTopControls {
+          gap: 8px;
+        }
+
+        .aiProviderWrap {
+          min-height: 34px;
+          padding: 0 10px;
+        }
+
+        .globalAiStatus {
+          min-height: 34px;
+          padding: 0 10px;
+          font-size: 10px;
+        }
+
+        .aiProviderLabel,
+        .aiProviderSelect {
+          font-size: 11px;
+        }
+
         .heroWeekLabel {
           transform: translate(-50%, clamp(28px, 8vw, 40px));
           font-size: clamp(11px, 4.6vw, 27px);
@@ -1476,27 +1811,48 @@
         }
 
         .hotCard {
-          min-height: 268px;
+          min-height: 282px;
           padding: 26px 21px;
           width: 100%;
           margin-inline: 0;
         }
 
+        .hotBody {
+          width: 100%;
+          max-width: 100%;
+        }
+
+        .hotTopline {
+          margin-bottom: 12px;
+        }
+
         .hotRank {
-          top: 14px;
-          left: 14px;
+          min-height: 28px;
+          margin: 0 6px 6px 0;
+          padding: 7px 11px;
           font-size: 10px;
-          padding: 8px 12px;
+        }
+
+        .hotTopicPill {
+          min-height: 24px;
+          margin: 1px 0 6px;
+          padding: 0 9px;
+          font-size: 10px;
         }
 
         .hotHeadline {
-          margin-top: 34px;
-          font-size: 21px;
+          margin-top: 0;
+          font-size: 23px;
         }
 
         .hotMeta {
-          font-size: 11px;
           margin-top: 12px;
+          font-size: 11px;
+        }
+
+        .summaryLabel {
+          margin-top: 12px;
+          font-size: 10px;
         }
 
         .hotDesc {
@@ -1505,19 +1861,27 @@
           -webkit-line-clamp: unset;
         }
 
-        .summaryLabel {
-          margin-top: 12px;
-          font-size: 10px;
+        .hotInsight {
+          margin-top: 14px;
+          padding-top: 12px;
         }
 
-        .hotCats {
-          margin-top: 12px;
+        .hotAiStatus {
+          font-size: 10px;
+          margin-left: 6px;
+          padding: 0 10px;
+        }
+
+        .hotInsightText {
+          font-size: 13px;
+        }
+
+        .hotFoot {
+          padding-top: 9px;
           gap: 6px;
         }
 
         .hotSource {
-          margin-top: auto;
-          padding-top: 9px;
           font-size: 11px;
           gap: 6px;
         }
@@ -1530,7 +1894,6 @@
         .hotScroller {
           gap: 12px;
         }
-
       }
     </style>
   </head>
@@ -1538,7 +1901,18 @@
     <div class="blogShell">
       <header class="heroSection">
         <div class="heroTopBar">
-          <button id="langToggle" class="langToggleBtn" type="button" aria-label="Toggle language">KR</button>
+          <div class="heroTopControls">
+            <label class="aiProviderWrap" for="aiProviderSelect">
+              <span class="aiProviderLabel" data-i18n="ai_provider_label">AI</span>
+              <select id="aiProviderSelect" class="aiProviderSelect" aria-label="AI Provider">
+                <option value="auto" data-i18n="ai_provider_auto">Auto</option>
+                <option value="openai">OpenAI</option>
+                <option value="gemini">Gemini</option>
+              </select>
+            </label>
+            <span id="aiNetworkStatus" class="globalAiStatus" hidden data-i18n="ai_network_badge">AI Network</span>
+            <button id="langToggle" class="langToggleBtn" type="button" aria-label="Toggle language">KR</button>
+          </div>
         </div>
         <div class="heroThumb" role="img" aria-label="WEEKLY AI HOT 15">
           <img
@@ -1573,14 +1947,41 @@
             <div id="sourceToggles" class="sourceToggles"></div>
           </div>
           <div id="grid" class="stage" aria-live="polite"></div>
+          <footer class="pageFooter">
+            <div class="pageFooterCard">
+              <h4 class="pageFooterCardTitle" data-i18n="page_footer_sources_title">Curated Sources</h4>
+              <p class="pageFooterCardDesc" data-i18n="page_footer_sources_desc">이번 주 HOT 15는 글로벌 주요 AI 기술/연구 미디어 및 공식 블로그 데이터를 기반으로 구성했습니다.</p>
+              <div class="pageFooterChips">
+                <span class="pageFooterChip">AI Times</span>
+                <span class="pageFooterChip">TechCrunch</span>
+                <span class="pageFooterChip">The Rundown AI</span>
+                <span class="pageFooterChip">Superhuman</span>
+                <span class="pageFooterChip">The Decoder</span>
+                <span class="pageFooterChip">TLDR AI</span>
+                <span class="pageFooterChip">MIT Technology Review</span>
+                <span class="pageFooterChip">deepmind.google</span>
+                <span class="pageFooterChip">anthropic.com</span>
+                <span class="pageFooterChip">ai.meta.com</span>
+                <span class="pageFooterChip">Google AI</span>
+                <span class="pageFooterChip">huggingface.com</span>
+                <span class="pageFooterChip">anandtech.com</span>
+                <span class="pageFooterChip">Microsoft Research</span>
+                <span class="pageFooterChip">NVIDIA AI Blog</span>
+                <span class="pageFooterChip">The Verge</span>
+              </div>
+            </div>
+            <div class="pageFooterBrand">
+              <div class="pageFooterBrandTitle" data-i18n="page_footer_brand">Weekly AI Hot 15</div>
+              <div class="pageFooterBadgeRow">
+                <div class="pageFooterTag"><span class="pageFooterTagMark">*</span><span data-i18n="page_footer_ai_notice_short">AI Generated Content</span></div>
+                <div class="pageFooterDivider">x</div>
+                <div class="pageFooterTag"><span class="pageFooterTagMark">+</span><span data-i18n="page_footer_curated_by_prefix">Curated by</span> <span class="pageFooterTagBrand" data-i18n="page_footer_curated_by_brand">MOSSLAND</span></div>
+              </div>
+              <div class="pageFooterCopyright" data-i18n="page_footer_copyright">© 2026 MOSSLAND. All rights reserved.</div>
+            </div>
+          </footer>
         </section>
       </main>
-      <footer class="pageFooter">
-        <div class="pageFooterMeta">
-          <div data-i18n="page_footer_sources">출처: AI Times, TechCrunch, OpenAI, Google AI, DeepMind, Microsoft Research, NVIDIA AI Blog, The Verge, MIT Technology Review</div>
-          <div data-i18n="page_footer_ai_notice">안내: 카드 이미지와 일부 보조 문구는 AI로 생성되거나 AI 기반으로 보정될 수 있습니다.</div>
-        </div>
-      </footer>
     </div>
 
     <div class="srOnlyControls" aria-hidden="true">
@@ -1600,7 +2001,11 @@
         { key: "all_ai", label: "ALL AI (Aggregated)", url: "https://techcrunch.com/category/artificial-intelligence/feed/" },
         { key: "openai_news", label: "OpenAI News", url: "https://openai.com/news/rss.xml" },
         { key: "google_ai", label: "Google AI", url: "https://blog.google/technology/ai/rss/" },
-        { key: "deepmind_blog", label: "DeepMind Blog", url: "https://deepmind.google/blog/rss.xml" },
+        { key: "deepmind_blog", label: "deepmind.google", url: "https://deepmind.google/blog/rss.xml" },
+        { key: "anthropic_news", label: "anthropic.com", url: "https://www.anthropic.com/news", parser: "anthropic_news" },
+        { key: "meta_ai_blog", label: "ai.meta.com", url: "https://ai.meta.com/blog/", parser: "meta_ai_blog" },
+        { key: "huggingface_blog", label: "huggingface.com", url: "https://huggingface.co/blog/feed.xml" },
+        { key: "anandtech_ai", label: "anandtech.com", url: "https://www.anandtech.com/tag/artificial-intelligence", parser: "anandtech_ai" },
         { key: "ms_research", label: "Microsoft Research", url: "https://www.microsoft.com/en-us/research/feed/" },
         { key: "nvidia_ai", label: "NVIDIA AI Blog", url: "https://blogs.nvidia.com/feed/" },
         {
@@ -1610,23 +2015,56 @@
           parser: "aitimes_list",
         },
         { key: "tc_ai", label: "TechCrunch AI", url: "https://techcrunch.com/category/artificial-intelligence/feed/" },
+        { key: "rundown_ai", label: "The Rundown AI", url: "https://www.therundown.ai/", parser: "rundown_ai" },
+        { key: "superhuman_ai", label: "Superhuman", url: "https://www.superhuman.ai/", parser: "superhuman_ai" },
+        { key: "decoder_ai", label: "The Decoder", url: "https://the-decoder.com/feed/", parser: "rss" },
+        { key: "tldr_ai", label: "TLDR AI", url: "https://tldr.tech/api/latest/ai", parser: "tldr_ai_digest" },
         { key: "theverge_ai", label: "The Verge AI", url: "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml" },
         { key: "mittr_ai", label: "MIT Technology Review AI", url: "https://www.technologyreview.com/topic/artificial-intelligence/feed/" },
       ];
 
-      const AGGREGATE_SOURCE_KEYS = [
-        "openai_news",
-        "google_ai",
-        "deepmind_blog",
-        "ms_research",
-        "nvidia_ai",
+      const SOURCE_PRIORITY_ORDER = [
         "aitimes_industry",
         "tc_ai",
-        "theverge_ai",
+        "rundown_ai",
+        "superhuman_ai",
+        "decoder_ai",
+        "tldr_ai",
         "mittr_ai",
+        "deepmind_blog",
+        "anthropic_news",
+        "meta_ai_blog",
+        "google_ai",
+        "huggingface_blog",
+        "anandtech_ai",
+        "ms_research",
+        "theverge_ai",
+        "nvidia_ai",
+        "openai_news",
       ];
+      const SOURCE_PRIORITY_WEIGHTS = new Map([
+        ["aitimes_industry", 460],
+        ["tc_ai", 360],
+        ["rundown_ai", 210],
+        ["superhuman_ai", 198],
+        ["decoder_ai", 190],
+        ["tldr_ai", 180],
+        ["mittr_ai", 170],
+        ["deepmind_blog", 150],
+        ["anthropic_news", 136],
+        ["meta_ai_blog", 124],
+        ["google_ai", 112],
+        ["huggingface_blog", 98],
+        ["anandtech_ai", 90],
+        ["ms_research", 82],
+        ["theverge_ai", 66],
+        ["nvidia_ai", 18],
+        ["openai_news", -220],
+      ]);
+      const AGGREGATE_SOURCE_KEYS = SOURCE_PRIORITY_ORDER.filter((key) => key !== "openai_news");
       const PRIMARY_AGGREGATE_SOURCE_KEYS = ["aitimes_industry", "tc_ai"];
-      const SOURCE_TOGGLE_STORAGE_KEY = "ai2_active_sources_v1";
+      const SOURCE_TOGGLE_STORAGE_KEY = "ai2_active_sources_v4";
+      const AI2_BUILD_TAG = "2026-03-13-r4";
 
       // =========================
       // 2) CORS 프록시(예시)
@@ -1636,6 +2074,9 @@
       const USE_BACKEND = true;
       const BACKEND_API = "http://localhost:3000/api/feed";
       const BACKEND_TRANSLATE_API = BACKEND_API.replace(/\/feed$/i, "/translate");
+      const BACKEND_SUMMARY_API = BACKEND_API.replace(/\/feed$/i, "/summary");
+      const BACKEND_INSIGHT_API = BACKEND_API.replace(/\/feed$/i, "/insight");
+      const BACKEND_ARTICLE_BODY_API = BACKEND_API.replace(/\/feed$/i, "/article-body");
       const CORS_PROXY = "https://api.allorigins.win/raw?url=";
       const CORS_PROXIES = [
         (url) => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
@@ -1657,8 +2098,10 @@
       const IMG_PRELOAD_CONCURRENCY = 2;
       const HOT_WINDOW_DAYS = 7;
       const HOT_LIMIT = 15;
-      const AITIMES_MIN_CARDS = 6;
-      const TECHCRUNCH_MIN_CARDS = 5;
+      const AITIMES_MIN_CARDS = 10;
+      const TECHCRUNCH_MIN_CARDS = 4;
+      const ARTICLE_BODY_SOURCE_KEYS = new Set(["aitimes_industry", "tc_ai", "rundown_ai", "superhuman_ai", "decoder_ai", "tldr_ai"]);
+      const EXCLUDED_CARD_SOURCE_KEYS = new Set(["openai_news"]);
       const AITIMES_MAX_PAGES = Number.POSITIVE_INFINITY;
       const LAUNCH_TOP_RANK_COUNT = 10;
       const MIN_CARD_SUMMARY_CHARS = 150;
@@ -1682,9 +2125,7 @@
         ),
       );
       const CARD_BG_FALLBACKS = REAL_AI_PHOTO_POOLS.general || [];
-      const LOCAL_AI_FALLBACKS = [
-        "./HUMAN-AI.jpg",
-      ];
+      const LOCAL_AI_FALLBACKS = ["./HUMAN-AI.jpg"];
       const FALLBACK_SESSION_SEED = Math.floor(Math.random() * 1000000000);
       const KO_TRANSLATE_CACHE_KEY = "ai2_ko_translate_cache_v5";
       const EN_TRANSLATE_CACHE_KEY = "ai2_en_translate_cache_v2";
@@ -1719,8 +2160,25 @@
       const AUTO_END_DATE_BY_TODAY = true;
       const MIN_PRODUCT_TECH_ITEMS = 10;
       const ISSUE_TOKEN_MIN_LEN = 3;
-      const PRIMARY_CARD_SOURCES = new Set(["aitimes_industry", "tc_ai"]);
-      const OFFICIAL_TECH_SOURCES = new Set(["openai_news", "google_ai", "deepmind_blog", "ms_research", "nvidia_ai", "aitimes_industry", "tc_ai"]);
+      const PRIMARY_CARD_SOURCES = new Set(PRIMARY_AGGREGATE_SOURCE_KEYS);
+      const OFFICIAL_TECH_SOURCES = new Set([
+        "openai_news",
+        "google_ai",
+        "deepmind_blog",
+        "anthropic_news",
+        "meta_ai_blog",
+        "huggingface_blog",
+        "anandtech_ai",
+        "ms_research",
+        "nvidia_ai",
+        "aitimes_industry",
+        "tc_ai",
+        "rundown_ai",
+        "superhuman_ai",
+        "decoder_ai",
+        "tldr_ai",
+        "mittr_ai",
+      ]);
       const TITLE_CLUSTER_EXCLUDE = new Set([
         "openai",
         "google",
@@ -1764,6 +2222,18 @@
         "beta",
         "update",
         "updated",
+        "partner",
+        "partnership",
+        "collaboration",
+        "alliance",
+        "integration",
+        "integrated",
+        "platform",
+        "service",
+        "agent",
+        "deployment",
+        "commercial",
+        "commercialization",
         "feature",
         "features",
         "availability",
@@ -1774,6 +2244,17 @@
         "업데이트",
         "배포",
         "확장",
+        "제휴",
+        "협력",
+        "파트너십",
+        "통합",
+        "연동",
+        "플랫폼",
+        "서비스",
+        "에이전트",
+        "상용화",
+        "고도화",
+        "강화",
       ];
       const LAUNCH_PRIORITY_KEYWORDS = [
         ...PRODUCT_NEWS_KEYWORDS,
@@ -1819,6 +2300,14 @@
         "npu",
         "데이터센터",
         "클라우드",
+        "플랫폼",
+        "에이전트",
+        "반도체",
+        "추론",
+        "서빙",
+        "워크플로",
+        "멀티모달",
+        "임베딩",
       ];
       const NON_PRODUCT_NEWS_KEYWORDS = [
         "funding",
@@ -2072,6 +2561,8 @@
       const elSourceToggleWrap = document.getElementById("sourceToggleWrap");
       const elSourceToggles = document.getElementById("sourceToggles");
       const elLangToggle = document.getElementById("langToggle");
+      const elAiProviderSelect = document.getElementById("aiProviderSelect");
+      const elAiNetworkStatus = document.getElementById("aiNetworkStatus");
       const DEBUG = true;
       const log = (...args) => {
         if (DEBUG) console.log("[FE]", ...args);
@@ -2098,6 +2589,7 @@
           meta_basis_issue: "이슈 점수 우선",
           meta_basis_recent: "최신 발행순",
           meta_sources: "소스",
+          meta_ai_provider: "AI",
           no_items: "표시할 항목이 없습니다. (검색어를 지우거나 다른 카테고리를 선택해보세요)",
           no_image: "이미지 없음",
           footer_source: "RSS",
@@ -2112,6 +2604,13 @@
           hot_rank: "순위",
           summary_label: "요약",
           source_label: "출처",
+          dev_insight_label: "DEV INSIGHT",
+          dev_insight_loading: "생성 중...",
+          dev_insight_network: "AI 네트워크 문제로 인사이트를 생성하지 못했습니다.",
+          dev_insight_unavailable: "AI 인사이트를 아직 불러오지 못했습니다.",
+          ai_network_badge: "AI Network",
+          ai_provider_label: "AI",
+          ai_provider_auto: "Auto",
           source_toggle_title: "집계 소스 선택",
           source_toggle_hint: "클릭해서 포함/제외",
           summary_empty: "요약 정보가 없습니다.",
@@ -2123,8 +2622,13 @@
           err_tip1: "공개 CORS 프록시(AllOrigins)가 일시적으로 느리거나 차단되었을 수 있어요.",
           err_tip2: "안정성이 필요하면 서버/서버리스에서 RSS를 받아 JSON으로 내려주는 방식을 권장합니다.",
           err_tip3: "또는 <code>CORS_PROXY</code>를 다른 프록시로 교체해 보세요.",
-          page_footer_sources: "출처: AI Times, TechCrunch, OpenAI, Google AI, DeepMind, Microsoft Research, NVIDIA AI Blog, The Verge, MIT Technology Review",
-          page_footer_ai_notice: "안내: 카드 이미지와 일부 보조 문구는 AI로 생성되거나 AI 기반으로 보정될 수 있습니다.",
+          page_footer_sources_title: "Curated Sources",
+          page_footer_sources_desc: "이번 주 HOT 15는 글로벌 주요 AI 기술/연구 미디어 및 공식 블로그 데이터를 기반으로 구성했습니다.",
+          page_footer_brand: "Weekly AI Hot 15",
+          page_footer_ai_notice_short: "AI Generated Content",
+          page_footer_curated_by_prefix: "Curated by",
+          page_footer_curated_by_brand: "MOSSLAND",
+          page_footer_copyright: "© 2026 MOSSLAND. All rights reserved.",
         },
         en: {
           title: "WEEKLY AI HOT 15",
@@ -2144,6 +2648,7 @@
           meta_basis_issue: "Issue score first",
           meta_basis_recent: "Newest first",
           meta_sources: "sources",
+          meta_ai_provider: "AI",
           no_items: "No items to display. (Clear the query or choose another category)",
           no_image: "No image",
           footer_source: "RSS",
@@ -2158,6 +2663,13 @@
           hot_rank: "Rank",
           summary_label: "Summary",
           source_label: "Source",
+          dev_insight_label: "DEV INSIGHT",
+          dev_insight_loading: "Generating...",
+          dev_insight_network: "AI insight could not be generated because the network request failed.",
+          dev_insight_unavailable: "AI insight is not available yet.",
+          ai_network_badge: "AI Network",
+          ai_provider_label: "AI",
+          ai_provider_auto: "Auto",
           source_toggle_title: "Aggregation Sources",
           source_toggle_hint: "Click to include or exclude",
           summary_empty: "No summary available.",
@@ -2169,8 +2681,13 @@
           err_tip1: "The public CORS proxy (AllOrigins) may be slow or temporarily blocked.",
           err_tip2: "For stability, proxy RSS on a server/serverless and return JSON.",
           err_tip3: "Or replace <code>CORS_PROXY</code> with another proxy.",
-          page_footer_sources: "Sources: AI Times, TechCrunch, OpenAI, Google AI, DeepMind, Microsoft Research, NVIDIA AI Blog, The Verge, MIT Technology Review",
-          page_footer_ai_notice: "Note: Card images and some supporting copy may be AI-generated or refined with AI assistance.",
+          page_footer_sources_title: "Curated Sources",
+          page_footer_sources_desc: "This week's HOT 15 is curated from major global AI technology and research media sources, along with official product and lab blogs.",
+          page_footer_brand: "Weekly AI Hot 15",
+          page_footer_ai_notice_short: "AI Generated Content",
+          page_footer_curated_by_prefix: "Curated by",
+          page_footer_curated_by_brand: "MOSSLAND",
+          page_footer_copyright: "© 2026 MOSSLAND. All rights reserved.",
         },
       };
       let currentLang = "ko";
@@ -2194,6 +2711,45 @@
         }
       }
 
+      function normalizeAiProvider(input) {
+        const raw = String(input || "").trim().toLowerCase();
+        if (raw === "openai" || raw === "gemini") return raw;
+        return "auto";
+      }
+
+      function applyAiProviderUi() {
+        if (elAiProviderSelect) {
+          elAiProviderSelect.value = normalizeAiProvider(currentAiProvider);
+        }
+      }
+
+      function loadAiProviderFromStorage() {
+        try {
+          currentAiProvider = normalizeAiProvider(localStorage.getItem(AI_PROVIDER_STORAGE_KEY) || "auto");
+        } catch (e) {
+          currentAiProvider = "auto";
+        }
+        applyAiProviderUi();
+      }
+
+      function saveAiProviderToStorage() {
+        try {
+          localStorage.setItem(AI_PROVIDER_STORAGE_KEY, normalizeAiProvider(currentAiProvider));
+        } catch (e) {}
+      }
+
+      function hasAiNetworkIssueForItem(item, provider = currentAiProvider, lang = currentLang) {
+        const insightErrorType = getAiCardMeta(item, "__aiInsightError", provider, lang);
+        const summaryErrorType = getAiCardMeta(item, "__aiSummaryError", provider, lang);
+        return insightErrorType === "network" || summaryErrorType === "network";
+      }
+
+      function updateAiNetworkStatus(items = []) {
+        if (!elAiNetworkStatus) return;
+        const hasIssue = Array.isArray(items) && items.some((it) => hasAiNetworkIssueForItem(it, currentAiProvider, currentLang));
+        elAiNetworkStatus.hidden = !hasIssue;
+      }
+
 /** @type {Array<ReturnType<typeof mapItem>>} */
       let lastItems = [];
       let lastFeedMeta = { title: "", link: "", updated: "" };
@@ -2207,12 +2763,797 @@
       let hotWindowLabel = "";
       let hotWeekMeta = null;
       let hotSortBasis = "issue";
+      const AI_PROVIDER_STORAGE_KEY = "ai2_ai_provider_v1";
       let lastAiTimesCandidateItems = [];
       let lastAiTimesBackfillItems = [];
       let lastAiTimesEmergencyItems = [];
       let cardBgShuffleSalt = Date.now();
       const cardVisualContextCache = new WeakMap();
       let activeAggregateSourceKeys = new Set(AGGREGATE_SOURCE_KEYS);
+      let currentAiProvider = "auto";
+      const AI_CARD_TEXT_ERROR = "__ai_error__";
+      let aiCardTextRefreshPending = false;
+
+      function makeAiCardTextStoreKey(provider = currentAiProvider, lang = currentLang) {
+        return `${normalizeAiProvider(provider)}|${lang === "en" ? "en" : "ko"}`;
+      }
+
+      function ensureAiCardTextStore(item, field) {
+        if (!item || !field) return null;
+        if (!item[field] || typeof item[field] !== "object") item[field] = {};
+        return item[field];
+      }
+
+      function getAiCardText(item, field, provider = currentAiProvider, lang = currentLang) {
+        const store = item && item[field] && typeof item[field] === "object" ? item[field] : null;
+        if (!store) return "";
+        const value = store[makeAiCardTextStoreKey(provider, lang)];
+        if (!value || value === AI_CARD_TEXT_ERROR) return "";
+        return decodeHtmlEntitiesText(String(value || "")).trim();
+      }
+
+      function hasAiCardText(item, field, provider = currentAiProvider, lang = currentLang) {
+        const store = item && item[field] && typeof item[field] === "object" ? item[field] : null;
+        if (!store) return false;
+        return Object.prototype.hasOwnProperty.call(store, makeAiCardTextStoreKey(provider, lang));
+      }
+
+      function setAiCardText(item, field, value, provider = currentAiProvider, lang = currentLang) {
+        const store = ensureAiCardTextStore(item, field);
+        if (!store) return;
+        store[makeAiCardTextStoreKey(provider, lang)] = value || AI_CARD_TEXT_ERROR;
+      }
+
+      function clearAiCardText(item, field, provider = currentAiProvider, lang = currentLang) {
+        const store = item && item[field] && typeof item[field] === "object" ? item[field] : null;
+        if (!store) return;
+        delete store[makeAiCardTextStoreKey(provider, lang)];
+      }
+
+      function getAiCardMeta(item, field, provider = currentAiProvider, lang = currentLang) {
+        const store = item && item[field] && typeof item[field] === "object" ? item[field] : null;
+        if (!store) return "";
+        return String(store[makeAiCardTextStoreKey(provider, lang)] || "").trim();
+      }
+
+      function setAiCardMeta(item, field, value, provider = currentAiProvider, lang = currentLang) {
+        const store = ensureAiCardTextStore(item, field);
+        if (!store) return;
+        store[makeAiCardTextStoreKey(provider, lang)] = String(value || "").trim();
+      }
+
+      function classifyAiCardError(error) {
+        const message = String(error?.message || error || "");
+        if (/(network_error|timeout_|HTTP_502|HTTP_504)/i.test(message)) return "network";
+        if (/(api_key_missing|summary_model_missing|insight_model_missing|HTTP_503|HTTP_4\d\d)/i.test(message)) return "provider";
+        if (message) return "unknown";
+        return "";
+      }
+
+      function normalizeArticleBodyText(text, maxChars = 3600) {
+        return decodeHtmlEntitiesText(text || "")
+          .replace(/\u00a0/g, " ")
+          .replace(/\s+/g, " ")
+          .trim()
+          .slice(0, Math.max(1, maxChars));
+      }
+
+      function shouldFetchArticleBodyForItem(item) {
+        if (!USE_BACKEND) return false;
+        if (!item?.link) return false;
+        return ARTICLE_BODY_SOURCE_KEYS.has(String(item?.sourceFeed || "").trim());
+      }
+
+      function splitArticleSentences(text) {
+        return decodeHtmlEntitiesText(text || "")
+          .replace(/\s+/g, " ")
+          .trim()
+          .split(/(?<=[.!?。！？])\s+|(?<=다\.)\s+|(?<=니다\.)\s+|(?<=했다\.)\s+/)
+          .map((part) => part.trim())
+          .filter((part) => part && part.length >= 24);
+      }
+
+      function buildArticleLeadSummaryText(bodyText, titleText, lang = currentLang) {
+        const clean = normalizeArticleBodyText(bodyText, lang === "en" ? 900 : 700);
+        if (!clean) return "";
+        const sentences = splitArticleSentences(clean);
+        if (sentences.length >= 2) {
+          return sentences.slice(0, 2).join(" ");
+        }
+        const clipped = clean.slice(0, lang === "en" ? 320 : 220).trim();
+        if (!clipped) return "";
+        if (lang === "en") {
+          return proofreadEnglishSummaryText(clipped, titleText) || clipped;
+        }
+        return proofreadKoreanSummaryText(stylizeKoreanSummaryText(clipped, titleText) || clipped) || clipped;
+      }
+
+      async function fetchArticleBodyFromBackend(item) {
+        const params = new URLSearchParams({
+          url: String(item?.link || "").trim(),
+        });
+        const res = await fetchWithTimeout(`${BACKEND_ARTICLE_BODY_API}?${params.toString()}`, { method: "GET", cache: "no-store" }, NETWORK_FETCH_TIMEOUT_MS);
+        if (!res.ok) {
+          let details = "";
+          try {
+            const errJson = await res.json();
+            details = String(errJson?.error || "").trim();
+          } catch (e) {
+            details = await res.text().catch(() => "");
+          }
+          throw new Error(`ARTICLE_HTTP_${res.status}${details ? `:${details}` : ""}`);
+        }
+        const json = await res.json();
+        return {
+          bodyText: normalizeArticleBodyText(json?.bodyText || "", 4200),
+          summaryText: normalizeArticleBodyText(json?.summary || "", 600),
+        };
+      }
+
+      async function ensureArticleBodyTextForItem(item) {
+        if (!shouldFetchArticleBodyForItem(item)) return false;
+        if (item.__articleBodyLoaded) return false;
+        item.__articleBodyLoaded = true;
+        try {
+          const article = await fetchArticleBodyFromBackend(item);
+          const nextBody = normalizeArticleBodyText(article?.bodyText || "", 4200);
+          const nextSummary = normalizeArticleBodyText(article?.summaryText || "", 600);
+          const prevBody = normalizeArticleBodyText(item.__articleBodyText || "", 4200);
+          item.__articleBodyText = nextBody;
+          item.__articleBodySummary = nextSummary;
+          item.__articleBodyError = "";
+          return nextBody !== prevBody;
+        } catch (e) {
+          item.__articleBodyText = "";
+          item.__articleBodySummary = "";
+          item.__articleBodyError = classifyAiCardError(e) || "unknown";
+          return false;
+        }
+      }
+
+      async function prefetchArticleBodiesForSourceItems(items = [], sourceKey = "", limit = 18) {
+        const key = String(sourceKey || "").trim();
+        if (!key) return false;
+        const pool = dedupeByGuidOrLink(
+          (Array.isArray(items) ? items : [])
+            .filter((it) => String(it?.sourceFeed || key).trim() === key)
+            .filter((it) => shouldFetchArticleBodyForItem({ ...it, sourceFeed: key }))
+            .sort((a, b) => {
+              const launchDelta = getLaunchPriorityScore(b) - getLaunchPriorityScore(a);
+              if (launchDelta !== 0) return launchDelta;
+              return toDateMs(b?.pubDate || "") - toDateMs(a?.pubDate || "");
+            })
+            .slice(0, Math.max(1, Number(limit) || 18)),
+        );
+        if (!pool.length) return false;
+
+        let changed = false;
+        let cursor = 0;
+        const concurrency = Math.max(1, Math.min(3, pool.length));
+        const worker = async () => {
+          while (cursor < pool.length) {
+            const idx = cursor++;
+            const item = pool[idx];
+            if (!item) continue;
+            const updated = await ensureArticleBodyTextForItem(item);
+            const sourceLang = key === "aitimes_industry" ? "ko" : "en";
+            const leadSummary = buildArticleLeadSummaryText(item.__articleBodyText || "", item.title || "", sourceLang);
+            if (leadSummary && (!item.summaryText || item.summaryText.length < (sourceLang === "en" ? 140 : 80))) {
+              item.summaryText = leadSummary;
+              changed = true;
+              continue;
+            }
+            if (updated) changed = true;
+          }
+        };
+        await Promise.allSettled(Array.from({ length: concurrency }, () => worker()));
+        return changed;
+      }
+
+      function isWeakGeneratedInsight(input, lang = currentLang) {
+        const text = decodeHtmlEntitiesText(input || "").replace(/\s+/g, " ").trim();
+        if (!text) return true;
+        const sentenceCount = text
+          .split(/(?<=[.!?。！？])\s+/)
+          .map((part) => part.trim())
+          .filter(Boolean).length;
+        return lang === "en" ? text.length < 90 || sentenceCount < 2 : text.length < 44 || sentenceCount < 2;
+      }
+
+      function isWeakGeneratedSummary(input, lang = currentLang) {
+        const text = decodeHtmlEntitiesText(input || "").replace(/\s+/g, " ").trim();
+        if (!text) return true;
+        const sentenceCount = text
+          .split(/(?<=[.!?。！？])\s+/)
+          .map((part) => part.trim())
+          .filter(Boolean).length;
+        return lang === "en" ? text.length < 130 || sentenceCount < 2 : text.length < 72 || sentenceCount < 2;
+      }
+
+      function buildAiCardRequestText(item, lang = currentLang) {
+        const canonical = ensureCanonicalCardText(item);
+        let titleText =
+          lang === "ko"
+            ? decodeHtmlEntitiesText(item?.cardTitleKo || item?.titleKo || canonical.titleEn)
+            : decodeHtmlEntitiesText(canonical.titleEn);
+        if (lang === "ko") {
+          titleText = proofreadKoreanHeadlineText(stylizeKoreanHeadlineText(titleText) || titleText);
+        } else {
+          titleText = proofreadEnglishHeadlineText(titleText) || titleText;
+          if (!titleText || /[가-힣]/.test(titleText)) titleText = buildEnglishFallbackTitleFromItem(item);
+        }
+
+        let summaryText =
+          lang === "ko"
+            ? decodeHtmlEntitiesText(item?.cardSummaryKo || item?.summaryKo || "")
+            : decodeHtmlEntitiesText(canonical.summaryEn);
+        const articleBodyText = normalizeArticleBodyText(item?.__articleBodyText || "", 3600);
+        const articleBodySummary =
+          normalizeArticleBodyText(item?.__articleBodySummary || "", 500) || buildArticleLeadSummaryText(articleBodyText, titleText, lang);
+        if (!summaryText || isSummaryEmptyText(summaryText)) {
+          const emergencySummary = buildEmergencySummaryText(item?.summaryText || "", canonical.titleEn || item?.title || titleText || "");
+          summaryText = emergencySummary || articleBodySummary || decodeHtmlEntitiesText(item?.summaryText || "") || "";
+        }
+        if (lang === "ko" && summaryText) {
+          summaryText = proofreadKoreanSummaryText(stylizeKoreanSummaryText(summaryText, titleText)) || summaryText;
+        } else if (lang === "en" && summaryText) {
+          summaryText = proofreadEnglishSummaryText(summaryText, titleText) || summaryText;
+        }
+        return {
+          titleText: decodeHtmlEntitiesText(titleText || "").replace(/\s+/g, " ").trim(),
+          summaryText: decodeHtmlEntitiesText(summaryText || "").replace(/\s+/g, " ").trim(),
+          bodyText: articleBodyText,
+        };
+      }
+
+      function extractInsightSubject(titleText, lang = currentLang) {
+        const cleaned = decodeHtmlEntitiesText(titleText || "")
+          .replace(/\s+/g, " ")
+          .replace(/\s+[|｜]\s+.*$/g, "")
+          .trim();
+        if (!cleaned) return lang === "en" ? "This update" : "이번 업데이트";
+        let subject =
+          cleaned
+            .split(/\s*[:：]\s*|\s+-\s+|,\s+/)
+            .map((part) => part.trim())
+            .find(Boolean) || cleaned;
+        if (lang !== "en") {
+          subject = subject.replace(/\s*(발표|공개|출시|도입|업데이트|강화|확장|제휴|적용)\s*$/g, "").trim();
+        }
+        const maxChars = lang === "en" ? 44 : 24;
+        if (subject.length > maxChars) subject = `${subject.slice(0, maxChars).trim()}...`;
+        return subject || (lang === "en" ? "This update" : "이번 업데이트");
+      }
+
+      function pickStableVariant(options, seedInput) {
+        const list = Array.isArray(options) ? options.filter((entry) => typeof entry === "string" && entry.trim()) : [];
+        if (!list.length) return "";
+        return list[stableHashNumber(seedInput) % list.length];
+      }
+
+      function uniqueInsightLabels(entries = []) {
+        const out = [];
+        const seen = new Set();
+        (Array.isArray(entries) ? entries : []).forEach((entry) => {
+          const ko = String(entry?.ko || "").trim();
+          const en = String(entry?.en || "").trim();
+          if (!ko && !en) return;
+          const sig = `${ko}__${en}`;
+          if (seen.has(sig)) return;
+          seen.add(sig);
+          out.push({ ko, en });
+        });
+        return out;
+      }
+
+      function buildInsightAnalysis(item, titleText, summaryText) {
+        const sourceKey = String(item?.sourceFeed || "").trim();
+        const titleNorm = normalizeCompareText(titleText || "");
+        const normalized = normalizeCompareText(
+          `${titleText || ""} ${summaryText || ""} ${item?.__articleBodyText || ""} ${(item?.categories || []).join(" ")}`,
+        );
+        const detailLabels = [];
+        const pushDetail = (condition, ko, en) => {
+          if (condition) detailLabels.push({ ko, en });
+        };
+
+        pushDetail(/infini[\s-]?attention|attention|transformer|moe|mixture of experts/.test(titleNorm), "어텐션·모델 아키텍처", "attention and model architecture");
+        pushDetail(/long context|context window|context|memory|kv cache|cache/.test(titleNorm), "긴 컨텍스트와 메모리 효율", "long-context memory efficiency");
+        pushDetail(/swe[\s-]?bench/.test(titleNorm), "SWE-bench 같은 실전 개발 지표", "developer benchmarks like SWE-bench");
+        pushDetail(/benchmark|score|accuracy|latency|reasoning|coding/.test(titleNorm), "실전 성능 지표", "production-facing benchmark signals");
+        pushDetail(/\bagent\b|agents|workflow|copilot|assistant|browser|retrieval|rag/.test(titleNorm), "에이전트·워크플로 오케스트레이션", "agent workflow orchestration");
+        pushDetail(/\bapi\b|sdk|developer|platform|integration/.test(titleNorm), "API와 개발자 플랫폼 통합", "API and developer platform integration");
+        pushDetail(/aws|azure|cloud|partnership|partner|ecosystem|marketplace/.test(titleNorm), "클라우드 배포 채널", "cloud distribution channels");
+        pushDetail(/gpu|npu|chip|server|datacenter|inference|training|semiconductor/.test(titleNorm), "추론 인프라 효율", "inference infrastructure efficiency");
+        pushDetail(/video|voice|audio|image|vision|multimodal/.test(titleNorm), "멀티모달 입력 파이프라인", "multimodal input pipelines");
+        pushDetail(/robot|robotics|device|phone|wearable/.test(titleNorm), "디바이스·실세계 상호작용", "device and real-world interaction");
+        pushDetail(/open source|open-source|weights|checkpoint|hugging face/.test(titleNorm), "가중치 공개와 커스터마이징", "weight release and customization");
+        pushDetail(/security|safety|privacy|compliance|policy|regulation|guardrail/.test(titleNorm), "운영 통제와 거버넌스", "operational control and governance");
+        pushDetail(/enterprise|workplace|office|productivity|automation/.test(titleNorm), "업무 자동화 통합", "enterprise workflow automation");
+
+        pushDetail(/architecture|attention|transformer|context|memory|kv cache|multimodal|reasoning|dataset|distillation|fine tuning|fine-tuning|아키텍처|어텐션|트랜스포머|컨텍스트|메모리|데이터셋|추론|파인튜닝/.test(normalized), "모델 구조와 추론 효율", "model structure and reasoning efficiency");
+        pushDetail(/benchmark|score|latency|accuracy|coding|swe|벤치마크|점수|성능|코딩/.test(normalized), "실전 태스크 성능", "real-task performance");
+        pushDetail(/api|sdk|agent|workflow|assistant|integration|platform|copilot|browser|retrieval|rag|api|플랫폼|통합|에이전트|워크플로/.test(normalized), "제품 워크플로 통합", "product workflow integration");
+        pushDetail(/gpu|chip|server|datacenter|inference|training|semiconductor|반도체|서버|데이터센터|추론비용/.test(normalized), "서빙 비용과 처리량", "serving cost and throughput");
+        pushDetail(/aws|azure|cloud|partner|partnership|ecosystem|협력|제휴|클라우드|생태계/.test(normalized), "유통·클라우드 결합", "distribution and cloud leverage");
+        pushDetail(/open source|open-source|weights|checkpoint|허깅페이스|오픈소스|가중치/.test(normalized), "오픈 모델 생태계", "open-model ecosystem");
+        pushDetail(/security|safety|privacy|compliance|policy|regulation|보안|안전|프라이버시|규제|컴플라이언스/.test(normalized), "보안·컴플라이언스 레이어", "security and compliance layers");
+        pushDetail(/enterprise|automation|workflow|productivity|기업|자동화|업무|생산성/.test(normalized), "기업 운영 흐름", "enterprise operating flows");
+
+        const details = uniqueInsightLabels(detailLabels);
+        const hasArchitecture = /infini[\s-]?attention|attention|transformer|architecture|context|memory|kv cache|moe|reasoning|멀티모달|아키텍처|어텐션|트랜스포머|컨텍스트|메모리/.test(titleNorm) || /attention|transformer|architecture|context|memory|kv cache|reasoning|아키텍처|어텐션|트랜스포머|컨텍스트|메모리/.test(normalized);
+        const hasBenchmark = /swe[\s-]?bench|benchmark|score|latency|accuracy|coding|reasoning|벤치마크|점수|성능|코딩/.test(titleNorm) || /benchmark|score|latency|accuracy|coding|reasoning|벤치마크|점수|성능|코딩/.test(normalized);
+        const hasInfra = /gpu|npu|chip|server|datacenter|inference|training|semiconductor|반도체|서버|데이터센터|추론비용/.test(titleNorm) || /gpu|npu|chip|server|datacenter|inference|training|semiconductor|반도체|서버|데이터센터|추론비용/.test(normalized);
+        const hasPlatform = /\bapi\b|sdk|agent|workflow|assistant|copilot|integration|platform|browser|retrieval|rag|api|플랫폼|통합|에이전트|워크플로/.test(titleNorm) || /api|sdk|agent|workflow|assistant|copilot|integration|platform|browser|retrieval|rag|플랫폼|통합|에이전트|워크플로/.test(normalized);
+        const hasMultimodal = /video|voice|audio|image|vision|multimodal|robot|robotics|device|phone|wearable|영상|음성|이미지|비전|멀티모달|로봇|디바이스/.test(titleNorm) || /video|voice|audio|image|vision|multimodal|robot|robotics|device|phone|wearable|영상|음성|이미지|비전|멀티모달|로봇|디바이스/.test(normalized);
+        const hasOpenSource = /open source|open-source|weights|checkpoint|hugging face|허깅페이스|오픈소스|가중치/.test(titleNorm) || /open source|open-source|weights|checkpoint|hugging face|허깅페이스|오픈소스|가중치/.test(normalized);
+        const hasDistribution = /aws|azure|cloud|partnership|partner|ecosystem|marketplace|협력|제휴|클라우드|생태계/.test(titleNorm) || /aws|azure|cloud|partnership|partner|ecosystem|marketplace|협력|제휴|클라우드|생태계/.test(normalized);
+        const hasSafety = /security|safety|privacy|compliance|policy|regulation|guardrail|보안|안전|프라이버시|규제|컴플라이언스/.test(titleNorm) || /security|safety|privacy|compliance|policy|regulation|guardrail|보안|안전|프라이버시|규제|컴플라이언스/.test(normalized);
+        const hasEnterprise = /enterprise|workplace|office|productivity|automation|기업|업무|생산성|자동화/.test(titleNorm) || /enterprise|workplace|office|productivity|automation|기업|업무|생산성|자동화/.test(normalized);
+
+        let track = "general";
+        if (hasArchitecture) track = "architecture";
+        else if (hasBenchmark) track = "benchmark";
+        else if (hasInfra) track = "infra";
+        else if (hasPlatform) track = "platform";
+        else if (hasMultimodal) track = "multimodal";
+        else if (hasOpenSource) track = "open_source";
+        else if (hasDistribution) track = "distribution";
+        else if (hasSafety) track = "safety";
+        else if (hasEnterprise) track = "enterprise";
+
+        const defaultKo =
+          sourceKey === "aitimes_industry"
+            ? "산업 도입과 제품화 신호"
+            : sourceKey === "tc_ai"
+              ? "제품 출시와 시장 적용 신호"
+              : "배포 가능한 기술 신호";
+        const defaultEn =
+          sourceKey === "aitimes_industry"
+            ? "industry adoption and productization signals"
+            : sourceKey === "tc_ai"
+              ? "product launch and go-to-market signals"
+              : "deployment-ready technical signals";
+
+        return {
+          sourceKey,
+          track,
+          details,
+          focusKo: details[0]?.ko || defaultKo,
+          focusEn: details[0]?.en || defaultEn,
+          signalStrength: details.length + (track !== "general" ? 2 : 0) + (normalizeArticleBodyText(item?.__articleBodyText || "", 800).length >= 240 ? 1 : 0),
+        };
+      }
+
+      function buildInsightTokenSet(input, lang = currentLang) {
+        const commonStops = new Set(["update", "release", "launch", "announced", "model", "product", "article", "today", "week"]);
+        const koStops = new Set(["이번", "관련", "통해", "대한", "있는", "했다", "한다", "하며", "에서", "으로", "위한", "대한"]);
+        const enStops = new Set(["the", "and", "for", "with", "that", "this", "from", "into", "about", "their", "they"]);
+        const langStops = lang === "ko" ? koStops : enStops;
+        return new Set(
+          normalizeCompareText(input)
+            .split(/\s+/)
+            .map((token) => token.trim())
+            .filter((token) => {
+              if (!token) return false;
+              if (commonStops.has(token) || langStops.has(token)) return false;
+              return token.length >= (lang === "ko" ? 2 : 3);
+            }),
+        );
+      }
+
+      function isInsightTooSimilarToSummary(insightText, summaryText, lang = currentLang) {
+        const insight = decodeHtmlEntitiesText(insightText || "").replace(/\s+/g, " ").trim();
+        const summary = decodeHtmlEntitiesText(summaryText || "").replace(/\s+/g, " ").trim();
+        if (!insight || !summary) return false;
+        const insightNorm = normalizeCompareText(insight);
+        const summaryNorm = normalizeCompareText(summary);
+        if (!insightNorm) return true;
+        if (summaryNorm.includes(insightNorm)) return true;
+
+        const insightTokens = buildInsightTokenSet(insight, lang);
+        const summaryTokens = buildInsightTokenSet(summary, lang);
+        if (!insightTokens.size) return true;
+        let overlap = 0;
+        insightTokens.forEach((token) => {
+          if (summaryTokens.has(token)) overlap++;
+        });
+        return overlap / Math.max(1, insightTokens.size) >= 0.72;
+      }
+
+      function hasRelevantInsightSignal(analysis) {
+        if (!analysis || typeof analysis !== "object") return false;
+        if ((analysis.track || "") !== "general" && (analysis.details || []).length >= 1) return true;
+        return Number(analysis.signalStrength || 0) >= 4;
+      }
+
+      function isInsightRelevantToContext(insightText, item, titleText, summaryText, lang = currentLang) {
+        const insight = decodeHtmlEntitiesText(insightText || "").replace(/\s+/g, " ").trim();
+        if (!insight) return false;
+        const context = `${titleText || ""} ${summaryText || ""} ${item?.__articleBodyText || ""} ${Array.isArray(item?.categories) ? item.categories.join(" ") : ""}`;
+        const insightTokens = buildInsightTokenSet(insight, lang);
+        const contextTokens = buildInsightTokenSet(context, lang);
+        if (!insightTokens.size || !contextTokens.size) return false;
+        let overlap = 0;
+        insightTokens.forEach((token) => {
+          if (contextTokens.has(token)) overlap++;
+        });
+        const overlapRatio = overlap / Math.max(1, insightTokens.size);
+        return overlap >= (lang === "en" ? 2 : 1) && overlapRatio >= 0.24;
+      }
+
+      function buildLocalInsightText(item, titleText, summaryText, lang = currentLang) {
+        const subject = extractInsightSubject(titleText, lang);
+        const analysis = buildInsightAnalysis(item, titleText, summaryText);
+        if (!hasRelevantInsightSignal(analysis)) return "";
+        const { track, focusKo, focusEn } = analysis;
+        const seedBase = `${titleText || ""}|${summaryText || ""}|${item?.link || ""}|${item?.sourceFeed || ""}|${lang}|${track}`;
+
+        if (lang === "en") {
+          if (track === "architecture") {
+            return pickStableVariant(
+              [
+                `The technical signal behind ${subject} is the work on ${focusEn}, not just a feature refresh. If that layer improves, teams can push longer context handling and agent-style execution without letting memory cost and latency climb as quickly.`,
+                `${focusEn} matters here because it changes the cost curve of serving advanced models, not just the headline capability. That kind of shift can widen the range of products that keep complex reasoning or long-session features turned on by default.`,
+                `This headline points to ${focusEn} as the real differentiator underneath the launch. When that layer gets more efficient, model quality becomes easier to ship inside practical latency and infrastructure budgets.`,
+              ],
+              seedBase,
+            );
+          }
+          if (track === "benchmark") {
+            return pickStableVariant(
+              [
+                `${focusEn} is meaningful only if the gain survives real developer or reasoning workflows rather than staying on a benchmark chart. When those gains hold in production, the immediate effect is lower failure rates in automation loops and less human rework.`,
+                `The important signal here is not the score itself but what ${focusEn} says about reliability on harder tasks. If the result generalizes, it pushes AI closer to trusted use in coding, evaluation, and multi-step task completion.`,
+                `${subject} matters because ${focusEn} often reveals whether a model can handle compound work instead of isolated prompts. That distinction directly affects how far teams can move from assisted usage toward partial automation.`,
+              ],
+              seedBase,
+            );
+          }
+          if (track === "infra") {
+            return pickStableVariant(
+              [
+                `The deeper issue here is ${focusEn}, because deployment only scales when serving cost, latency, and throughput improve together. Better infrastructure efficiency is what lets advanced models stay viable under real traffic instead of demo conditions.`,
+                `${focusEn} is the layer that ultimately decides whether the update can move beyond pilot usage. If this part gets stronger, teams can support larger workloads and richer features without breaking the production cost envelope.`,
+                `This title is really about ${focusEn} more than model messaging. Infrastructure gains are what determine whether new capabilities remain affordable enough to keep enabled at scale.`,
+              ],
+              seedBase,
+            );
+          }
+          if (track === "platform") {
+            return pickStableVariant(
+              [
+                `The technical moat here comes from ${focusEn}, not from isolated model quality. Once that integration layer hardens, the product becomes harder to replace because workflows, tools, and user habits start to lock in around it.`,
+                `${focusEn} matters because AI value increasingly shows up inside repeatable workflows rather than one-off chat results. The stronger this layer becomes, the easier it is to turn a model improvement into persistent product usage.`,
+                `What stands out is ${focusEn} as the real product surface behind the announcement. That is the layer that reduces switching cost and makes automation more durable across everyday work streams.`,
+              ],
+              seedBase,
+            );
+          }
+          if (track === "multimodal") {
+            return pickStableVariant(
+              [
+                `The real technical challenge in ${subject} is ${focusEn}, because multimodal features only stick when the model can align different inputs under stable latency. If this layer improves, it expands where AI can be used in live search, device interaction, and real-time assistance.`,
+                `${focusEn} matters because it decides whether multimodal capability stays a demo or becomes a product surface people can use continuously. Lower coordination cost across inputs usually translates into broader adoption across consumer and enterprise interfaces.`,
+                `This update points to ${focusEn} as the key engineering layer under the headline. Once that path becomes reliable, the product can support richer real-time experiences without adding as much workflow friction.`,
+              ],
+              seedBase,
+            );
+          }
+          if (track === "open_source") {
+            return pickStableVariant(
+              [
+                `${focusEn} changes the pace of ecosystem adoption because developers can test, adapt, and deploy faster. As access broadens, the competitive advantage often shifts from the base model toward evaluation, tooling, and optimization layers.`,
+                `The strategic value here is ${focusEn}, not just the announcement itself. Open access usually compresses model-level differentiation and pushes more value into platform tooling, fine-tuning pipelines, and deployment operations.`,
+                `${subject} matters because ${focusEn} makes experimentation cheaper for the ecosystem. That tends to speed up downstream products and move competition toward integration quality rather than model scarcity alone.`,
+              ],
+              seedBase,
+            );
+          }
+          if (track === "distribution") {
+            return pickStableVariant(
+              [
+                `The signal behind ${subject} is ${focusEn}, because technical adoption often follows the easiest deployment path rather than the strongest raw model. When distribution and infrastructure are bundled, go-to-market speed becomes part of the product advantage.`,
+                `${focusEn} matters here because the route to market is becoming as important as the model itself. Stronger cloud and ecosystem positioning usually lowers procurement friction and accelerates enterprise rollout.`,
+                `This headline is really about ${focusEn} expanding the product's deployment surface. Once that surface widens, the winner is often the team that turns model access into faster operational adoption.`,
+              ],
+              seedBase,
+            );
+          }
+          if (track === "safety") {
+            return pickStableVariant(
+              [
+                `${focusEn} is not a side policy concern here but part of the product architecture. Enterprise deployment usually depends on whether teams can audit, constrain, and manage AI behavior without adding a heavy manual layer.`,
+                `The core implication is ${focusEn}, because stronger control paths are what turn experimental AI into something organizations can operate safely. This layer often matters more for adoption than another marginal model improvement.`,
+                `${subject} points to ${focusEn} as a shipping requirement, not just a compliance checkbox. If that layer is weak, even strong model capability tends to stall before broad rollout.`,
+              ],
+              seedBase,
+            );
+          }
+          if (track === "enterprise") {
+            return pickStableVariant(
+              [
+                `${focusEn} matters because AI value compounds when it fits existing operating systems and recurring tasks. The real win is not novelty but how smoothly the capability can be repeated, managed, and measured inside work.`,
+                `The deeper signal here is ${focusEn}, since enterprise adoption depends on lowering operational friction more than on adding one more feature. Stronger workflow fit is what turns AI from occasional assistance into dependable process infrastructure.`,
+                `${subject} is significant because ${focusEn} determines whether the product can stay in everyday business use. That layer is where productivity claims either convert into repeatable outcomes or fall apart.`,
+              ],
+              seedBase,
+            );
+          }
+          return pickStableVariant(
+            [
+              `${subject} matters less for the headline novelty than for what it says about ${focusEn}. The teams that connect that layer to deployment, operating cost, and user workflow usually capture more durable value.`,
+              `The meaningful signal here is ${focusEn}, because AI advantage is increasingly determined by how well a capability can be shipped and sustained. Technical progress only compounds when it can survive real product and infrastructure constraints.`,
+              `${focusEn} is the part to watch underneath ${subject}. That is usually where a research update turns into an actual product edge or a faster adoption path.`,
+            ],
+            seedBase,
+          );
+        }
+
+        if (track === "architecture") {
+          return pickStableVariant(
+            [
+              `${subject}의 기술 포인트는 ${focusKo}를 손봐 긴 입력과 반복 추론의 비용 구조를 바꾸려는 데 있습니다. 이 레이어가 좋아져야 더 긴 컨텍스트 처리와 에이전트 실행을 같은 예산 안에서 유지할 수 있습니다.`,
+              `핵심은 기능 이름보다 ${focusKo}가 실제 제품 차별화의 중심으로 올라왔다는 점입니다. 이 부분이 개선되면 메모리 사용량과 지연 시간 부담을 줄이면서도 고급 모델 기능을 더 오래 켜둘 수 있습니다.`,
+              `${focusKo}는 연구 키워드처럼 보이지만 실제로는 서빙 비용과 컨텍스트 확장 한계를 함께 건드리는 층입니다. 이 변화가 안정화되면 긴 문서 처리나 복합 작업 자동화를 더 넓은 제품 표면에 붙이기 쉬워집니다.`,
+            ],
+            seedBase,
+          );
+        }
+        if (track === "benchmark") {
+          return pickStableVariant(
+            [
+              `${focusKo}에서 봐야 할 것은 숫자 자체보다 그 성능이 실제 개발·추론 워크플로에서 재현되느냐입니다. 이 지표가 유지되면 단발성 답변보다 코드 수정 루프와 자동화 품질에 더 직접적인 영향을 줍니다.`,
+              `${subject}에서 중요한 것은 점수보다 ${focusKo}가 실패율과 재시도 비용을 얼마나 낮추느냐입니다. 실전 태스크에서 이 차이가 유지되면 인간 검수 비중을 줄이고 에이전트 신뢰도를 높일 수 있습니다.`,
+              `${focusKo}는 홍보용 벤치마크가 아니라 복합 업무를 얼마나 안정적으로 처리할 수 있는지 보여주는 신호에 가깝습니다. 이런 개선이 실제 환경까지 이어지면 개발 생산성과 자동화 범위가 함께 넓어질 수 있습니다.`,
+            ],
+            seedBase,
+          );
+        }
+        if (track === "infra") {
+          return pickStableVariant(
+            [
+              `이 주제의 본질은 모델 홍보보다 ${focusKo}를 얼마나 개선해 토큰당 비용과 지연 시간을 낮추느냐에 있습니다. 인프라 효율이 따라와야 더 큰 모델과 복잡한 기능도 상용 트래픽에서 유지할 수 있습니다.`,
+              `${focusKo}는 결국 서빙 단가와 처리량 문제로 이어집니다. 이 레이어가 좋아져야 파일럿 수준을 넘어서 실제 서비스 규모로 확장할 수 있습니다.`,
+              `${subject}에서 실제로 봐야 할 부분은 ${focusKo}처럼 눈에 덜 보이는 인프라 층입니다. 이 부분이 개선돼야 고급 기능이 데모가 아니라 지속 가능한 제품 기능으로 남습니다.`,
+            ],
+            seedBase,
+          );
+        }
+        if (track === "platform") {
+          return pickStableVariant(
+            [
+              `기술 포인트는 모델 자체보다 ${focusKo}를 제품 흐름 안에 얼마나 깊게 묶느냐입니다. 이 축이 강해질수록 사용자는 단발성 챗보다 반복 가능한 업무 자동화를 더 쉽게 구축하게 됩니다.`,
+              `${focusKo}는 성능 경쟁보다 전환 비용과 생태계 잠금효과를 더 크게 만듭니다. 한번 워크플로에 고정되면 모델 교체보다 통합 깊이와 운영 편의가 경쟁 우위를 좌우하게 됩니다.`,
+              `${subject}의 의미는 새로운 기능 목록보다 ${focusKo}가 제품의 기본 작업 경로로 들어간다는 데 있습니다. 이 단계에 들어서면 AI 품질 차이보다 연결성, 기록성, 반복 사용성이 더 중요해집니다.`,
+            ],
+            seedBase,
+          );
+        }
+        if (track === "multimodal") {
+          return pickStableVariant(
+            [
+              `이 제목이 보여주는 기술 포인트는 ${focusKo}를 한 추론 경로에서 다루는 능력입니다. 이 부분이 안정화되면 검색, 실시간 보조, 디바이스 기능처럼 입력이 섞이는 제품 표면이 빠르게 넓어질 수 있습니다.`,
+              `${focusKo}는 기능 추가처럼 보이지만 실제로는 지연 시간과 입력 정합성을 다루는 문제입니다. 이 레이어가 정리돼야 멀티모달 기능이 데모를 넘어 지속 사용 가능한 제품으로 넘어갑니다.`,
+              `${subject}에서 핵심은 화면에 보이는 기능보다 ${focusKo}를 얼마나 매끄럽게 연결하느냐입니다. 입력 전환 비용이 낮아져야 음성, 영상, 검색, 디바이스 제어가 하나의 경험으로 묶일 수 있습니다.`,
+            ],
+            seedBase,
+          );
+        }
+        if (track === "open_source") {
+          return pickStableVariant(
+            [
+              `핵심은 ${focusKo}가 넓어질수록 개발자 실험 속도와 파생 생태계가 빨라진다는 점입니다. 공개 범위가 커질수록 차별화 포인트는 모델 자체보다 평가, 파인튜닝, 배포 도구 쪽으로 이동합니다.`,
+              `${subject}의 가치는 발표 자체보다 ${focusKo}가 생태계 진입장벽을 얼마나 낮추느냐에 있습니다. 접근성이 넓어질수록 경쟁은 모델 희소성보다 최적화와 제품화 속도로 옮겨갑니다.`,
+              `${focusKo}는 오픈 모델이 어디까지 실제 제품 안으로 들어갈 수 있는지를 가늠하는 신호입니다. 이런 흐름이 커지면 플랫폼과 툴링 레이어의 중요도도 함께 올라갑니다.`,
+            ],
+            seedBase,
+          );
+        }
+        if (track === "distribution") {
+          return pickStableVariant(
+            [
+              `핵심은 제휴 기사 자체보다 ${focusKo}가 넓어지면서 채택 마찰이 낮아진다는 점입니다. 모델 성능이 비슷해질수록 조달, 보안, 운영도구가 묶인 유통 경로가 실제 확산 속도를 좌우합니다.`,
+              `${subject}에서 중요한 기술 함의는 모델이 ${focusKo} 안으로 더 깊게 들어간다는 점입니다. 배포 표면이 넓어질수록 우위는 알고리즘보다 운영 체계와 고객 접점에서 커질 가능성이 큽니다.`,
+              `${focusKo}는 단순 유통 이슈가 아니라 기술 채택 속도를 결정하는 인프라 레이어입니다. 이 부분이 강해질수록 같은 기능도 더 빠르게 기업 환경으로 퍼질 수 있습니다.`,
+            ],
+            seedBase,
+          );
+        }
+        if (track === "safety") {
+          return pickStableVariant(
+            [
+              `이 뉴스의 기술 포인트는 성능보다 ${focusKo}를 운영 경로에 얼마나 내장하느냐입니다. 기업 환경에서는 이 레이어가 안정적이어야 모델 개선도 실제 구매와 배포로 이어집니다.`,
+              `${focusKo}는 정책 문구가 아니라 제품 설계의 핵심 운영 층에 가깝습니다. 이 부분이 약하면 성능이 좋아도 현업 배포 단계에서 계속 제동이 걸릴 수 있습니다.`,
+              `${subject}의 의미는 기능 추가보다 ${focusKo}를 기본 제어면으로 끌어올렸다는 데 있습니다. 결국 안전한 운영 구조가 있어야 AI도 조직 안에서 지속적으로 사용됩니다.`,
+            ],
+            seedBase,
+          );
+        }
+        if (track === "enterprise") {
+          return pickStableVariant(
+            [
+              `${focusKo}는 모델 품질보다 기존 업무 시스템 안에 얼마나 무리 없이 붙느냐를 가늠하는 신호입니다. 채택은 신기한 기능보다 관리 가능성과 반복 사용성에서 결정될 가능성이 큽니다.`,
+              `${subject}의 본질은 새 기능보다 ${focusKo}가 실제 업무 루프 안으로 들어갈 수 있느냐입니다. 이 단계에 들어가야 AI가 부가 기능이 아니라 운영 인프라처럼 쓰이기 시작합니다.`,
+              `${focusKo}가 강해질수록 AI 가치는 답변 품질보다 작업 전환 비용 절감에서 더 크게 나타납니다. 결국 기업은 모델 성능보다도 얼마나 안정적으로 반복 활용할 수 있는지를 먼저 보게 됩니다.`,
+            ],
+            seedBase,
+          );
+        }
+        return pickStableVariant(
+          [
+            `${subject}에서 중요한 것은 발표 사실보다 ${focusKo} 같은 기술 레이어가 실제 제품화 단계로 이동했는지입니다. 결국 경쟁력은 기능 수보다 통합 난이도와 운영 비용을 얼마나 낮추느냐에서 갈립니다.`,
+            `핵심은 ${focusKo}가 실제 배포와 채택 속도에 어떤 차이를 만들 수 있느냐입니다. AI 경쟁은 점점 기능 소개보다 운영 가능성과 제품 연결성에서 더 크게 갈릴 가능성이 큽니다.`,
+            `${subject}의 함의는 신기한 기능보다 ${focusKo}를 얼마나 빠르게 실사용 환경에 붙일 수 있느냐에 있습니다. 이 과정이 안정화돼야 기술 뉴스가 실제 제품 우위로 이어집니다.`,
+          ],
+          seedBase,
+        );
+      }
+
+      async function fetchAiSummaryFromBackend(titleText, summaryText, bodyText = "", lang = currentLang, provider = currentAiProvider) {
+        const payload = {
+          title: decodeHtmlEntitiesText(titleText || "").replace(/\s+/g, " ").trim().slice(0, 240),
+          summary: decodeHtmlEntitiesText(summaryText || "").replace(/\s+/g, " ").trim().slice(0, 1200),
+          bodyText: normalizeArticleBodyText(bodyText || "", 3600),
+          lang: lang === "en" ? "en" : "ko",
+          provider: normalizeAiProvider(provider),
+        };
+        const res = await fetchWithTimeout(
+          BACKEND_SUMMARY_API,
+          {
+            method: "POST",
+            cache: "no-store",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          },
+          TRANSLATE_FETCH_TIMEOUT_MS,
+        );
+        if (!res.ok) {
+          let details = "";
+          try {
+            const errJson = await res.json();
+            details = String(errJson?.error || "").trim();
+          } catch (e) {
+            details = await res.text().catch(() => "");
+          }
+          throw new Error(`SUMMARY_HTTP_${res.status}${details ? `:${details}` : ""}`);
+        }
+        const json = await res.json();
+        return decodeHtmlEntitiesText(json?.summary || "").replace(/\s+/g, " ").trim();
+      }
+
+      async function fetchAiInsightFromBackend(titleText, summaryText, bodyText = "", lang = currentLang, provider = currentAiProvider) {
+        const payload = {
+          title: decodeHtmlEntitiesText(titleText || "").replace(/\s+/g, " ").trim().slice(0, 240),
+          summary: decodeHtmlEntitiesText(summaryText || "").replace(/\s+/g, " ").trim().slice(0, 1200),
+          bodyText: normalizeArticleBodyText(bodyText || "", 3600),
+          lang: lang === "en" ? "en" : "ko",
+          provider: normalizeAiProvider(provider),
+        };
+        const res = await fetchWithTimeout(
+          BACKEND_INSIGHT_API,
+          {
+            method: "POST",
+            cache: "no-store",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          },
+          TRANSLATE_FETCH_TIMEOUT_MS,
+        );
+        if (!res.ok) {
+          let details = "";
+          try {
+            const errJson = await res.json();
+            details = String(errJson?.error || "").trim();
+          } catch (e) {
+            details = await res.text().catch(() => "");
+          }
+          throw new Error(`INSIGHT_HTTP_${res.status}${details ? `:${details}` : ""}`);
+        }
+        const json = await res.json();
+        return decodeHtmlEntitiesText(json?.insight || "").replace(/\s+/g, " ").trim();
+      }
+
+      async function ensureAiCardTextsForItem(item, lang = currentLang, provider = currentAiProvider) {
+        if (!item || !USE_BACKEND) return false;
+        const requestedProvider = normalizeAiProvider(provider);
+        const requestedLang = lang === "en" ? "en" : "ko";
+        let changed = false;
+        const articleBodyUpdated = await ensureArticleBodyTextForItem(item);
+        if (articleBodyUpdated) {
+          clearAiCardText(item, "__aiSummary", requestedProvider, requestedLang);
+          clearAiCardText(item, "__aiInsight", requestedProvider, requestedLang);
+          clearAiCardText(item, "__aiSummaryError", requestedProvider, requestedLang);
+          clearAiCardText(item, "__aiInsightError", requestedProvider, requestedLang);
+          changed = true;
+        }
+        const { titleText, summaryText, bodyText } = buildAiCardRequestText(item, requestedLang);
+        if (!titleText && !summaryText && !bodyText) return false;
+
+        let nextSummary = getAiCardText(item, "__aiSummary", requestedProvider, requestedLang);
+        if (!hasAiCardText(item, "__aiSummary", requestedProvider, requestedLang)) {
+          try {
+            const generatedSummary = await fetchAiSummaryFromBackend(titleText, summaryText, bodyText, requestedLang, requestedProvider);
+            if (generatedSummary && !isSummarySameAsTitle(generatedSummary, titleText) && !isWeakGeneratedSummary(generatedSummary, requestedLang)) {
+              const polishedSummary =
+                requestedLang === "ko"
+                  ? proofreadKoreanSummaryText(stylizeKoreanSummaryText(generatedSummary, titleText)) || generatedSummary
+                  : proofreadEnglishSummaryText(generatedSummary, titleText) || generatedSummary;
+              setAiCardText(item, "__aiSummary", polishedSummary, requestedProvider, requestedLang);
+              setAiCardMeta(item, "__aiSummaryError", "", requestedProvider, requestedLang);
+              nextSummary = polishedSummary;
+              changed = true;
+            } else {
+              setAiCardText(item, "__aiSummary", "", requestedProvider, requestedLang);
+              setAiCardMeta(item, "__aiSummaryError", generatedSummary ? "short" : "empty", requestedProvider, requestedLang);
+              changed = true;
+            }
+          } catch (e) {
+            console.warn("[AI summary fallback]", requestedProvider, requestedLang, String(e?.message || e));
+            setAiCardText(item, "__aiSummary", "", requestedProvider, requestedLang);
+            setAiCardMeta(item, "__aiSummaryError", classifyAiCardError(e), requestedProvider, requestedLang);
+            changed = true;
+          }
+        }
+
+        if (!hasAiCardText(item, "__aiInsight", requestedProvider, requestedLang)) {
+          try {
+            const insightSeed = nextSummary || summaryText;
+            const generatedInsight = await fetchAiInsightFromBackend(titleText, insightSeed, bodyText, requestedLang, requestedProvider);
+            if (generatedInsight && !isWeakGeneratedInsight(generatedInsight, requestedLang)) {
+              setAiCardText(item, "__aiInsight", generatedInsight, requestedProvider, requestedLang);
+              setAiCardMeta(item, "__aiInsightError", "", requestedProvider, requestedLang);
+              changed = true;
+            } else {
+              setAiCardText(item, "__aiInsight", "", requestedProvider, requestedLang);
+              setAiCardMeta(item, "__aiInsightError", generatedInsight ? "short" : "empty", requestedProvider, requestedLang);
+              changed = true;
+            }
+          } catch (e) {
+            console.warn("[AI insight fallback]", requestedProvider, requestedLang, String(e?.message || e));
+            setAiCardText(item, "__aiInsight", "", requestedProvider, requestedLang);
+            setAiCardMeta(item, "__aiInsightError", classifyAiCardError(e), requestedProvider, requestedLang);
+            changed = true;
+          }
+        }
+        return changed;
+      }
+
+      function hydrateAiCardTexts(filteredItems, sourceItems) {
+        if (aiCardTextRefreshPending || !USE_BACKEND) return;
+        const provider = normalizeAiProvider(currentAiProvider);
+        const lang = currentLang === "en" ? "en" : "ko";
+        const targets = (filteredItems || []).slice(0, HOT_LIMIT).filter(
+          (it) => !hasAiCardText(it, "__aiSummary", provider, lang) || !hasAiCardText(it, "__aiInsight", provider, lang),
+        );
+        if (!targets.length) return;
+        aiCardTextRefreshPending = true;
+
+        const queue = targets.slice();
+        const concurrency = Math.max(1, Math.min(2, queue.length));
+        let cursor = 0;
+
+        const worker = async () => {
+          let changed = false;
+          while (cursor < queue.length) {
+            const idx = cursor++;
+            const item = queue[idx];
+            if (!item) continue;
+            const updated = await ensureAiCardTextsForItem(item, lang, provider);
+            if (updated) changed = true;
+          }
+          return changed;
+        };
+
+        Promise.allSettled(Array.from({ length: concurrency }, () => worker()))
+          .then((results) => {
+            const hasChanged = results.some((r) => r.status === "fulfilled" && r.value);
+            if (hasChanged) render(sourceItems);
+          })
+          .finally(() => {
+            aiCardTextRefreshPending = false;
+          });
+      }
 
       function loadOgCacheFromStorage() {
         try {
@@ -2567,6 +3908,37 @@
         return toSafeEnglishLabel(sourceHint, "AI Times");
       }
 
+      function getCardTopicLabel(item) {
+        const merged = normalizeCompareText(
+          `${item?.title || ""} ${item?.summaryText || ""} ${(item?.categories || []).join(" ")}`,
+        );
+        if (!merged) return "PRODUCT UPDATE";
+        if (/(benchmark|swe-bench|state of the art|sota|record|score|달성|최고 점수|기록)/i.test(merged)) return "SOTA MODEL";
+        if (/(attention|transformer|architecture|context|memory|latency|inference|throughput|어텐션|트랜스포머|아키텍처|메모리|컨텍스트)/i.test(merged)) return "ARCHITECTURE";
+        if (/(api|sdk|agent|workflow|platform|integration|service|앱|서비스|플랫폼|연동|통합|에이전트)/i.test(merged)) return "PLATFORM";
+        if (/(gpu|chip|semiconductor|npu|server|data center|infrastructure|infra|칩|반도체|서버|데이터센터|인프라)/i.test(merged)) return "INFRASTRUCTURE";
+        if (/(security|privacy|guardrail|safety|보안|프라이버시|안전)/i.test(merged)) return "SECURITY";
+        if (/(health|medical|bio|healthcare|의료|헬스케어|바이오)/i.test(merged)) return "APPLIED AI";
+        return "PRODUCT UPDATE";
+      }
+
+      function buildLooseSourceTopupPool(sourceItems = []) {
+        const relaxedPool = dedupeByGuidOrLink(
+          (sourceItems || [])
+            .filter((it) => !isBlockedCardSourceKey(it?.sourceFeed || ""))
+            .filter((it) => !isPromotionalSelfPost(it) && !isSubjectiveStyleStory(it))
+            .filter((it) => hasAnyUsableSummary(it) || hasRelaxedArticleSummary(it))
+            .sort(compareItemsBySourceOrder),
+        );
+        const loosePool = dedupeByGuidOrLink(
+          (sourceItems || [])
+            .filter((it) => !isBlockedCardSourceKey(it?.sourceFeed || ""))
+            .filter((it) => !isPromotionalSelfPost(it) && !isSubjectiveStyleStory(it))
+            .sort(compareItemsBySourceOrder),
+        );
+        return dedupeByGuidOrLink([...(relaxedPool || []), ...(loosePool || [])]);
+      }
+
       function saveActiveSourcesToStorage() {
         try {
           const arr = AGGREGATE_SOURCE_KEYS.filter((k) => activeAggregateSourceKeys.has(k));
@@ -2577,9 +3949,7 @@
       function prioritizeAggregateSourceKeys(keys) {
         const uniq = Array.from(new Set((keys || []).map((k) => String(k || "").trim()).filter(Boolean)));
         const valid = uniq.filter((k) => AGGREGATE_SOURCE_KEYS.includes(k));
-        const primary = PRIMARY_AGGREGATE_SOURCE_KEYS.filter((k) => valid.includes(k));
-        const secondary = valid.filter((k) => !PRIMARY_AGGREGATE_SOURCE_KEYS.includes(k));
-        return [...primary, ...secondary];
+        return valid.sort((a, b) => getSourcePriorityIndex(a) - getSourcePriorityIndex(b));
       }
 
       function getSelectedAggregateSourceKeys() {
@@ -2612,7 +3982,8 @@
           (elCategory?.value || "") === "all_ai"
             ? ` - ${t("meta_sources")} ${getSelectedAggregateSourceKeys().length}/${AGGREGATE_SOURCE_KEYS.length}`
             : "";
-        elMetaText.textContent = `${ts}${feedTitle}${count}${hotWindow}${sourceText}`;
+        const aiProviderText = ` - ${t("meta_ai_provider")} ${normalizeAiProvider(currentAiProvider)}`;
+        elMetaText.textContent = `${ts}${feedTitle}${count}${hotWindow}${sourceText}${aiProviderText} - build ${AI2_BUILD_TAG}`;
         setHeroWeekLabel();
       }
 
@@ -2684,13 +4055,23 @@
         return `https://images.pexels.com/photos/${id}/pexels-photo-${id}.jpeg?auto=compress&cs=tinysrgb&w=${width}&h=${height}&fit=crop`;
       }
 
+      function buildProxyImageUrl(rawUrl, quality = "high", useAlt = false) {
+        const normalized = normalizeImageUrl(rawUrl);
+        if (!normalized) return "";
+        const baseProxy = useAlt ? IMG_PROXY_ALT : IMG_PROXY;
+        const width = quality === "low" ? IMG_LOW_W : IMG_HIGH_W;
+        const imageQuality = quality === "low" ? IMG_QUALITY_LOW : IMG_QUALITY_HIGH;
+        return `${baseProxy}${encodeURIComponent(normalized)}&w=${width}&q=${imageQuality}&fit=cover`;
+      }
+
+      function buildImageCandidateUrls(rawUrl, quality = "high") {
+        const normalized = normalizeImageUrl(rawUrl);
+        if (!normalized) return [];
+        return Array.from(new Set([normalized, buildProxyImageUrl(normalized, quality, false), buildProxyImageUrl(normalized, quality, true)].filter(Boolean)));
+      }
+
       function buildImageUrl(rawUrl, quality) {
-        if (!rawUrl) return "";
-        const base =
-          quality === "low"
-            ? `${IMG_PROXY}${encodeURIComponent(rawUrl)}&w=${IMG_LOW_W}&q=${IMG_QUALITY_LOW}&fit=cover`
-            : `${IMG_PROXY}${encodeURIComponent(rawUrl)}&w=${IMG_HIGH_W}&q=${IMG_QUALITY_HIGH}&fit=cover`;
-        return base;
+        return buildImageCandidateUrls(rawUrl, quality)[0] || "";
       }
 
       function shouldLoadHighRes() {
@@ -2767,28 +4148,36 @@
 
       function preloadImage(url) {
         if (!url) return Promise.resolve(false);
-        if (imagePreloadCache.get(url) === "done") return Promise.resolve(true);
+        const cached = imagePreloadCache.get(url);
+        if (cached && cached !== "loading" && cached !== "error") return Promise.resolve(cached);
         if (imagePreloadCache.get(url) === "loading") return Promise.resolve(false);
         imagePreloadCache.set(url, "loading");
-        const load = (u, triedAlt) =>
+        const normalized = normalizeImageUrl(url);
+        const candidates = normalized ? buildImageCandidateUrls(normalized, "high") : [String(url || "").trim()].filter(Boolean);
+        const load = (candidateIndex) =>
           new Promise((resolve) => {
+            const u = candidates[candidateIndex] || "";
+            if (!u) {
+              imagePreloadCache.set(url, "error");
+              resolve(false);
+              return;
+            }
             const img = new Image();
             img.onload = () => {
-              imagePreloadCache.set(url, "done");
-              resolve(true);
+              imagePreloadCache.set(url, u);
+              resolve(u);
             };
             img.onerror = () => {
-              if (!triedAlt && u.includes(IMG_PROXY)) {
-                const altUrl = u.replace(IMG_PROXY, IMG_PROXY_ALT);
-                load(altUrl, true).then(resolve);
+              if (candidateIndex + 1 < candidates.length) {
+                load(candidateIndex + 1).then(resolve);
                 return;
               }
               imagePreloadCache.set(url, "error");
-              resolve(false);
+              resolve("");
             };
             img.src = u;
           });
-        return load(url, false);
+        return load(0);
       }
 
       async function ensureImageForItem(item) {
@@ -2799,7 +4188,11 @@
           if (shouldLoadHighRes()) {
             highOk = await preloadImage(buildImageUrl(item.imgUrl, "high"));
           }
-          if (lowOk || highOk) return item.imgUrl;
+          const resolvedUrl = highOk || lowOk || item.imgUrl;
+          if (resolvedUrl) {
+            item.displayImgUrl = normalizeImageUrl(String(resolvedUrl || "").trim()) || item.imgUrl;
+            return item.displayImgUrl;
+          }
           item.imgUrl = "";
         }
         if (!item.link) return "";
@@ -2811,7 +4204,11 @@
           if (shouldLoadHighRes()) {
             highOk = await preloadImage(buildImageUrl(ogUrl, "high"));
           }
-          if (lowOk || highOk) return ogUrl;
+          const resolvedUrl = highOk || lowOk || ogUrl;
+          if (resolvedUrl) {
+            item.displayImgUrl = normalizeImageUrl(String(resolvedUrl || "").trim()) || ogUrl;
+            return item.displayImgUrl;
+          }
           item.imgUrl = "";
         }
         return "";
@@ -3068,14 +4465,14 @@
         const nonProductHits = countKeywordHits(text, NON_PRODUCT_NEWS_KEYWORDS);
         const productBoost = Math.min(180, productHits * 42);
         const techBoost = Math.min(130, techHits * 24);
-        const sourceBoost = OFFICIAL_TECH_SOURCES.has(item?.sourceFeed || "") ? 36 : 0;
+        const sourceBoost = (OFFICIAL_TECH_SOURCES.has(item?.sourceFeed || "") ? 18 : 0) + getSourcePriorityBoost(item?.sourceFeed || "");
         const nonProductPenalty = Math.min(96, nonProductHits * 24);
         return productBoost + techBoost + sourceBoost - nonProductPenalty;
       }
 
       function getLaunchSignalMetrics(item) {
         const titleText = normalizeCompareText(item?.title || "");
-        const bodyText = normalizeCompareText(`${item?.title || ""} ${item?.summaryText || ""} ${(item?.categories || []).join(" ")}`);
+        const bodyText = getProductSignalCorpus(item);
         if (!bodyText) {
           return {
             launchHits: 0,
@@ -3093,7 +4490,7 @@
 
       function getLaunchPriorityScore(item) {
         const { launchHits, titleLaunchHits, techHits, nonProductHits } = getLaunchSignalMetrics(item);
-        const officialBoost = OFFICIAL_TECH_SOURCES.has(item?.sourceFeed || "") ? 28 : 0;
+        const officialBoost = (OFFICIAL_TECH_SOURCES.has(item?.sourceFeed || "") ? 16 : 0) + Math.round(getSourcePriorityBoost(item?.sourceFeed || "") * 0.45);
         const detailBoost = hasProductDetailCard(item, true) ? 34 : 0;
         const techNewsBoost = isProductTechNews(item) ? 26 : 0;
 
@@ -3122,7 +4519,7 @@
       }
 
       function isProductTechNews(item) {
-        const text = normalizeCompareText(`${item?.title || ""} ${item?.summaryText || ""} ${(item?.categories || []).join(" ")}`);
+        const text = getProductSignalCorpus(item);
         if (!text) return false;
         const productHits = countKeywordHits(text, PRODUCT_NEWS_KEYWORDS);
         const techHits = countKeywordHits(text, TECH_DEPTH_KEYWORDS);
@@ -3130,6 +4527,10 @@
         const hasLaunchSignal = launchHits > 0 || titleLaunchHits > 0;
         const fromOfficial = OFFICIAL_TECH_SOURCES.has(item?.sourceFeed || "");
         if (nonProductHits >= 3 && !hasLaunchSignal) return false;
+        if (String(item?.sourceFeed || "") === "aitimes_industry") {
+          if (hasLaunchSignal && (productHits >= 1 || techHits >= 1)) return true;
+          if (productHits >= 2) return true;
+        }
         if (fromOfficial) {
           if (hasLaunchSignal && (productHits >= 1 || techHits >= 2)) return true;
           return (productHits >= 1 && techHits >= 1) || techHits >= 3;
@@ -3156,6 +4557,7 @@
       }
 
       function isPromotionalSelfPost(item) {
+        if (String(item?.sourceFeed || "") === "aitimes_industry") return false;
         const title = stripHtml(decodeHtmlEntitiesText(item?.title || ""));
         const summary = stripHtml(decodeHtmlEntitiesText(item?.summaryText || ""));
         const cats = (item?.categories || []).map((c) => decodeHtmlEntitiesText(c)).join(" ");
@@ -3177,6 +4579,7 @@
       }
 
       function isSubjectiveStyleStory(item) {
+        if (String(item?.sourceFeed || "") === "aitimes_industry") return false;
         const title = decodeHtmlEntitiesText(item?.title || "");
         const summary = decodeHtmlEntitiesText(item?.summaryText || "");
         const cats = Array.isArray(item?.categories) ? item.categories.map((c) => decodeHtmlEntitiesText(c)).join(" ") : "";
@@ -3481,7 +4884,6 @@
 
       function buildAiGeneratedCardBg(item, variant = 0) {
         const key = `${FALLBACK_SESSION_SEED}|${item?.guid || ""}|${item?.link || ""}|${item?.title || ""}|${item?.pubDate || ""}|${variant}`;
-
         const seed = stableHashNumber(key);
         const topicKey = detectCardVisualTopic(item);
         const topicScene = topicVisualScenePrompt(topicKey);
@@ -3529,7 +4931,7 @@
 
       function pickLocalAiFallback(item, variant = 0) {
         const list = Array.isArray(LOCAL_AI_FALLBACKS) ? LOCAL_AI_FALLBACKS : [];
-        if (!list.length) return "./HUMAN-AI.jpg";
+        if (!list.length) return "";
         const key = `${item?.guid || ""}|${item?.link || ""}|${item?.title || ""}|${item?.pubDate || ""}|local|${variant}`;
         const idx = stableHashNumber(key) % list.length;
         return list[idx] || list[0];
@@ -3546,7 +4948,7 @@
         const entries = Array.isArray(items) ? items : [];
         const sourceImageKeys = new Set(
           entries
-            .map((it) => normalizeImageCompareKey(normalizeImageUrl(String(it?.imgUrl || "").trim())))
+            .map((it) => normalizeImageCompareKey(normalizeImageUrl(String(it?.displayImgUrl || it?.imgUrl || "").trim())))
             .filter(Boolean),
         );
         const usedKeys = new Set(sourceImageKeys);
@@ -3555,7 +4957,7 @@
         const topicCursorMap = new Map();
 
         return entries.map((it, idx) => {
-          const sourceRaw = normalizeImageUrl(String(it?.imgUrl || "").trim());
+          const sourceRaw = normalizeImageUrl(String(it?.displayImgUrl || it?.imgUrl || "").trim());
           const sourceKey = normalizeImageCompareKey(sourceRaw);
           if (sourceKey) usedKeys.add(sourceKey);
 
@@ -3592,26 +4994,25 @@
             fallbackCursor,
           );
           fallbackCursor = staticPick.nextCursor;
-          const generatedRaw = buildAiGeneratedCardBg(it, idx + 1);
           const localRaw = pickLocalAiFallback(it, idx + 1) || defaultRaw;
           const fallbackPrimaryRaw =
             primaryPick.rawUrl ||
             buildTopicMatchedPhotoFallback(it, idx * 3 + 1) ||
             staticPick.rawUrl ||
-            generatedRaw ||
             localRaw;
           const fallbackSecondaryRaw =
             secondaryPick.rawUrl ||
             buildTopicMatchedPhotoFallback(it, idx * 3 + 2) ||
             staticPick.rawUrl ||
-            generatedRaw ||
+            primaryPick.rawUrl ||
             localRaw;
           const fallbackTertiaryRaw =
+            secondaryPick.rawUrl ||
             staticPick.rawUrl ||
             buildTopicMatchedPhotoFallback(it, idx * 3 + 3) ||
-            generatedRaw ||
+            primaryPick.rawUrl ||
             localRaw;
-          const fallbackQuaternaryRaw = generatedRaw || localRaw;
+          const fallbackQuaternaryRaw = staticPick.rawUrl || secondaryPick.rawUrl || primaryPick.rawUrl || localRaw;
           const fallbackQuinaryRaw = localRaw;
           [fallbackPrimaryRaw, fallbackSecondaryRaw, fallbackTertiaryRaw, fallbackQuaternaryRaw, fallbackQuinaryRaw].forEach((raw) => {
             const k = normalizeImageCompareKey(raw);
@@ -4804,11 +6205,21 @@
         return normalizeCompareText(emergency).length >= 36;
       }
 
+      function getProductSignalCorpus(item) {
+        const canonical = ensureCanonicalCardText(item);
+        const rawTitle = decodeHtmlEntitiesText(item?.title || "");
+        const rawSummary = decodeHtmlEntitiesText(item?.summaryText || "");
+        const bodyText = decodeHtmlEntitiesText(item?.__articleBodyText || "");
+        const titleEn = decodeHtmlEntitiesText(canonical.titleEn || "");
+        const summaryEn = decodeHtmlEntitiesText(canonical.summaryEn || "");
+        const categories = Array.isArray(item?.categories) ? item.categories.join(" ") : "";
+        return normalizeCompareText(`${rawTitle} ${rawSummary} ${bodyText} ${titleEn} ${summaryEn} ${categories}`);
+      }
+
       function getProductDetailScore(item) {
         const canonical = ensureCanonicalCardText(item);
         const summaryEn = decodeHtmlEntitiesText(canonical.summaryEn || "");
-        const titleEn = decodeHtmlEntitiesText(canonical.titleEn || item?.title || "");
-        const text = normalizeCompareText(`${titleEn} ${summaryEn} ${(item?.categories || []).join(" ")}`);
+        const text = getProductSignalCorpus(item);
         if (!text) return 0;
 
         const productHits = countKeywordHits(text, PRODUCT_NEWS_KEYWORDS);
@@ -4850,7 +6261,11 @@
           "throughput",
         ]);
 
-        const len = normalizeCompareText(summaryEn).length;
+        const len = Math.max(
+          normalizeCompareText(summaryEn).length,
+          normalizeCompareText(decodeHtmlEntitiesText(item?.summaryText || "")).length,
+          normalizeCompareText(decodeHtmlEntitiesText(item?.__articleBodyText || "")).length,
+        );
         let score = 0;
         score += productHits * 2;
         score += techHits * 2;
@@ -4858,8 +6273,9 @@
         score += detailHits;
         if (OFFICIAL_TECH_SOURCES.has(item?.sourceFeed || "")) score += 1;
         if (len >= 220) score += 1;
-        if (len < 170) score -= 2;
+        if (len < 120) score -= 1;
         if (nonProductHits >= 2 && launchHits === 0 && productHits === 0) score -= 4;
+        if (String(item?.sourceFeed || "") === "aitimes_industry" && (launchHits > 0 || productHits > 0) && techHits > 0) score += 3;
         return score;
       }
 
@@ -4868,14 +6284,43 @@
         return relaxed ? score >= 3 : score >= 4;
       }
 
+      function getSourcePriorityBoost(sourceKey) {
+        const key = String(sourceKey || "").trim();
+        if (!key) return 0;
+        if (SOURCE_PRIORITY_WEIGHTS.has(key)) return SOURCE_PRIORITY_WEIGHTS.get(key) || 0;
+        if (OFFICIAL_TECH_SOURCES.has(key)) return 12;
+        return 0;
+      }
+
+      function getSourcePriorityIndex(sourceKey) {
+        const key = String(sourceKey || "").trim();
+        const idx = SOURCE_PRIORITY_ORDER.indexOf(key);
+        return idx === -1 ? SOURCE_PRIORITY_ORDER.length : idx;
+      }
+
+      function compareItemsBySourceOrder(a, b) {
+        const orderDelta = getSourcePriorityIndex(a?.sourceFeed || "") - getSourcePriorityIndex(b?.sourceFeed || "");
+        if (orderDelta !== 0) return orderDelta;
+        const launchDelta = getLaunchPriorityScore(b) - getLaunchPriorityScore(a);
+        if (launchDelta !== 0) return launchDelta;
+        const summaryDelta = summaryQualityScore(b) - summaryQualityScore(a);
+        if (summaryDelta !== 0) return summaryDelta;
+        return toDateMs(b?.pubDate || "") - toDateMs(a?.pubDate || "");
+      }
+
       function isPrimaryCardSource(sourceKey) {
         const key = String(sourceKey || "").trim();
         return PRIMARY_CARD_SOURCES.has(key);
       }
 
+      function isBlockedCardSourceKey(sourceKey) {
+        const key = String(sourceKey || "").trim();
+        return EXCLUDED_CARD_SOURCE_KEYS.has(key);
+      }
+
       function hasLaunchUpdateSignal(item) {
         const title = decodeHtmlEntitiesText(item?.title || "");
-        const summary = decodeHtmlEntitiesText(item?.summaryText || "");
+        const summary = decodeHtmlEntitiesText(`${item?.summaryText || ""} ${item?.__articleBodyText || ""}`);
         const cats = Array.isArray(item?.categories) ? item.categories.map((c) => decodeHtmlEntitiesText(c)).join(" ") : "";
         const mergedRaw = `${title} ${summary} ${cats}`.replace(/\s+/g, " ").trim();
         if (!mergedRaw) return false;
@@ -4891,6 +6336,8 @@
 
       function isProductTechCardCandidate(item, relaxed = false) {
         if (!item) return false;
+        if (isBlockedCardSourceKey(item?.sourceFeed || "")) return false;
+        if (String(item?.sourceFeed || "") === "aitimes_industry") return true;
         if (isPromotionalSelfPost(item) || isSubjectiveStyleStory(item)) return false;
 
         const summaryOk = relaxed ? hasRelaxedArticleSummary(item) || hasAnyUsableSummary(item) : hasMinimumArticleSummary(item);
@@ -4909,6 +6356,8 @@
       }
 
       function isSourcePriorityCandidate(item, relaxed = false) {
+        if (isBlockedCardSourceKey(item?.sourceFeed || "")) return false;
+        if (String(item?.sourceFeed || "") === "aitimes_industry") return true;
         if (!isProductTechCardCandidate(item, relaxed)) return false;
         const { launchHits, titleLaunchHits, techHits, nonProductHits } = getLaunchSignalMetrics(item);
         const launchSignal = titleLaunchHits > 0 || launchHits > 0 || hasLaunchUpdateSignal(item);
@@ -4921,6 +6370,22 @@
         if (launchSignal && (techStrong || detailStrong)) return true;
         if ((fromPrimary || fromOfficial) && detailStrong && techStrong) return true;
         return getLaunchPriorityScore(item) >= (relaxed ? 220 : 250) && detailStrong;
+      }
+
+      function isAiTimesStrategicCandidate(item, relaxed = false) {
+        if (String(item?.sourceFeed || "") !== "aitimes_industry") return false;
+        if (isPromotionalSelfPost(item) || isSubjectiveStyleStory(item)) return false;
+        const text = getProductSignalCorpus(item);
+        if (!text) return false;
+        const productHits = countKeywordHits(text, PRODUCT_NEWS_KEYWORDS);
+        const techHits = countKeywordHits(text, TECH_DEPTH_KEYWORDS);
+        const { launchHits, titleLaunchHits, nonProductHits } = getLaunchSignalMetrics(item);
+        const hasLaunchSignal = launchHits > 0 || titleLaunchHits > 0 || hasLaunchUpdateSignal(item);
+        if (nonProductHits >= 4 && !hasLaunchSignal) return false;
+        if (hasLaunchSignal && (productHits >= 1 || techHits >= 1)) return true;
+        if (productHits >= 2 && techHits >= 1) return true;
+        if (relaxed && productHits >= 1 && techHits >= 1) return true;
+        return false;
       }
 
       function stylizeKoreanHeadlineText(input) {
@@ -5396,6 +6861,10 @@
         return score;
       }
 
+      function isAiTimesSource(item) {
+        return String(item?.sourceFeed || "") === "aitimes_industry";
+      }
+
       function pickBetterDuplicateItem(a, b) {
         const qa = summaryQualityScore(a);
         const qb = summaryQualityScore(b);
@@ -5421,15 +6890,18 @@
       function dedupeItems(items) {
         const map = new Map();
         for (const it of items || []) {
+          const isAiTimesItem = isAiTimesSource(it);
           const titleKey = normalizeCompareText(it?.title || "").slice(0, 140);
           const linkKey = canonicalLinkKey(it?.link || "");
           const summaryKey = normalizeCompareText(getNormalizedSummaryForItem(it)).slice(0, 140);
-          const keys = [
-            it?.guid ? `g:${it.guid}` : "",
-            linkKey ? `l:${linkKey}` : "",
-            titleKey ? `t:${titleKey}` : "",
-            titleKey && summaryKey ? `ts:${titleKey}|${summaryKey}` : "",
-          ].filter(Boolean);
+          const keys = isAiTimesItem
+            ? [it?.guid ? `g:${it.guid}` : "", linkKey ? `l:${linkKey}` : "", it?.guid || linkKey ? "" : titleKey ? `t:${titleKey}` : ""].filter(Boolean)
+            : [
+                it?.guid ? `g:${it.guid}` : "",
+                linkKey ? `l:${linkKey}` : "",
+                titleKey ? `t:${titleKey}` : "",
+                titleKey && summaryKey ? `ts:${titleKey}|${summaryKey}` : "",
+              ].filter(Boolean);
           if (!keys.length) continue;
 
           let picked = it;
@@ -5444,6 +6916,7 @@
         for (const it of unique) {
           let hit = -1;
           for (let i = 0; i < merged.length; i++) {
+            if (isAiTimesSource(it) || isAiTimesSource(merged[i])) continue;
             if (isNearDuplicateByTitle(it, merged[i]) || isNearDuplicateByContent(it, merged[i])) {
               hit = i;
               break;
@@ -5473,8 +6946,8 @@
           const bvLaunch = getLaunchPriorityScore(b);
           const avLowSignal = getLowSignalPenalty(a);
           const bvLowSignal = getLowSignalPenalty(b);
-          const avPrimarySourceBoost = isPrimaryCardSource(a?.sourceFeed || "") ? 120 : 0;
-          const bvPrimarySourceBoost = isPrimaryCardSource(b?.sourceFeed || "") ? 120 : 0;
+          const avSourcePriorityBoost = getSourcePriorityBoost(a?.sourceFeed || "") + (isPrimaryCardSource(a?.sourceFeed || "") ? 36 : 0);
+          const bvSourcePriorityBoost = getSourcePriorityBoost(b?.sourceFeed || "") + (isPrimaryCardSource(b?.sourceFeed || "") ? 36 : 0);
           const avProductPriority =
             (isProductTechNews(a) ? 220 : -120) +
             (hasProductDetailCard(a, true) ? 140 : 0) +
@@ -5490,7 +6963,7 @@
             avIssue * 0.52 +
             avEng * 0.34 +
             avProductPriority +
-            avPrimarySourceBoost -
+            avSourcePriorityBoost -
             avLowSignal * 1.3;
           const bvTotal =
             bvLaunch * 2.9 +
@@ -5499,12 +6972,12 @@
             bvIssue * 0.52 +
             bvEng * 0.34 +
             bvProductPriority +
-            bvPrimarySourceBoost -
+            bvSourcePriorityBoost -
             bvLowSignal * 1.3;
           if (bvTotal !== avTotal) return bvTotal - avTotal;
           if (bvLaunch !== avLaunch) return bvLaunch - avLaunch;
           if (bvTech !== avTech) return bvTech - avTech;
-          if (bvPrimarySourceBoost !== avPrimarySourceBoost) return bvPrimarySourceBoost - avPrimarySourceBoost;
+          if (bvSourcePriorityBoost !== avSourcePriorityBoost) return bvSourcePriorityBoost - avSourcePriorityBoost;
           if (bvProductPriority !== avProductPriority) return bvProductPriority - avProductPriority;
           if (avLowSignal !== bvLowSignal) return avLowSignal - bvLowSignal;
           if (bvSummary !== avSummary) return bvSummary - avSummary;
@@ -5525,12 +6998,14 @@
           if (!ms || !Number.isFinite(ms)) return false;
           return ms >= startMs && ms < endExclusiveMs;
         });
-        const withoutPromo = inWindow.filter((it) => !isPromotionalSelfPost(it) && !isSubjectiveStyleStory(it));
+        const withoutPromo = inWindow.filter(
+          (it) => !isBlockedCardSourceKey(it?.sourceFeed || "") && !isPromotionalSelfPost(it) && !isSubjectiveStyleStory(it),
+        );
         const deduped = dedupeItems(withoutPromo);
         const { sorted, sortBasis } = sortHotItems(deduped);
-        const eligible = sorted.filter((it) => isSourcePriorityCandidate(it, false));
-        const relaxedEligible = sorted.filter((it) => isSourcePriorityCandidate(it, true));
-        const preferred = eligible.filter((it) => isGoodSummaryItem(it));
+        const eligible = sorted.filter((it) => isSourcePriorityCandidate(it, false)).sort(compareItemsBySourceOrder);
+        const relaxedEligible = sorted.filter((it) => isSourcePriorityCandidate(it, true)).sort(compareItemsBySourceOrder);
+        const preferred = eligible.filter((it) => isGoodSummaryItem(it)).sort(compareItemsBySourceOrder);
         const cap = Math.max(HOT_LIMIT, Number(selectionLimit) || HOT_LIMIT);
         const picked = preferred.slice(0, cap);
         let selected = fillHotItems(picked, eligible, cap);
@@ -5548,6 +7023,49 @@
         }
         const windowLabel = formatMonthWeekLabel(weekMeta);
         return { items: selected, sortBasis, windowLabel, weekMeta };
+      }
+
+      function buildAiTimesWeeklyBundle(items, endDateStr, selectionLimit = HOT_LIMIT) {
+        const endDate = parseDateInputToUtc(endDateStr);
+        const weekMeta = buildMonthWeekMeta(endDate);
+        const endExclusiveMs = Date.UTC(endDate.getUTCFullYear(), endDate.getUTCMonth(), endDate.getUTCDate() + 1);
+        const startMs = endExclusiveMs - HOT_WINDOW_DAYS * 24 * 60 * 60 * 1000;
+        const cap = Math.max(HOT_LIMIT, Number(selectionLimit) || 0, Number(AITIMES_MIN_CARDS) || 0, 15);
+        const dedupedItems = dedupeByGuidOrLink(items || []);
+        const weeklyItems = dedupeByGuidOrLink(
+          (items || []).filter((it) => {
+            const ms = toDateMs(it?.pubDate || "");
+            return ms >= startMs && ms < endExclusiveMs && !!String(it?.title || "").trim();
+          }),
+        ).sort((a, b) => {
+          const dateDelta = toDateMs(b?.pubDate || "") - toDateMs(a?.pubDate || "");
+          if (dateDelta !== 0) return dateDelta;
+          const launchDelta = getLaunchPriorityScore(b) - getLaunchPriorityScore(a);
+          if (launchDelta !== 0) return launchDelta;
+          return getEngagementScore(b) - getEngagementScore(a);
+        });
+        let selected = weeklyItems.slice(0, cap);
+        if (selected.length < cap) {
+          const selectedKeySet = new Set(selected.map((it) => getItemIdentityKey(it)));
+          const fallbackItems = dedupedItems
+            .filter((it) => !!String(it?.title || "").trim())
+            .filter((it) => !selectedKeySet.has(getItemIdentityKey(it)))
+            .sort((a, b) => {
+              const dateDelta = toDateMs(b?.pubDate || "") - toDateMs(a?.pubDate || "");
+              if (dateDelta !== 0) return dateDelta;
+              const launchDelta = getLaunchPriorityScore(b) - getLaunchPriorityScore(a);
+              if (launchDelta !== 0) return launchDelta;
+              return getEngagementScore(b) - getEngagementScore(a);
+            });
+          if (fallbackItems.length) {
+            selected = selected.concat(fallbackItems.slice(0, cap - selected.length));
+          }
+        }
+        const windowLabel = formatMonthWeekLabel(weekMeta);
+        lastAiTimesCandidateItems = selected.slice();
+        lastAiTimesBackfillItems = selected.slice();
+        lastAiTimesEmergencyItems = selected.slice();
+        return { items: selected, sortBasis: "recent", windowLabel, weekMeta };
       }
 
       function diversifyBySource(items, limit, perSourceMax) {
@@ -5585,6 +7103,10 @@
         const tokenFreq = buildIssueTokenFrequency(items || []);
         const byTopic = new Map();
         const consume = (it, maxPerTopic) => {
+          if (isAiTimesSource(it)) {
+            out.push(it);
+            return true;
+          }
           const topics = getTopicCandidateTokens(it, tokenFreq);
           if (topics.length) {
             for (const topic of topics) {
@@ -5648,6 +7170,10 @@
         const byKey = new Map();
         const topicLimits = { ...OVERREP_TOPIC_LIMITS, ...OVERREP_COMPOSITE_TOPIC_LIMITS };
         const tryPush = (it, relaxed) => {
+          if (isAiTimesSource(it)) {
+            out.push(it);
+            return true;
+          }
           const keys = detectOverrepTopicKeys(it);
           if (!keys.length) {
             out.push(it);
@@ -5705,6 +7231,7 @@
         const topicLimits = { ...OVERREP_TOPIC_LIMITS, ...OVERREP_COMPOSITE_TOPIC_LIMITS };
 
         const canUseTopic = (item, relaxed) => {
+          if (isAiTimesSource(item)) return true;
           const keys = detectOverrepTopicKeys(item);
           for (const key of keys) {
             const cap = (topicLimits[key] || 99) + (relaxed ? 1 : 0);
@@ -5715,11 +7242,13 @@
         };
 
         const markTopic = (item) => {
+          if (isAiTimesSource(item)) return;
           const keys = detectOverrepTopicKeys(item);
           keys.forEach((key) => byTopic.set(key, (byTopic.get(key) || 0) + 1));
         };
 
         const canUseCluster = (item, relaxed) => {
+          if (isAiTimesSource(item)) return true;
           const key = getTitleClusterKey(item);
           if (!key) return true;
           const cap = relaxed ? 2 : 1;
@@ -5728,26 +7257,34 @@
         };
 
         const markCluster = (item) => {
+          if (isAiTimesSource(item)) return;
           const key = getTitleClusterKey(item);
           if (!key) return;
           byCluster.set(key, (byCluster.get(key) || 0) + 1);
         };
 
         const isDistinct = (item, relaxed) => {
+          if (isAiTimesSource(item)) return true;
           const contentCap = relaxed ? 0.56 : 0.44;
           const titleCap = relaxed ? 0.58 : 0.46;
           return !out.some(
-            (picked) =>
-              isNearDuplicateByTitle(item, picked) ||
-              isNearDuplicateByContent(item, picked) ||
-              contentSimilarity(item, picked) >= contentCap ||
-              titleSimilarity(item, picked) >= titleCap,
+            (picked) => {
+              if (isAiTimesSource(picked)) return false;
+              return (
+                isNearDuplicateByTitle(item, picked) ||
+                isNearDuplicateByContent(item, picked) ||
+                contentSimilarity(item, picked) >= contentCap ||
+                titleSimilarity(item, picked) >= titleCap
+              );
+            },
           );
         };
 
         const tryPush = (item, relaxedTopic, relaxedSimilarity) => {
           if (!item) return false;
+          const isAiTimesSource = String(item?.sourceFeed || "") === "aitimes_industry";
           const passesSummary =
+            isAiTimesSource ||
             isGoodSummaryItem(item) ||
             (allowRelaxedSummary && hasRelaxedArticleSummary(item)) ||
             (allowAnySummary && hasAnyUsableSummary(item));
@@ -5765,10 +7302,10 @@
         };
 
         const passes = [
-          { list: baseItems || [], relaxedTopic: false, relaxedSimilarity: false },
-          { list: candidatePool || [], relaxedTopic: false, relaxedSimilarity: false },
-          { list: candidatePool || [], relaxedTopic: true, relaxedSimilarity: false },
-          { list: candidatePool || [], relaxedTopic: true, relaxedSimilarity: true },
+          { list: (baseItems || []).slice().sort(compareItemsBySourceOrder), relaxedTopic: false, relaxedSimilarity: false },
+          { list: (candidatePool || []).slice().sort(compareItemsBySourceOrder), relaxedTopic: false, relaxedSimilarity: false },
+          { list: (candidatePool || []).slice().sort(compareItemsBySourceOrder), relaxedTopic: true, relaxedSimilarity: false },
+          { list: (candidatePool || []).slice().sort(compareItemsBySourceOrder), relaxedTopic: true, relaxedSimilarity: true },
         ];
 
         for (const pass of passes) {
@@ -5882,11 +7419,15 @@
         if (!seeds.length) return [];
 
         const clusters = [];
-        const isSameTopic = (a, b) =>
-          isNearDuplicateByTitle(a, b) ||
-          isNearDuplicateByContent(a, b) ||
-          contentSimilarity(a, b) >= 0.37 ||
-          titleSimilarity(a, b) >= 0.42;
+        const isSameTopic = (a, b) => {
+          if (isAiTimesSource(a) || isAiTimesSource(b)) return false;
+          return (
+            isNearDuplicateByTitle(a, b) ||
+            isNearDuplicateByContent(a, b) ||
+            contentSimilarity(a, b) >= 0.37 ||
+            titleSimilarity(a, b) >= 0.42
+          );
+        };
 
         seeds.forEach((item, idx) => {
           let hit = -1;
@@ -5923,7 +7464,7 @@
           if (!cand) continue;
           const key = getItemIdentityKey(cand);
           if (seen.has(key)) continue;
-          const duplicate = out.some((picked) => isSameTopic(cand, picked));
+          const duplicate = isAiTimesSource(cand) ? false : out.some((picked) => isSameTopic(cand, picked));
           if (duplicate) continue;
           enrichCanonicalSummaryEn(cand, []);
           out.push(cand);
@@ -5947,6 +7488,10 @@
         const out = [];
         const byCluster = new Map();
         const consume = (it, relaxed) => {
+          if (isAiTimesSource(it)) {
+            out.push(it);
+            return true;
+          }
           const key = getTitleClusterKey(it);
           if (!key) {
             out.push(it);
@@ -5987,12 +7532,20 @@
         const threshold = Number.isFinite(similarityThreshold) ? similarityThreshold : 0.5;
         for (const it of items || []) {
           if (out.length >= limit) break;
+          if (isAiTimesSource(it)) {
+            out.push(it);
+            continue;
+          }
           const tooSimilar = out.some(
-            (picked) =>
-              isNearDuplicateByTitle(it, picked) ||
-              isNearDuplicateByContent(it, picked) ||
-              contentSimilarity(it, picked) >= threshold ||
-              titleSimilarity(it, picked) >= 0.44,
+            (picked) => {
+              if (isAiTimesSource(picked)) return false;
+              return (
+                isNearDuplicateByTitle(it, picked) ||
+                isNearDuplicateByContent(it, picked) ||
+                contentSimilarity(it, picked) >= threshold ||
+                titleSimilarity(it, picked) >= 0.44
+              );
+            },
           );
           if (tooSimilar) deferred.push(it);
           else out.push(it);
@@ -6000,8 +7553,12 @@
         if (out.length >= limit) return out.slice(0, limit);
         for (const it of deferred) {
           if (out.length >= limit) break;
+          if (isAiTimesSource(it)) {
+            out.push(it);
+            continue;
+          }
           const tooSimilar = out.some(
-            (picked) => contentSimilarity(it, picked) >= threshold + 0.06 || titleSimilarity(it, picked) >= 0.56,
+            (picked) => !isAiTimesSource(picked) && (contentSimilarity(it, picked) >= threshold + 0.06 || titleSimilarity(it, picked) >= 0.56),
           );
           if (!tooSimilar) out.push(it);
         }
@@ -6088,6 +7645,24 @@
         return out.slice(0, limit);
       }
 
+      function enforceAggregateSourceMinimums(selectedItems, pools = {}, limit = HOT_LIMIT) {
+        let out = Array.isArray(selectedItems) ? selectedItems.slice(0, limit) : [];
+        const aiTimesPool = dedupeByGuidOrLink((Array.isArray(pools?.aitimes) ? pools.aitimes : []).slice().sort(compareItemsBySourceOrder));
+        const techCrunchPool = dedupeByGuidOrLink((Array.isArray(pools?.techcrunch) ? pools.techcrunch : []).slice().sort(compareItemsBySourceOrder));
+
+        if (aiTimesPool.length) {
+          const minAiTimesCards = Math.min(limit, aiTimesPool.length, Math.max(1, Number(AITIMES_MIN_CARDS) || 1));
+          out = ensureSourcePresence(out, aiTimesPool, "aitimes_industry", minAiTimesCards, limit);
+        }
+
+        if (techCrunchPool.length) {
+          const minTcCards = Math.min(limit, techCrunchPool.length, Math.max(1, Number(TECHCRUNCH_MIN_CARDS) || 1));
+          out = ensureSourcePresence(out, techCrunchPool, "tc_ai", minTcCards, limit);
+        }
+
+        return out.slice(0, limit);
+      }
+
       function ensureTopPriorityItems(selectedItems, candidatePool, topCount = LAUNCH_TOP_RANK_COUNT, limit = HOT_LIMIT) {
         const out = (selectedItems || []).slice(0, limit);
         const target = Math.min(limit, Math.max(0, Number(topCount) || 0));
@@ -6143,7 +7718,7 @@
 
       async function fetchWeeklyHotItemsSingle(feedKey, endDateStr) {
         const feed = FEEDS.find((f) => f.key === feedKey) || null;
-        if (feed?.parser === "aitimes_list" || feedKey === "aitimes_industry") {
+        if (feed?.parser && !USE_BACKEND) {
           if (!feed?.url) {
             return {
               meta: { title: feedKey, link: "", updated: "" },
@@ -6153,7 +7728,23 @@
               sortBasis: "issue",
             };
           }
-          const sourceItems = await fetchSourceItemsWithParser(feed);
+          const sourceFeedTitle = lastFeedMeta?.title || feed.label || feed.key;
+          const sourceItems = (await fetchSourceItemsWithParser(feed)).map((it) => ({
+            ...it,
+            sourceFeed: feed.key,
+            sourceFeedTitle,
+          }));
+          if (feedKey === "aitimes_industry") {
+            await prefetchArticleBodiesForSourceItems(sourceItems, "aitimes_industry", 24);
+            const aiTimesBundle = buildAiTimesWeeklyBundle(sourceItems, endDateStr, HOT_LIMIT);
+            return {
+              meta: lastFeedMeta?.title ? lastFeedMeta : { title: feed.label || feedKey, link: feed.url, updated: "" },
+              items: aiTimesBundle.items,
+              windowLabel: aiTimesBundle.windowLabel,
+              weekMeta: aiTimesBundle.weekMeta || null,
+              sortBasis: aiTimesBundle.sortBasis,
+            };
+          }
           const endDate = parseDateInputToUtc(endDateStr);
           const weekMeta = buildMonthWeekMeta(endDate);
           const endExclusiveMs = Date.UTC(endDate.getUTCFullYear(), endDate.getUTCMonth(), endDate.getUTCDate() + 1);
@@ -6162,21 +7753,29 @@
             const ms = toDateMs(it?.pubDate || "");
             return ms >= startMs && ms < endExclusiveMs;
           });
-          const withoutPromo = inWindow.filter((it) => !isPromotionalSelfPost(it) && !isSubjectiveStyleStory(it));
+          const withoutPromo = inWindow.filter(
+            (it) => !isBlockedCardSourceKey(it?.sourceFeed || "") && !isPromotionalSelfPost(it) && !isSubjectiveStyleStory(it),
+          );
           const deduped = dedupeByGuidOrLink(withoutPromo);
           const { sorted, sortBasis } = sortHotItems(deduped);
-          const aiTimesPreferred = dedupeByGuidOrLink(sorted.filter((it) => isSourcePriorityCandidate(it, false)));
+          const preferred = dedupeByGuidOrLink(sorted.filter((it) => isSourcePriorityCandidate(it, false)));
           const relaxedCandidates = dedupeByGuidOrLink(sorted.filter((it) => isSourcePriorityCandidate(it, true)));
-          let selected = dedupeByGuidOrLink([...aiTimesPreferred, ...relaxedCandidates]);
+          let selected = dedupeByGuidOrLink([...preferred, ...relaxedCandidates]);
           if (!selected.length) {
             selected = dedupeByGuidOrLink(sorted.filter((it) => isSourcePriorityCandidate(it, true)));
           }
-          const aiTimesBackfillPool = dedupeByGuidOrLink(
+          if (selected.length < HOT_LIMIT) {
+            selected = topUpItemsByIdentity(selected, buildLooseSourceTopupPool(inWindow), HOT_LIMIT);
+          }
+          if (selected.length < HOT_LIMIT) {
+            selected = topUpItemsByIdentity(selected, buildLooseSourceTopupPool(sourceItems), HOT_LIMIT);
+          }
+          const parserBackfillPool = dedupeByGuidOrLink(
             (inWindow || [])
               .map((it) => ({
                 ...it,
-                sourceFeed: "aitimes_industry",
-                sourceFeedTitle: lastFeedMeta?.title || feed.label || "AI Times - AI Industry",
+                sourceFeed: feed.key,
+                sourceFeedTitle: lastFeedMeta?.title || feed.label || feed.key,
               }))
               .filter(
                 (it) =>
@@ -6189,8 +7788,10 @@
             if (launchDelta !== 0) return launchDelta;
             return toDateMs(b?.pubDate || "") - toDateMs(a?.pubDate || "");
           });
-          lastAiTimesBackfillItems = aiTimesBackfillPool;
-          lastAiTimesEmergencyItems = aiTimesBackfillPool.slice();
+          if (feedKey === "aitimes_industry") {
+            lastAiTimesBackfillItems = parserBackfillPool;
+            lastAiTimesEmergencyItems = parserBackfillPool.slice();
+          }
           const windowLabel = formatMonthWeekLabel(weekMeta);
           return {
             meta: lastFeedMeta?.title ? lastFeedMeta : { title: feed.label || feedKey, link: feed.url, updated: "" },
@@ -6213,9 +7814,36 @@
             }
           });
 
-          const sourceItems = weeklyItems.length ? weeklyItems : latest.items || [];
+          const sourceFeedTitle = latest?.meta?.title || feed?.label || feedKey;
+          let sourceItems = (weeklyItems.length ? weeklyItems : latest.items || []).map((it) => ({
+            ...it,
+            sourceFeed: feedKey,
+            sourceFeedTitle,
+          }));
+          if (feedKey === "aitimes_industry" && Array.isArray(latest?.items) && latest.items.length) {
+            sourceItems = dedupeByGuidOrLink([...(sourceItems || []), ...(latest.items || []).map((it) => ({
+              ...it,
+              sourceFeed: feedKey,
+              sourceFeedTitle,
+            }))]);
+          }
           if (!sourceItems.length && feed?.url) {
-            const parsedItems = await fetchSourceItemsWithParser(feed);
+            const parsedItems = (await fetchSourceItemsWithParser(feed)).map((it) => ({
+              ...it,
+              sourceFeed: feedKey,
+              sourceFeedTitle: feed.label || feedKey,
+            }));
+            if (feedKey === "aitimes_industry") {
+              await prefetchArticleBodiesForSourceItems(parsedItems, "aitimes_industry", 24);
+              const aiTimesBundle = buildAiTimesWeeklyBundle(parsedItems, endDateStr, HOT_LIMIT);
+              return {
+                meta: lastFeedMeta?.title ? lastFeedMeta : { title: feed.label || feedKey, link: feed.url, updated: "" },
+                items: aiTimesBundle.items,
+                windowLabel: aiTimesBundle.windowLabel,
+                weekMeta: aiTimesBundle.weekMeta || null,
+                sortBasis: aiTimesBundle.sortBasis,
+              };
+            }
             const parsedBundle = buildHotBundleFromItems(parsedItems, endDateStr);
             const parsedConsolidated = consolidateSimilarHotItems(parsedBundle.items, parsedBundle.items, HOT_LIMIT);
             return {
@@ -6226,8 +7854,22 @@
               sortBasis: parsedBundle.sortBasis,
             };
           }
+          if (feedKey === "aitimes_industry") {
+            await prefetchArticleBodiesForSourceItems(sourceItems, "aitimes_industry", 24);
+            const aiTimesBundle = buildAiTimesWeeklyBundle(sourceItems, endDateStr, HOT_LIMIT);
+            return {
+              meta: latest.meta || {},
+              items: aiTimesBundle.items,
+              windowLabel: aiTimesBundle.windowLabel,
+              weekMeta: aiTimesBundle.weekMeta || null,
+              sortBasis: aiTimesBundle.sortBasis,
+            };
+          }
           const bundle = buildHotBundleFromItems(sourceItems, endDateStr);
-          const consolidatedItems = consolidateSimilarHotItems(bundle.items, bundle.items, HOT_LIMIT);
+          let consolidatedItems = consolidateSimilarHotItems(bundle.items, bundle.items, HOT_LIMIT);
+          if (consolidatedItems.length < HOT_LIMIT) {
+            consolidatedItems = topUpItemsByIdentity(consolidatedItems, buildLooseSourceTopupPool(sourceItems), HOT_LIMIT);
+          }
 
           return {
             meta: latest.meta || {},
@@ -6238,9 +7880,27 @@
           };
         } catch (backendErr) {
           if (!feed?.url) throw backendErr;
-          const sourceItems = await fetchSourceItemsWithParser(feed);
+          const sourceItems = (await fetchSourceItemsWithParser(feed)).map((it) => ({
+            ...it,
+            sourceFeed: feedKey,
+            sourceFeedTitle: feed.label || feedKey,
+          }));
+          if (feedKey === "aitimes_industry") {
+            await prefetchArticleBodiesForSourceItems(sourceItems, "aitimes_industry", 24);
+            const aiTimesBundle = buildAiTimesWeeklyBundle(sourceItems, endDateStr, HOT_LIMIT);
+            return {
+              meta: lastFeedMeta?.title ? lastFeedMeta : { title: feed.label || feedKey, link: feed.url, updated: "" },
+              items: aiTimesBundle.items,
+              windowLabel: aiTimesBundle.windowLabel,
+              weekMeta: aiTimesBundle.weekMeta || null,
+              sortBasis: aiTimesBundle.sortBasis,
+            };
+          }
           const bundle = buildHotBundleFromItems(sourceItems, endDateStr);
-          const consolidatedItems = consolidateSimilarHotItems(bundle.items, bundle.items, HOT_LIMIT);
+          let consolidatedItems = consolidateSimilarHotItems(bundle.items, bundle.items, HOT_LIMIT);
+          if (consolidatedItems.length < HOT_LIMIT) {
+            consolidatedItems = topUpItemsByIdentity(consolidatedItems, buildLooseSourceTopupPool(sourceItems), HOT_LIMIT);
+          }
           return {
             meta: lastFeedMeta?.title ? lastFeedMeta : { title: feed.label || feedKey, link: feed.url, updated: "" },
             items: consolidatedItems,
@@ -6259,6 +7919,23 @@
         }
 
         const sourceKeys = getSelectedAggregateSourceKeys();
+        if (sourceKeys.length === 1) {
+          const onlyKey = sourceKeys[0];
+          const single = await fetchWeeklyHotItemsSingle(onlyKey, endDateStr);
+          const singleItems = dedupeByGuidOrLink(Array.isArray(single?.items) ? single.items : []);
+          const filled = topUpItemsByIdentity(singleItems.slice(0, HOT_LIMIT), singleItems, HOT_LIMIT);
+          return {
+            meta: {
+              title: `AI Aggregated (1 sources)`,
+              link: single?.meta?.link || "",
+              updated: single?.meta?.updated || "",
+            },
+            items: filled,
+            windowLabel: single?.windowLabel || "",
+            weekMeta: single?.weekMeta || null,
+            sortBasis: single?.sortBasis || "issue",
+          };
+        }
         const endDate = parseDateInputToUtc(endDateStr);
         const endExclusiveMs = Date.UTC(endDate.getUTCFullYear(), endDate.getUTCMonth(), endDate.getUTCDate() + 1);
         const startMs = endExclusiveMs - HOT_WINDOW_DAYS * 24 * 60 * 60 * 1000;
@@ -6287,6 +7964,7 @@
           if (aiTimesFeed?.url) {
             try {
               const aiTimesItems = await fetchSourceItemsWithParser(aiTimesFeed);
+              await prefetchArticleBodiesForSourceItems(aiTimesItems, "aitimes_industry", 24);
               const aiTimesTitle = lastFeedMeta?.title || aiTimesFeed.label;
               aiTimesItems.forEach((it) => {
                 mergedItems.push({ ...it, sourceFeed: "aitimes_industry", sourceFeedTitle: aiTimesTitle });
@@ -6525,7 +8203,7 @@
           const secondaryRelaxedPool = dedupeByGuidOrLink(
             dedupeItems([...mergedItems, ...fallbackPool]).filter((it) => {
               const sourceKey = String(it?.sourceFeed || "").trim();
-              if (!secondarySourceSet.has(sourceKey)) return false;
+              if (!secondarySourceSet.has(sourceKey) || isBlockedCardSourceKey(sourceKey)) return false;
               const ms = toDateMs(it?.pubDate || "");
               const inWindow = ms >= startMs && ms < endExclusiveMs;
               if (!inWindow || isPromotionalSelfPost(it) || isSubjectiveStyleStory(it)) return false;
@@ -6539,6 +8217,41 @@
           consolidatedFinal = topUpItemsByIdentity(consolidatedFinal, secondaryRelaxedPool, HOT_LIMIT);
         }
         consolidatedFinal = ensureTopPriorityItems(consolidatedFinal, launchPriorityPool, LAUNCH_TOP_RANK_COUNT, HOT_LIMIT);
+        if (consolidatedFinal.length < HOT_LIMIT) {
+          const absoluteFallbackPool = dedupeByGuidOrLink(
+            dedupeItems([...mergedItems, ...fallbackPool]).filter((it) => {
+              if (isBlockedCardSourceKey(it?.sourceFeed || "")) return false;
+              const ms = toDateMs(it?.pubDate || "");
+              const inWindow = ms >= startMs && ms < endExclusiveMs;
+              return inWindow && !isPromotionalSelfPost(it) && !isSubjectiveStyleStory(it);
+            }),
+          ).sort((a, b) => {
+            const launchDelta = getLaunchPriorityScore(b) - getLaunchPriorityScore(a);
+            if (launchDelta !== 0) return launchDelta;
+            return toDateMs(b?.pubDate || "") - toDateMs(a?.pubDate || "");
+          });
+          consolidatedFinal = topUpItemsByIdentity(consolidatedFinal, absoluteFallbackPool, HOT_LIMIT);
+        }
+        consolidatedFinal = enforceAggregateSourceMinimums(
+          consolidatedFinal,
+          {
+            aitimes: (
+              Array.isArray(lastAiTimesBackfillItems) && lastAiTimesBackfillItems.length
+                ? lastAiTimesBackfillItems
+                : mergedItems
+            ).filter((it) => {
+              if (String(it?.sourceFeed || "") !== "aitimes_industry") return false;
+              const ms = toDateMs(it?.pubDate || "");
+              return ms >= startMs && ms < endExclusiveMs;
+            }),
+            techcrunch: (mergedItems || []).filter((it) => {
+              if (String(it?.sourceFeed || "") !== "tc_ai") return false;
+              const ms = toDateMs(it?.pubDate || "");
+              return ms >= startMs && ms < endExclusiveMs;
+            }),
+          },
+          HOT_LIMIT,
+        );
         return {
           meta: { title: `AI Aggregated (${activeSources.length} sources)`, link: "", updated: "" },
           items: consolidatedFinal,
@@ -6566,244 +8279,73 @@
           if (elQ) elQ.value = "";
         }
 
-        const endDateForRender = parseDateInputToUtc((elDatePick?.value || "").trim());
-        const renderEndExclusiveMs = Date.UTC(
-          endDateForRender.getUTCFullYear(),
-          endDateForRender.getUTCMonth(),
-          endDateForRender.getUTCDate() + 1,
-        );
-        const renderStartMs = renderEndExclusiveMs - HOT_WINDOW_DAYS * 24 * 60 * 60 * 1000;
+        const useCuratedAllItems = selectedCategoryKey === "all_ai" && !q;
+        if (useCuratedAllItems) {
+          const curatedPool = dedupeByGuidOrLink(Array.isArray(items) ? items : []);
+          filtered = curatedPool.slice(0, HOT_LIMIT);
+          if (filtered.length < HOT_LIMIT) {
+            filtered = topUpItemsByIdentity(filtered, curatedPool, HOT_LIMIT);
+          }
+        } else {
+          const endDateForRender = parseDateInputToUtc((elDatePick?.value || "").trim());
+          const renderEndExclusiveMs = Date.UTC(
+            endDateForRender.getUTCFullYear(),
+            endDateForRender.getUTCMonth(),
+            endDateForRender.getUTCDate() + 1,
+          );
+          const renderStartMs = renderEndExclusiveMs - HOT_WINDOW_DAYS * 24 * 60 * 60 * 1000;
 
-        const strictFiltered = filtered.filter((it) => {
-          const ms = toDateMs(it?.pubDate || "");
-          const inWindow = ms >= renderStartMs && ms < renderEndExclusiveMs;
-          const sourceKey = String(it?.sourceFeed || "");
-          const isAiTimes = sourceKey === "aitimes_industry";
-          return inWindow && isSourcePriorityCandidate(it, isAiTimes);
-        });
-        filtered = strictFiltered;
-        if (filtered.length < HOT_LIMIT) {
-          const relaxedPool = (items || []).filter((it) => {
+          const strictFiltered = filtered.filter((it) => {
             const ms = toDateMs(it?.pubDate || "");
             const inWindow = ms >= renderStartMs && ms < renderEndExclusiveMs;
-            return inWindow && isSourcePriorityCandidate(it, true);
+            const sourceKey = String(it?.sourceFeed || "");
+            const isAiTimes = sourceKey === "aitimes_industry";
+            return inWindow && isSourcePriorityCandidate(it, isAiTimes);
           });
-          filtered = fillHotItems(filtered, relaxedPool, HOT_LIMIT, { allowRelaxedSummary: true });
-        }
-        if (filtered.length < HOT_LIMIT) {
-          const lastResortPool = (items || []).filter((it) => {
-            const ms = toDateMs(it?.pubDate || "");
-            const inWindow = ms >= renderStartMs && ms < renderEndExclusiveMs;
-            return inWindow && isSourcePriorityCandidate(it, true);
-          });
-          filtered = fillHotItems(filtered, lastResortPool, HOT_LIMIT, { allowRelaxedSummary: true, allowAnySummary: true });
-        }
-        if (filtered.length < HOT_LIMIT) {
-          const qualityBackfillPool = (items || []).filter((it) => {
-            const ms = toDateMs(it?.pubDate || "");
-            const inWindow = ms >= renderStartMs && ms < renderEndExclusiveMs;
-            return inWindow && isSourcePriorityCandidate(it, true);
-          });
-          filtered = fillHotItems(filtered, qualityBackfillPool, HOT_LIMIT, {
-            allowRelaxedSummary: true,
-            allowAnySummary: true,
-          });
-        }
-        if (filtered.length < HOT_LIMIT) {
-          const finalBackfillPool = (items || []).filter((it) => {
-            const ms = toDateMs(it?.pubDate || "");
-            const inWindow = ms >= renderStartMs && ms < renderEndExclusiveMs;
-            return inWindow && isSourcePriorityCandidate(it, true);
-          });
-          filtered = fillHotItems(filtered, finalBackfillPool, HOT_LIMIT, {
-            allowRelaxedSummary: true,
-            allowAnySummary: true,
-          });
-        }
-
-        if (!q) {
-          const productFallbackPool = (items || []).filter((it) => isSourcePriorityCandidate(it, true));
-          filtered = consolidateSimilarHotItems(filtered, productFallbackPool, HOT_LIMIT);
-        }
-        if (selectedCategoryKey === "all_ai") {
-          const minAiTimesCards = Math.min(HOT_LIMIT, Math.max(1, Number(AITIMES_MIN_CARDS) || 1));
-          const aiTimesPoolSource =
-            Array.isArray(lastAiTimesBackfillItems) && lastAiTimesBackfillItems.length
-              ? lastAiTimesBackfillItems
-              : Array.isArray(lastAiTimesCandidateItems) && lastAiTimesCandidateItems.length
-                ? lastAiTimesCandidateItems
-                : items || [];
-          const aiTimesPool = aiTimesPoolSource.filter((it) => {
-            if (String(it?.sourceFeed || "") !== "aitimes_industry") return false;
-            const ms = toDateMs(it?.pubDate || "");
-            const inWindow = ms >= renderStartMs && ms < renderEndExclusiveMs;
-            if (!inWindow || isPromotionalSelfPost(it) || isSubjectiveStyleStory(it)) return false;
-            return isSourcePriorityCandidate(it, true);
-          });
-          if (aiTimesPool.length) {
-            filtered = ensureSourcePresence(filtered, aiTimesPool, "aitimes_industry", minAiTimesCards, HOT_LIMIT);
-          }
-        }
-        if (selectedCategoryKey === "all_ai") {
-          const minTcCards = Math.min(HOT_LIMIT, Math.max(1, Number(TECHCRUNCH_MIN_CARDS) || 1));
-          const tcPool = (items || []).filter((it) => {
-            if (String(it?.sourceFeed || "") !== "tc_ai") return false;
-            const ms = toDateMs(it?.pubDate || "");
-            const inWindow = ms >= renderStartMs && ms < renderEndExclusiveMs;
-            return inWindow && isSourcePriorityCandidate(it, true);
-          });
-          if (tcPool.length) {
-            filtered = ensureSourcePresence(filtered, tcPool, "tc_ai", minTcCards, HOT_LIMIT);
-          }
-        }
-        const launchPool = (items || []).filter((it) => {
-          const ms = toDateMs(it?.pubDate || "");
-          const inWindow = ms >= renderStartMs && ms < renderEndExclusiveMs;
-          return inWindow && isSourcePriorityCandidate(it, true);
-        });
-        filtered = ensureTopPriorityItems(filtered, launchPool, LAUNCH_TOP_RANK_COUNT, HOT_LIMIT);
-        if (selectedCategoryKey === "all_ai") {
-          const minAiTimesCards = Math.min(HOT_LIMIT, Math.max(1, Number(AITIMES_MIN_CARDS) || 1));
-          const aiTimesPoolSource =
-            Array.isArray(lastAiTimesBackfillItems) && lastAiTimesBackfillItems.length
-              ? lastAiTimesBackfillItems
-              : Array.isArray(lastAiTimesCandidateItems) && lastAiTimesCandidateItems.length
-                ? lastAiTimesCandidateItems
-                : launchPool;
-          const aiTimesPool = aiTimesPoolSource.filter((it) => {
-            if (String(it?.sourceFeed || "") !== "aitimes_industry") return false;
-            const ms = toDateMs(it?.pubDate || "");
-            const inWindow = ms >= renderStartMs && ms < renderEndExclusiveMs;
-            if (!inWindow || isPromotionalSelfPost(it) || isSubjectiveStyleStory(it)) return false;
-            return isSourcePriorityCandidate(it, true);
-          });
-          if (aiTimesPool.length) {
-            filtered = ensureSourcePresence(filtered, aiTimesPool, "aitimes_industry", minAiTimesCards, HOT_LIMIT);
-          }
-        }
-        if (selectedCategoryKey === "all_ai") {
-          const minTcCards = Math.min(HOT_LIMIT, Math.max(1, Number(TECHCRUNCH_MIN_CARDS) || 1));
-          const tcPool = launchPool.filter((it) => String(it?.sourceFeed || "") === "tc_ai" && isSourcePriorityCandidate(it, true));
-          if (tcPool.length) {
-            filtered = ensureSourcePresence(filtered, tcPool, "tc_ai", minTcCards, HOT_LIMIT);
-          }
-        }
-        if (filtered.length < HOT_LIMIT) {
-          const renderTopupPool = (items || []).filter((it) => {
-            const ms = toDateMs(it?.pubDate || "");
-            const inWindow = ms >= renderStartMs && ms < renderEndExclusiveMs;
-            return inWindow && isSourcePriorityCandidate(it, true);
-          });
-          filtered = topUpItemsByIdentity(filtered, renderTopupPool, HOT_LIMIT);
-        }
-        if (filtered.length < HOT_LIMIT) {
-          const renderPrimaryTopupPool = (items || []).filter((it) => {
-            const ms = toDateMs(it?.pubDate || "");
-            const inWindow = ms >= renderStartMs && ms < renderEndExclusiveMs;
-            return inWindow && isPrimaryCardSource(it?.sourceFeed || "") && isProductTechCardCandidate(it, true);
-          });
-          filtered = topUpItemsByIdentity(filtered, renderPrimaryTopupPool, HOT_LIMIT);
-        }
-        if (filtered.length < HOT_LIMIT) {
-          const renderAiTimesHardPoolSource =
-            Array.isArray(lastAiTimesBackfillItems) && lastAiTimesBackfillItems.length ? lastAiTimesBackfillItems : items || [];
-          const renderAiTimesHardTopupPool = renderAiTimesHardPoolSource
-            .filter((it) => {
-            if (String(it?.sourceFeed || "") !== "aitimes_industry") return false;
-            const ms = toDateMs(it?.pubDate || "");
-            const inWindow = ms >= renderStartMs && ms < renderEndExclusiveMs;
-            if (!inWindow) return false;
-            if (isPromotionalSelfPost(it) || isSubjectiveStyleStory(it)) return false;
-            return isSourcePriorityCandidate(it, true);
-            })
-            .sort((a, b) => {
-              const launchDelta = getLaunchPriorityScore(b) - getLaunchPriorityScore(a);
-              if (launchDelta !== 0) return launchDelta;
-              return toDateMs(b?.pubDate || "") - toDateMs(a?.pubDate || "");
-            });
-          filtered = topUpItemsByIdentity(filtered, renderAiTimesHardTopupPool, HOT_LIMIT);
-        }
-        if (filtered.length < HOT_LIMIT) {
-          const renderAiTimesEmergencyPoolSource =
-            Array.isArray(lastAiTimesEmergencyItems) && lastAiTimesEmergencyItems.length ? lastAiTimesEmergencyItems : items || [];
-          const renderAiTimesEmergencyTopupPool = renderAiTimesEmergencyPoolSource
-            .filter((it) => {
-              if (String(it?.sourceFeed || "") !== "aitimes_industry") return false;
+          filtered = strictFiltered;
+          if (filtered.length < HOT_LIMIT) {
+            const relaxedPool = (items || []).filter((it) => {
               const ms = toDateMs(it?.pubDate || "");
               const inWindow = ms >= renderStartMs && ms < renderEndExclusiveMs;
-              if (!inWindow || isPromotionalSelfPost(it) || isSubjectiveStyleStory(it)) return false;
-              return isSourcePriorityCandidate(it, true);
-            })
-            .sort((a, b) => {
-              const launchDelta = getLaunchPriorityScore(b) - getLaunchPriorityScore(a);
-              if (launchDelta !== 0) return launchDelta;
-              return toDateMs(b?.pubDate || "") - toDateMs(a?.pubDate || "");
+              return inWindow && isSourcePriorityCandidate(it, true);
             });
-          filtered = topUpItemsByIdentity(filtered, renderAiTimesEmergencyTopupPool, HOT_LIMIT);
-        }
-        if (filtered.length < HOT_LIMIT) {
-          const renderProductTechBackfillPool = dedupeByGuidOrLink(
-            (items || [])
-              .filter((it) => {
-                const ms = toDateMs(it?.pubDate || "");
-                const inWindow = ms >= renderStartMs && ms < renderEndExclusiveMs;
-                if (!inWindow || isPromotionalSelfPost(it) || isSubjectiveStyleStory(it)) return false;
-                return isProductTechCardCandidate(it, true);
-              })
-              .sort((a, b) => {
-                const launchDelta = getLaunchPriorityScore(b) - getLaunchPriorityScore(a);
-                if (launchDelta !== 0) return launchDelta;
-                return toDateMs(b?.pubDate || "") - toDateMs(a?.pubDate || "");
-              }),
-          );
-          filtered = topUpItemsByIdentity(filtered, renderProductTechBackfillPool, HOT_LIMIT);
-        }
-        filtered = ensureTopPriorityItems(filtered, launchPool, LAUNCH_TOP_RANK_COUNT, HOT_LIMIT);
-        if (!q) {
-          filtered = consolidateSimilarHotItems(filtered, launchPool, HOT_LIMIT);
-        }
-        if (!q && filtered.length < HOT_LIMIT) {
-          filtered = fillHotItems(filtered, launchPool, HOT_LIMIT, {
-            allowRelaxedSummary: true,
-            allowAnySummary: true,
-          });
-        }
-        if (!q && filtered.length < HOT_LIMIT) {
-          const renderSourcePriorityPool = (items || []).filter((it) => {
-            const ms = toDateMs(it?.pubDate || "");
-            const inWindow = ms >= renderStartMs && ms < renderEndExclusiveMs;
-            return inWindow && isSourcePriorityCandidate(it, true);
-          });
-          filtered = topUpItemsByIdentity(filtered, renderSourcePriorityPool, HOT_LIMIT);
-        }
-        if (!q && filtered.length < HOT_LIMIT) {
-          const renderAiTimesFinalPoolSource =
-            Array.isArray(lastAiTimesBackfillItems) && lastAiTimesBackfillItems.length
-              ? lastAiTimesBackfillItems
-              : Array.isArray(lastAiTimesCandidateItems) && lastAiTimesCandidateItems.length
-                ? lastAiTimesCandidateItems
-                : items || [];
-          const renderAiTimesFinalTopupPool = (renderAiTimesFinalPoolSource || []).filter((it) => {
-            if (String(it?.sourceFeed || "") !== "aitimes_industry") return false;
-            const ms = toDateMs(it?.pubDate || "");
-            const inWindow = ms >= renderStartMs && ms < renderEndExclusiveMs;
-            if (!inWindow || isPromotionalSelfPost(it) || isSubjectiveStyleStory(it)) return false;
-            return isProductTechCardCandidate(it, true);
-          });
-          filtered = topUpItemsByIdentity(filtered, renderAiTimesFinalTopupPool, HOT_LIMIT);
-        }
-        if (!q && filtered.length < HOT_LIMIT) {
-          const renderRelaxedProductPool = (items || []).filter((it) => {
-            const ms = toDateMs(it?.pubDate || "");
-            const inWindow = ms >= renderStartMs && ms < renderEndExclusiveMs;
-            if (!inWindow || isPromotionalSelfPost(it) || isSubjectiveStyleStory(it)) return false;
-            return isProductTechCardCandidate(it, true);
-          });
-          filtered = topUpItemsByIdentity(filtered, renderRelaxedProductPool, HOT_LIMIT);
+            filtered = fillHotItems(filtered, relaxedPool, HOT_LIMIT, { allowRelaxedSummary: true });
+          }
+          if (filtered.length < HOT_LIMIT) {
+            const lastResortPool = (items || []).filter((it) => {
+              const ms = toDateMs(it?.pubDate || "");
+              const inWindow = ms >= renderStartMs && ms < renderEndExclusiveMs;
+              return inWindow && isSourcePriorityCandidate(it, true);
+            });
+            filtered = fillHotItems(filtered, lastResortPool, HOT_LIMIT, { allowRelaxedSummary: true, allowAnySummary: true });
+          }
+          if (filtered.length < HOT_LIMIT) {
+            const qualityBackfillPool = (items || []).filter((it) => {
+              const ms = toDateMs(it?.pubDate || "");
+              const inWindow = ms >= renderStartMs && ms < renderEndExclusiveMs;
+              return inWindow && isSourcePriorityCandidate(it, true);
+            });
+            filtered = fillHotItems(filtered, qualityBackfillPool, HOT_LIMIT, {
+              allowRelaxedSummary: true,
+              allowAnySummary: true,
+            });
+          }
+          if (filtered.length < HOT_LIMIT) {
+            const finalBackfillPool = (items || []).filter((it) => {
+              const ms = toDateMs(it?.pubDate || "");
+              const inWindow = ms >= renderStartMs && ms < renderEndExclusiveMs;
+              return inWindow && isSourcePriorityCandidate(it, true);
+            });
+            filtered = fillHotItems(filtered, finalBackfillPool, HOT_LIMIT, {
+              allowRelaxedSummary: true,
+              allowAnySummary: true,
+            });
+          }
         }
 
         elGrid.classList.add("hotList");
         if (!filtered.length) {
+          updateAiNetworkStatus([]);
           elGrid.innerHTML = `<div class="note">${t("no_items")}</div>`;
           return;
         }
@@ -6853,6 +8395,10 @@
           if (currentLang === "ko" && summaryText && /[가-힣]/.test(summaryText) && !isSummaryEmptyText(summaryText)) {
             summaryText = proofreadKoreanSummaryText(summaryText) || summaryText;
           }
+          const articleLeadSummary = buildArticleLeadSummaryText(it.__articleBodyText || "", titleText, currentLang);
+          if ((!summaryText || isSummaryEmptyText(summaryText) || summaryText.length < (currentLang === "en" ? 120 : 68)) && articleLeadSummary) {
+            summaryText = articleLeadSummary;
+          }
           if (!summaryText || isSummaryEmptyText(summaryText)) {
             const emergencySummary = buildEmergencySummaryText(it.summaryText || "", canonical.titleEn || it.title || titleText || "");
             if (emergencySummary && !isSummaryEmptyText(emergencySummary)) {
@@ -6865,6 +8411,10 @@
           if (!summaryText || isSummaryEmptyText(summaryText)) {
             summaryText = currentLang === "ko" ? "자세한 내용은 원문 링크에서 확인할 수 있습니다." : "See the source link for full details.";
           }
+          const generatedSummary = getAiCardText(it, "__aiSummary", currentAiProvider, currentLang);
+          if (generatedSummary) {
+            summaryText = generatedSummary;
+          }
           const creatorText = getLocalizedCreatorText(it, currentLang);
           const date = it.pubDate ? new Date(it.pubDate) : null;
           const dateText =
@@ -6876,11 +8426,15 @@
           const sourceMarkup = it.link
             ? `<a class="hotSourceLink" href="${escapeHtml(it.link)}" target="_blank" rel="noopener noreferrer">${escapeHtml(sourceText)}</a>`
             : `<span class="hotSourceText">${escapeHtml(sourceText)}</span>`;
-          const categoryList = currentLang === "en" ? (it.categoriesEn && it.categoriesEn.length ? it.categoriesEn : getLocalizedCategories(it, "en")) : getLocalizedCategories(it, "ko");
-          const cats = (categoryList || [])
-            .slice(0, 3)
-            .map((c) => `<span class="pill">${escapeHtml(decodeHtmlEntitiesText(c))}</span>`)
-            .join("");
+          const topicLabel = getCardTopicLabel(it);
+          const aiInsightText = getAiCardText(it, "__aiInsight", currentAiProvider, currentLang);
+          const fallbackInsightText = buildLocalInsightText(it, titleText, summaryText, currentLang);
+          const aiInsightUsable =
+            aiInsightText &&
+            !isInsightTooSimilarToSummary(aiInsightText, summaryText, currentLang) &&
+            isInsightRelevantToContext(aiInsightText, it, titleText, summaryText, currentLang);
+          const devInsightText = aiInsightUsable ? aiInsightText : fallbackInsightText;
+          const shouldRenderInsight = !!devInsightText;
           const bgInfo = bgAssignments[idx] || {
             hasSourceImage: false,
             primaryCardBg: "",
@@ -6901,16 +8455,17 @@
             .map((url) => `url('${escapeHtml(url)}')`)
             .join(", ");
           const baseLayers = fallbackLayers || `url('./HUMAN-AI.jpg')`;
-          const cardBgLayer = primaryCardBg
-            ? `url('${escapeHtml(primaryCardBg)}'), ${baseLayers}`
-            : baseLayers;
+          const cardBgLayer = primaryCardBg ? `url('${escapeHtml(primaryCardBg)}')` : baseLayers;
           const bgStyle = `--card-bg:${cardBgLayer};`;
           const cardClass = bgInfo.hasSourceImage ? "hotCard hotCardBg hasImage" : "hotCard hotCardBg noImage";
           cardHtml.push(`
             <article class="${cardClass}" style="--delay:${idx * 70}ms;${bgStyle}">
               <div class="hotCardOverlay"></div>
-              <span class="hotRank">${t("hot_rank")} ${rank}</span>
               <div class="hotBody">
+                <div class="hotTopline">
+                  <span class="hotRank">${t("hot_rank")} ${rank}</span>
+                  <span class="hotTopicPill">${escapeHtml(topicLabel)}</span>
+                </div>
                 <h3 class="hotHeadline">
                   <a href="${escapeHtml(it.link)}" target="_blank" rel="noopener noreferrer">${escapeHtml(titleText)}</a>
                 </h3>
@@ -6920,10 +8475,17 @@
                 </div>
                 <p class="summaryLabel">${t("summary_label")}</p>
                 <p class="hotDesc">${escapeHtml(summaryText)}</p>
-                <div class="hotCats">${cats}</div>
-                <div class="hotSource">
-                  <span class="hotSourceLabel">${t("source_label")}</span>
-                  ${sourceMarkup}
+                ${shouldRenderInsight
+                  ? `<div class="hotInsight">
+                      <p class="hotInsightLabel">${t("dev_insight_label")}</p>
+                      <p class="hotInsightText">${escapeHtml(devInsightText)}</p>
+                    </div>`
+                  : ""}
+                <div class="hotFoot">
+                  <div class="hotSource">
+                    <span class="hotSourceLabel">${t("source_label")}</span>
+                    ${sourceMarkup}
+                  </div>
                 </div>
               </div>
             </article>
@@ -6932,10 +8494,12 @@
         });
 
         if (!cardHtml.length) {
+          updateAiNetworkStatus([]);
           elGrid.innerHTML = `<div class="note">${t("no_items")}</div>`;
           return;
         }
 
+        updateAiNetworkStatus(renderItems);
         elGrid.innerHTML = `
           <div class="hotHeader">
             <div>
@@ -6949,6 +8513,7 @@
 
         preloadAllImagesInOrder(renderItems, 0);
         hydrateMissingImages(renderItems, items);
+        hydrateAiCardTexts(renderItems, items);
       }
 
       async function fetchFeedJson(cat, dateStr) {
@@ -7072,10 +8637,171 @@
         return deduped;
       }
 
+      function normalizeLooseHtmlPubDate(rawDateText) {
+        const raw = decodeHtmlEntitiesText(rawDateText || "").replace(/\s+/g, " ").trim();
+        if (!raw) return "";
+        const parsed = new Date(raw);
+        if (!Number.isNaN(parsed.valueOf())) return parsed.toISOString();
+        const ymd = raw.match(/(\d{4})[./-](\d{1,2})[./-](\d{1,2})/);
+        if (ymd) {
+          const utcMs = Date.UTC(Number(ymd[1]), Number(ymd[2]) - 1, Number(ymd[3]), 0, 0, 0);
+          if (!Number.isNaN(utcMs)) return new Date(utcMs).toISOString();
+        }
+        return "";
+      }
+
+      function parseGenericAnchorFeed(htmlText, source, options = {}) {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(String(htmlText || ""), "text/html");
+        const feedUrl = String(source?.url || "");
+        const titleNode = doc.querySelector("title");
+        lastFeedMeta = {
+          title: decodeHtmlEntitiesText(titleNode?.textContent || source?.label || source?.key || "").replace(/\s+/g, " ").trim(),
+          link: feedUrl,
+          updated: "",
+        };
+
+        const hrefPattern = options.hrefPattern instanceof RegExp ? options.hrefPattern : /.*/i;
+        const anchors = Array.from(doc.querySelectorAll("a[href]"));
+        const items = [];
+        const seen = new Set();
+
+        for (const anchor of anchors) {
+          const href = toAbsoluteUrl(anchor.getAttribute("href") || "", feedUrl);
+          const titleText = decodeHtmlEntitiesText(anchor.textContent || "").replace(/\s+/g, " ").trim();
+          if (!href || !titleText || titleText.length < 14) continue;
+          if (!hrefPattern.test(href)) continue;
+          if (options.excludePattern && options.excludePattern.test(href)) continue;
+
+          const key = href.toLowerCase();
+          if (seen.has(key)) continue;
+          seen.add(key);
+
+          const container = anchor.closest("article, li, section, div") || anchor.parentElement || anchor;
+          const summaryText = decodeHtmlEntitiesText(
+            container?.querySelector("p")?.textContent ||
+              container?.querySelector("[class*='summary'], [class*='excerpt'], [class*='dek']")?.textContent ||
+              "",
+          )
+            .replace(/\s+/g, " ")
+            .trim();
+          const timeNode = container?.querySelector("time");
+          const pubDate =
+            normalizeLooseHtmlPubDate(timeNode?.getAttribute("datetime") || timeNode?.textContent || "") || new Date().toISOString();
+          const imgNode = container?.querySelector("img");
+          const imgRaw = toAbsoluteUrl(
+            imgNode?.getAttribute("src") || imgNode?.getAttribute("data-src") || imgNode?.getAttribute("srcset")?.split(",")?.[0]?.trim()?.split(" ")?.[0] || "",
+            feedUrl,
+          );
+          items.push({
+            title: titleText,
+            link: href,
+            guid: href,
+            pubDate,
+            creator: source?.label || "",
+            categories: options.category ? [options.category] : [],
+            summaryText,
+            imgUrl: normalizeImageUrl(imgRaw),
+          });
+          if (items.length >= 60) break;
+        }
+
+        return dedupeByGuidOrLink(items);
+      }
+
+      function parseTldrAiDigest(htmlText, source) {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(String(htmlText || ""), "text/html");
+        const feedUrl = String(source?.url || "https://tldr.tech/ai");
+        const pageTitle = decodeHtmlEntitiesText(doc.querySelector("title")?.textContent || source?.label || "TLDR AI")
+          .replace(/\s+/g, " ")
+          .trim();
+        const headingText = decodeHtmlEntitiesText(doc.querySelector("h1")?.textContent || "");
+        const dateMatch = headingText.match(/(\d{4})-(\d{2})-(\d{2})/);
+        const pubDate =
+          dateMatch
+            ? new Date(Date.UTC(Number(dateMatch[1]), Number(dateMatch[2]) - 1, Number(dateMatch[3]), 0, 0, 0)).toISOString()
+            : new Date().toISOString();
+        lastFeedMeta = {
+          title: pageTitle || source?.label || "TLDR AI",
+          link: "https://tldr.tech/ai",
+          updated: pubDate,
+        };
+
+        const items = [];
+        const seen = new Set();
+        Array.from(doc.querySelectorAll("section")).forEach((section) => {
+          const sectionTitle = decodeHtmlEntitiesText(section.querySelector("header h3")?.textContent || "")
+            .replace(/\s+/g, " ")
+            .trim();
+          Array.from(section.querySelectorAll("article")).forEach((article) => {
+            const linkEl = article.querySelector("a[href]");
+            const href = toAbsoluteUrl(linkEl?.getAttribute("href") || "", "https://tldr.tech/");
+            const titleText = decodeHtmlEntitiesText(linkEl?.querySelector("h3")?.textContent || linkEl?.textContent || "")
+              .replace(/\s+/g, " ")
+              .trim();
+            const summaryText = decodeHtmlEntitiesText(article.querySelector(".newsletter-html")?.textContent || "")
+              .replace(/\s+/g, " ")
+              .trim();
+            if (!href || !titleText) return;
+            if (/sponsor/i.test(titleText) || /sponsor/i.test(sectionTitle)) return;
+            const guid = `tldr:${href}`;
+            if (seen.has(guid)) return;
+            seen.add(guid);
+            items.push({
+              title: titleText,
+              link: href,
+              guid,
+              pubDate,
+              creator: "TLDR AI",
+              categories: sectionTitle ? [sectionTitle] : ["Newsletter"],
+              summaryText,
+              imgUrl: "",
+            });
+          });
+        });
+
+        return dedupeByGuidOrLink(items);
+      }
+
       function parseFeedPayloadForSource(source, payloadText) {
         const parserType = String(source?.parser || "");
         if (parserType === "aitimes_list" || source?.key === "aitimes_industry") {
           return parseAiTimesList(payloadText, source);
+        }
+        if (parserType === "rundown_ai") {
+          return parseGenericAnchorFeed(payloadText, source, {
+            hrefPattern: /\/p\/[^/?#]+/i,
+            category: "Newsletter",
+          });
+        }
+        if (parserType === "superhuman_ai") {
+          return parseGenericAnchorFeed(payloadText, source, {
+            hrefPattern: /\/p\/[^/?#]+/i,
+            category: "Newsletter",
+          });
+        }
+        if (parserType === "tldr_ai_digest") {
+          return parseTldrAiDigest(payloadText, source);
+        }
+        if (parserType === "anthropic_news") {
+          return parseGenericAnchorFeed(payloadText, source, {
+            hrefPattern: /\/news\/[^/]+/i,
+            category: "Company",
+          });
+        }
+        if (parserType === "meta_ai_blog") {
+          return parseGenericAnchorFeed(payloadText, source, {
+            hrefPattern: /\/blog\/[^/]+/i,
+            excludePattern: /\/blog\/?$/i,
+            category: "Technology",
+          });
+        }
+        if (parserType === "anandtech_ai") {
+          return parseGenericAnchorFeed(payloadText, source, {
+            hrefPattern: /\/show\/\d+/i,
+            category: "Hardware",
+          });
         }
         return parseRss(payloadText);
       }
@@ -7186,6 +8912,7 @@
         lastAiTimesCandidateItems = [];
 
         setStatus("warn", t("status_loading"), "status_loading");
+        updateAiNetworkStatus([]);
         elGrid.innerHTML = `<div class="note" style="grid-column: 1 / -1;">${t("status_loading")}</div>`;
 
         try {
@@ -7284,6 +9011,7 @@
         loadKoTranslateCacheFromStorage();
         loadEnTranslateCacheFromStorage();
         loadActiveSourcesFromStorage();
+        loadAiProviderFromStorage();
         applyI18n();
         // Options
         elCategory.innerHTML = FEEDS.map((f) => `<option value="${f.key}">${f.label}</option>`).join("");
@@ -7300,6 +9028,12 @@
         elDatePick.addEventListener("change", loadCurrentFeed);
         elReload.addEventListener("click", loadCurrentFeed);
         elQ.addEventListener("input", () => render(lastItems));
+        elAiProviderSelect?.addEventListener("change", () => {
+          currentAiProvider = normalizeAiProvider(elAiProviderSelect.value);
+          saveAiProviderToStorage();
+          setMetaText();
+          if (lastItems.length) render(lastItems);
+        });
         elSourceToggles?.addEventListener("click", (e) => {
           const btn = e.target && e.target.closest ? e.target.closest(".sourceChip") : null;
           if (!btn) return;

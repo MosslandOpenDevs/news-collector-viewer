@@ -51,7 +51,17 @@ const USER_AGENT = "Mozilla/5.0 (compatible; MossCardBot/1.0)";
 
 const FEEDS = [
   // Tech media
+  {
+    key: "aitimes_industry",
+    label: "AI Times - AI Industry",
+    url: "https://www.aitimes.com/news/articleList.html?sc_multi_code=S2&view_type=sm",
+    parser: "aitimes_list",
+  },
   { key: "tc_ai", label: "TechCrunch AI", url: "https://techcrunch.com/category/artificial-intelligence/feed/" },
+  { key: "rundown_ai", label: "The Rundown AI", url: "https://www.therundown.ai/", parser: "rundown_ai" },
+  { key: "superhuman_ai", label: "Superhuman", url: "https://www.superhuman.ai/", parser: "superhuman_ai" },
+  { key: "decoder_ai", label: "The Decoder", url: "https://the-decoder.com/feed/", parser: "rss" },
+  { key: "tldr_ai", label: "TLDR AI", url: "https://tldr.tech/api/latest/ai", parser: "tldr_ai_digest" },
   { key: "theverge_ai", label: "The Verge AI", url: "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml" },
   { key: "mittr_ai", label: "MIT Technology Review AI", url: "https://www.technologyreview.com/topic/artificial-intelligence/feed/" },
 
@@ -59,7 +69,10 @@ const FEEDS = [
   { key: "openai_news", label: "OpenAI News", url: "https://openai.com/news/rss.xml" },
   { key: "google_ai", label: "Google AI", url: "https://blog.google/technology/ai/rss/" },
   { key: "deepmind_blog", label: "deepmind.google", url: "https://deepmind.google/blog/rss.xml" },
+  { key: "anthropic_news", label: "anthropic.com", url: "https://www.anthropic.com/news", parser: "anthropic_news" },
+  { key: "meta_ai_blog", label: "ai.meta.com", url: "https://ai.meta.com/blog/", parser: "meta_ai_blog" },
   { key: "huggingface_blog", label: "huggingface.com", url: "https://huggingface.co/blog/feed.xml" },
+  { key: "anandtech_ai", label: "anandtech.com", url: "https://www.anandtech.com/tag/artificial-intelligence", parser: "anandtech_ai" },
   { key: "ms_research", label: "Microsoft Research", url: "https://www.microsoft.com/en-us/research/feed/" },
   { key: "nvidia_ai", label: "NVIDIA AI Blog", url: "https://blogs.nvidia.com/feed/" },
 
@@ -82,6 +95,7 @@ const TRANSLATE_MAX_TEXT = 1200;
 const ARTICLE_BODY_MAX_TEXT = 5000;
 const TRANSLATE_DEFAULT_TARGET = "ko";
 const TRANSLATE_CACHE_VERSION = "v2";
+const AITIMES_MAX_PAGES = Math.max(1, Number(process.env.AITIMES_MAX_PAGES || 8));
 const INSIGHT_PROVIDER_DEFAULT = normalizeInsightProvider(process.env.INSIGHT_PROVIDER || "auto");
 const OPENAI_API_KEY = String(process.env.OPENAI_API_KEY || "").trim();
 const OPENAI_INSIGHT_MODEL = String(process.env.OPENAI_INSIGHT_MODEL || process.env.OPENAI_MODEL || "").trim();
@@ -1246,35 +1260,471 @@ function mapItem(it) {
   };
 }
 
-async function fetchFeed(url) {
-  const cached = feedCache.get(url);
-  if (cached && Date.now() - cached.ts < FEED_CACHE_TTL_MS) {
-    console.log(`Feed cache hit: ${url}`);
-    return cached.data;
+function toAbsoluteUrl(url, baseUrl = "") {
+  const raw = String(url || "").trim();
+  if (!raw) return "";
+  try {
+    return new URL(raw, baseUrl || "https://localhost/").href;
+  } catch (e) {
+    return raw;
   }
+}
 
-  console.log(`Feed fetch: ${url}`);
-  const xmlText = await fetchText(url);
+function dedupeFeedItems(items = []) {
+  const out = [];
+  const seen = new Set();
+  for (const item of Array.isArray(items) ? items : []) {
+    const key = String(item?.guid || item?.link || item?.title || "").trim();
+    if (!key || seen.has(key)) continue;
+    seen.add(key);
+    out.push(item);
+  }
+  return out;
+}
+
+function parseRssFeedText(xmlText) {
   const parsed = xmlParser.parse(xmlText);
-  const channel = parsed?.rss?.channel || parsed?.channel;
-  const itemsRaw = channel?.item || [];
+  const channel = parsed?.rss?.channel || parsed?.channel || null;
+  const atomFeed = parsed?.feed || null;
+  const sourceRoot = channel || atomFeed;
+  if (!sourceRoot) throw new Error("rss_parse_failed");
+
+  const itemsRaw = channel?.item || atomFeed?.entry || [];
   const itemsArr = Array.isArray(itemsRaw) ? itemsRaw : [itemsRaw];
+  const items = dedupeFeedItems(itemsArr.map(mapItem).filter(Boolean));
 
-  const items = itemsArr.map(mapItem);
-
-  await enrichImages(items);
-  const data = {
+  return {
     meta: {
-      title: channel?.title || "",
-      link: channel?.link || "",
-      updated: channel?.lastBuildDate || "",
+      title: toPlainText(sourceRoot?.title || ""),
+      link: extractLink(sourceRoot?.link || "") || "",
+      updated: toPlainText(sourceRoot?.lastBuildDate || sourceRoot?.updated || ""),
     },
     items,
   };
+}
 
-  feedCache.set(url, { data, ts: Date.now() });
+function normalizeAiTimesPubDate(rawDateText) {
+  const raw = decodeHtmlEntities(rawDateText || "");
+  if (!raw) return "";
+
+  const full = raw.match(/^(\d{4})[.-](\d{2})[.-](\d{2})(?:\s+(\d{2}):(\d{2}))?$/);
+  if (full) {
+    const y = Number(full[1]);
+    const m = Number(full[2]);
+    const d = Number(full[3]);
+    const hh = Number(full[4] || "0");
+    const mm = Number(full[5] || "0");
+    const utcMs = Date.UTC(y, m - 1, d, hh - 9, mm, 0);
+    if (!Number.isNaN(utcMs)) return new Date(utcMs).toISOString();
+    return "";
+  }
+
+  const md = raw.match(/^(\d{2})-(\d{2})\s+(\d{2}):(\d{2})$/);
+  if (md) {
+    const now = new Date();
+    let y = now.getFullYear();
+    const m = Number(md[1]);
+    const d = Number(md[2]);
+    const hh = Number(md[3]);
+    const mm = Number(md[4]);
+    let utcMs = Date.UTC(y, m - 1, d, hh - 9, mm, 0);
+    if (utcMs - Date.now() > 36 * 60 * 60 * 1000) {
+      y -= 1;
+      utcMs = Date.UTC(y, m - 1, d, hh - 9, mm, 0);
+    }
+    if (!Number.isNaN(utcMs)) return new Date(utcMs).toISOString();
+  }
+  return "";
+}
+
+function normalizeLooseHtmlPubDate(rawDateText) {
+  const raw = decodeHtmlEntities(rawDateText || "").replace(/\s+/g, " ").trim();
+  if (!raw) return "";
+  const parsed = new Date(raw);
+  if (!Number.isNaN(parsed.valueOf())) return parsed.toISOString();
+  const ymd = raw.match(/(\d{4})[./-](\d{1,2})[./-](\d{1,2})/);
+  if (ymd) {
+    const utcMs = Date.UTC(Number(ymd[1]), Number(ymd[2]) - 1, Number(ymd[3]), 0, 0, 0);
+    if (!Number.isNaN(utcMs)) return new Date(utcMs).toISOString();
+  }
+  return "";
+}
+
+function firstSrcsetUrl(srcset) {
+  return String(srcset || "")
+    .split(",")[0]
+    ?.trim()
+    ?.split(/\s+/)[0] || "";
+}
+
+function parseAiTimesList(htmlText, source) {
+  const feedUrl = String(source?.url || "");
+  const feedLabel = String(source?.label || "AI Times - AI Industry");
+  const $ = cheerio.load(String(htmlText || ""));
+
+  const titleRaw = $(".altlist-title").first().contents().first().text() || $(".altlist-title").first().text() || "";
+  const meta = {
+    title: decodeHtmlEntities(titleRaw).replace(/\s+/g, " ").trim() || feedLabel,
+    link: feedUrl,
+    updated: "",
+  };
+
+  const items = $("li.altlist-webzine-item")
+    .map((_idx, row) => {
+      const $row = $(row);
+      let $subjectLink = $row.find("h2.altlist-subject a").first();
+      if (!$subjectLink.length) $subjectLink = $row.find(".altlist-subject a").first();
+      if (!$subjectLink.length) $subjectLink = $row.find("a[href*='articleView.html']").first();
+      const href = toAbsoluteUrl($subjectLink.attr("href") || "", feedUrl);
+      const titleText = decodeHtmlEntities($subjectLink.text() || "").replace(/\s+/g, " ").trim();
+      const summaryText = cleanSummaryText(decodeHtmlEntities($row.find(".altlist-summary").first().text() || ""));
+      const $imgNode = $row.find("a.altlist-image img, .altlist-image img").first();
+      const imgRaw = toAbsoluteUrl(
+        $imgNode.attr("src") || $imgNode.attr("data-src") || $imgNode.attr("data-original") || "",
+        feedUrl,
+      );
+      const info = $row
+        .find(".altlist-info .altlist-info-item")
+        .map((_infoIdx, node) => decodeHtmlEntities($(node).text() || "").replace(/\s+/g, " ").trim())
+        .get();
+      const category = info[0] || "AI Industry";
+      const creator = info[1] || "AI Times";
+      const pubDate = normalizeAiTimesPubDate(info[2] || "") || new Date().toISOString();
+      const idxMatch = href.match(/[?&]idxno=(\d+)/i);
+      const guid = idxMatch?.[1] ? `aitimes-${idxMatch[1]}` : href || titleText;
+      if (!href || !titleText) return null;
+      return {
+        title: titleText,
+        link: href,
+        guid,
+        pubDate,
+        creator,
+        categories: category ? [category] : ["AI Industry"],
+        summaryText,
+        imgUrl: normalizeUrl(imgRaw),
+      };
+    })
+    .get()
+    .filter(Boolean);
+
+  return { meta, items: dedupeFeedItems(items) };
+}
+
+function parseGenericAnchorFeed(htmlText, source, options = {}) {
+  const feedUrl = String(source?.url || "");
+  const $ = cheerio.load(String(htmlText || ""));
+  const meta = {
+    title: decodeHtmlEntities($("title").first().text() || source?.label || source?.key || "").replace(/\s+/g, " ").trim(),
+    link: feedUrl,
+    updated: "",
+  };
+
+  const hrefPattern = options.hrefPattern instanceof RegExp ? options.hrefPattern : /.*/i;
+  const items = [];
+  const seen = new Set();
+
+  $("a[href]").each((_idx, anchor) => {
+    if (items.length >= 60) return false;
+    const $anchor = $(anchor);
+    const href = toAbsoluteUrl($anchor.attr("href") || "", feedUrl);
+    const titleText = decodeHtmlEntities($anchor.text() || "").replace(/\s+/g, " ").trim();
+    if (!href || !titleText || titleText.length < 14) return;
+    if (!hrefPattern.test(href)) return;
+    if (options.excludePattern && options.excludePattern.test(href)) return;
+
+    const key = href.toLowerCase();
+    if (seen.has(key)) return;
+    seen.add(key);
+
+    const $container = $anchor.closest("article, li, section, div");
+    const $scope = $container.length ? $container.first() : $anchor.parent();
+    const summaryText = cleanSummaryText(
+      decodeHtmlEntities(
+        $scope.find("p").first().text() ||
+          $scope.find("[class*='summary'], [class*='excerpt'], [class*='dek']").first().text() ||
+          "",
+      )
+        .replace(/\s+/g, " ")
+        .trim(),
+    );
+    const $timeNode = $scope.find("time").first();
+    const pubDate =
+      normalizeLooseHtmlPubDate($timeNode.attr("datetime") || $timeNode.text() || "") || new Date().toISOString();
+    const $imgNode = $scope.find("img").first();
+    const imgRaw = toAbsoluteUrl(
+      $imgNode.attr("src") || $imgNode.attr("data-src") || firstSrcsetUrl($imgNode.attr("srcset") || ""),
+      feedUrl,
+    );
+    items.push({
+      title: titleText,
+      link: href,
+      guid: href,
+      pubDate,
+      creator: source?.label || "",
+      categories: options.category ? [options.category] : [],
+      summaryText,
+      imgUrl: normalizeUrl(imgRaw),
+    });
+  });
+
+  return { meta, items: dedupeFeedItems(items) };
+}
+
+function collectTldrJsonEntries(value, out = []) {
+  if (Array.isArray(value)) {
+    value.forEach((entry) => collectTldrJsonEntries(entry, out));
+    return out;
+  }
+  if (!value || typeof value !== "object") return out;
+
+  const title =
+    decodeHtmlEntities(value.title || value.headline || value.name || value.subject || "").replace(/\s+/g, " ").trim();
+  const link = toAbsoluteUrl(value.url || value.link || value.href || value.article_url || "", "https://tldr.tech/");
+  const summaryText = cleanSummaryText(
+    decodeHtmlEntities(value.summary || value.description || value.body || value.text || value.content || "")
+      .replace(/\s+/g, " ")
+      .trim(),
+  );
+  const pubDate =
+    normalizeLooseHtmlPubDate(value.pubDate || value.publishedAt || value.published_at || value.date || value.updatedAt || "") ||
+    new Date().toISOString();
+  const sectionTitle = decodeHtmlEntities(value.section || value.category || value.topic || value.tag || "").replace(/\s+/g, " ").trim();
+  const imgUrl = normalizeUrl(
+    toAbsoluteUrl(
+      value.image || value.imageUrl || value.image_url || value.thumbnail || value.thumbnailUrl || "",
+      "https://tldr.tech/",
+    ),
+  );
+
+  if (title && link) {
+    out.push({
+      title,
+      link,
+      guid: `tldr:${link}`,
+      pubDate,
+      creator: "TLDR AI",
+      categories: sectionTitle ? [sectionTitle] : ["Newsletter"],
+      summaryText,
+      imgUrl,
+    });
+  }
+
+  Object.values(value).forEach((child) => {
+    if (child && typeof child === "object") collectTldrJsonEntries(child, out);
+  });
+  return out;
+}
+
+function parseTldrAiDigest(payloadText, source) {
+  const raw = String(payloadText || "").trim();
+  if (raw.startsWith("{") || raw.startsWith("[")) {
+    try {
+      const json = JSON.parse(raw);
+      const items = dedupeFeedItems(collectTldrJsonEntries(json)).slice(0, 60);
+      return {
+        meta: {
+          title: String(source?.label || "TLDR AI"),
+          link: "https://tldr.tech/ai",
+          updated: normalizeLooseHtmlPubDate(json?.date || json?.updated || "") || "",
+        },
+        items,
+      };
+    } catch (e) {}
+  }
+
+  const feedUrl = String(source?.url || "https://tldr.tech/ai");
+  const $ = cheerio.load(raw);
+  const pageTitle = decodeHtmlEntities($("title").first().text() || source?.label || "TLDR AI")
+    .replace(/\s+/g, " ")
+    .trim();
+  const headingText = decodeHtmlEntities($("h1").first().text() || "");
+  const dateMatch = headingText.match(/(\d{4})-(\d{2})-(\d{2})/);
+  const pubDate =
+    dateMatch
+      ? new Date(Date.UTC(Number(dateMatch[1]), Number(dateMatch[2]) - 1, Number(dateMatch[3]), 0, 0, 0)).toISOString()
+      : new Date().toISOString();
+
+  const items = [];
+  const seen = new Set();
+  $("section").each((_sectionIdx, section) => {
+    const $section = $(section);
+    const sectionTitle = decodeHtmlEntities($section.find("header h3").first().text() || "")
+      .replace(/\s+/g, " ")
+      .trim();
+    $section.find("article").each((_articleIdx, article) => {
+      const $article = $(article);
+      const $linkEl = $article.find("a[href]").first();
+      const href = toAbsoluteUrl($linkEl.attr("href") || "", "https://tldr.tech/");
+      const titleText = decodeHtmlEntities($linkEl.find("h3").first().text() || $linkEl.text() || "")
+        .replace(/\s+/g, " ")
+        .trim();
+      const summaryText = cleanSummaryText(
+        decodeHtmlEntities($article.find(".newsletter-html").first().text() || "")
+          .replace(/\s+/g, " ")
+          .trim(),
+      );
+      if (!href || !titleText) return;
+      if (/sponsor/i.test(titleText) || /sponsor/i.test(sectionTitle)) return;
+      const guid = `tldr:${href}`;
+      if (seen.has(guid)) return;
+      seen.add(guid);
+      items.push({
+        title: titleText,
+        link: href,
+        guid,
+        pubDate,
+        creator: "TLDR AI",
+        categories: sectionTitle ? [sectionTitle] : ["Newsletter"],
+        summaryText,
+        imgUrl: "",
+      });
+    });
+  });
+
+  return {
+    meta: {
+      title: pageTitle || String(source?.label || "TLDR AI"),
+      link: feedUrl,
+      updated: pubDate,
+    },
+    items: dedupeFeedItems(items),
+  };
+}
+
+function parseFeedPayloadForSource(source, payloadText) {
+  const parserType = String(source?.parser || "");
+  if (parserType === "aitimes_list" || source?.key === "aitimes_industry") {
+    return parseAiTimesList(payloadText, source);
+  }
+  if (parserType === "rundown_ai") {
+    return parseGenericAnchorFeed(payloadText, source, {
+      hrefPattern: /\/p\/[^/?#]+/i,
+      category: "Newsletter",
+    });
+  }
+  if (parserType === "superhuman_ai") {
+    return parseGenericAnchorFeed(payloadText, source, {
+      hrefPattern: /\/p\/[^/?#]+/i,
+      category: "Newsletter",
+    });
+  }
+  if (parserType === "tldr_ai_digest") {
+    return parseTldrAiDigest(payloadText, source);
+  }
+  if (parserType === "anthropic_news") {
+    return parseGenericAnchorFeed(payloadText, source, {
+      hrefPattern: /\/news\/[^/]+/i,
+      category: "Company",
+    });
+  }
+  if (parserType === "meta_ai_blog") {
+    return parseGenericAnchorFeed(payloadText, source, {
+      hrefPattern: /\/blog\/[^/]+/i,
+      excludePattern: /\/blog\/?$/i,
+      category: "Technology",
+    });
+  }
+  if (parserType === "anandtech_ai") {
+    return parseGenericAnchorFeed(payloadText, source, {
+      hrefPattern: /\/show\/\d+/i,
+      category: "Hardware",
+    });
+  }
+  return parseRssFeedText(payloadText);
+}
+
+function buildAiTimesPagedUrl(baseUrl, page) {
+  const safePage = Math.max(1, Number(page) || 1);
+  try {
+    const url = new URL(String(baseUrl || ""));
+    if (safePage <= 1) {
+      url.searchParams.delete("page");
+      url.searchParams.delete("pageNo");
+      return url.href;
+    }
+    url.searchParams.set("page", String(safePage));
+    return url.href;
+  } catch (e) {
+    const raw = String(baseUrl || "").trim();
+    if (!raw || safePage <= 1) return raw;
+    return `${raw}${raw.includes("?") ? "&" : "?"}page=${safePage}`;
+  }
+}
+
+async function fetchAiTimesPagedItems(source, maxPages = AITIMES_MAX_PAGES) {
+  if (!source?.url) return { meta: { title: source?.label || "", link: "", updated: "" }, items: [] };
+  const rawPages = Number(maxPages);
+  const pages = Number.isFinite(rawPages) ? Math.max(1, rawPages) : Number.POSITIVE_INFINITY;
+  const seen = new Set();
+  const out = [];
+  let meta = { title: String(source?.label || ""), link: String(source?.url || ""), updated: "" };
+
+  for (let page = 1; page <= pages; page++) {
+    const pageUrl = buildAiTimesPagedUrl(source.url, page);
+    let payloadText = "";
+    try {
+      payloadText = await fetchText(pageUrl);
+    } catch (e) {
+      if (page === 1) throw e;
+      break;
+    }
+
+    const parsed = parseAiTimesList(payloadText, { ...source, url: pageUrl });
+    if (parsed?.meta?.title) meta = parsed.meta;
+    if (!Array.isArray(parsed?.items) || !parsed.items.length) break;
+
+    let added = 0;
+    for (const item of parsed.items) {
+      const key = String(item?.guid || item?.link || item?.title || "").trim();
+      if (!key || seen.has(key)) continue;
+      seen.add(key);
+      out.push(item);
+      added++;
+    }
+    if (page > 1 && added === 0) break;
+  }
+
+  return { meta, items: out };
+}
+
+async function fetchSourceItemsWithParser(source) {
+  if (!source?.url) return { meta: { title: source?.label || "", link: "", updated: "" }, items: [] };
+  const parserType = String(source?.parser || "");
+  if (parserType === "aitimes_list" || source?.key === "aitimes_industry") {
+    return await fetchAiTimesPagedItems(source);
+  }
+  const payloadText = await fetchText(source.url);
+  return parseFeedPayloadForSource(source, payloadText);
+}
+
+function buildFeedCacheKey(feed) {
+  if (feed && typeof feed === "object") {
+    return `feed:${String(feed.key || feed.url || "default")}:${String(feed.parser || "rss")}`;
+  }
+  return String(feed || "");
+}
+
+async function fetchFeed(feedInput) {
+  const feed =
+    feedInput && typeof feedInput === "object"
+      ? feedInput
+      : { key: "", label: "", url: String(feedInput || ""), parser: "" };
+  const cacheKey = buildFeedCacheKey(feed);
+  const cached = feedCache.get(cacheKey);
+  if (cached && Date.now() - cached.ts < FEED_CACHE_TTL_MS) {
+    console.log(`Feed cache hit: ${cacheKey}`);
+    return cached.data;
+  }
+
+  if (!feed?.url) throw new Error("feed_url_invalid");
+
+  console.log(`Feed fetch: ${feed.url}`);
+  const data = feed?.parser ? await fetchSourceItemsWithParser(feed) : parseRssFeedText(await fetchText(feed.url));
+  await enrichImages(data.items || []);
+
+  feedCache.set(cacheKey, { data, ts: Date.now() });
   scheduleSaveCache();
-  console.log(`Feed fetched: items=${items.length}`);
+  console.log(`Feed fetched: items=${data.items?.length || 0}`);
   return data;
 }
 
@@ -1292,7 +1742,7 @@ app.get("/api/feed", async (req, res) => {
       }
     }
 
-    const data = await fetchFeed(feed.url);
+    const data = await fetchFeed(feed);
     // Ensure snapshots from latest items (UTC date buckets)
     ensureSnapshotsFromItems(feed.key, data.items);
 
@@ -1318,7 +1768,7 @@ app.get("/api/backfill", async (req, res) => {
     const days = Math.max(1, Math.min(30, Number(req.query.days || 7)));
     const feed = getFeedByKey(cat);
     console.log(`API /api/backfill cat=${feed.key} days=${days}`);
-    const data = await fetchFeed(feed.url);
+    const data = await fetchFeed(feed);
     const dates = [];
     const now = new Date();
     for (let i = 0; i < days; i++) {
