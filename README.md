@@ -1,72 +1,97 @@
 # news-collector-viewer
 
-Weekly AI news card viewer with bilingual (KR/EN) rendering, ranked Top 10 curation, and backend-assisted feed/article processing.
+AI 뉴스 소스를 수집·정규화해 주간 Top 10 카드 형태로 보여주는 뷰어 프로젝트입니다.  
+현재 운영 기준 화면은 `ai4.html`이며, 한국어/영어 카드가 **동일 순위·동일 기사 기준으로 1:1 정렬**되도록 구성되어 있습니다.
 
-## Overview
+## 프로젝트 목적
 
-This project collects AI news from multiple sources, ranks items for weekly card output, and renders bilingual card pages.
+- 여러 AI 뉴스 소스를 한 화면에서 비교 가능한 형태로 통합
+- 중복 기사 제거 및 우선순위 기반 랭킹으로 주간 Top 10 구성
+- 한국어/영어 이중 언어 카드 제공(번역이 아니라 **동일 기사 매칭 기반 표시**)
+- 카드 품질 저하(플레이스홀더, 짧은 요약, 언어 혼합 등) 방지
 
-Current primary page:
+## 현재 메인 페이지
 
-- `ai4.html` (KR/EN aligned Top 10 card view)
+- `ai4.html`: KR/EN 정렬형 주간 Top 10 카드 뷰
 
-Backend responsibilities:
+## 핵심 동작 원칙
 
-- Feed collection and normalization
-- Article-body fetch for summary quality
-- Summary/insight API integration
+## 1) KR/EN 엄격 정렬
 
-## Key Behaviors
+- 한국어와 영어는 서로 다른 리스트를 만들지 않습니다.
+- 동일한 랭킹 풀을 기준으로, 언어별 제목/요약만 전환합니다.
+- 토글 시 순위·기사가 바뀌지 않아야 하며, 문구만 KR/EN으로 바뀌어야 합니다.
 
-- Strict KR/EN rank alignment:
-  - Korean and English cards are rendered from the same ranked item pool.
-  - Language toggle switches text only, not item order.
-- Duplicate control:
-  - Near-duplicate topics are deduplicated before final render.
-  - Priority source handling is applied where configured.
-- Editorial override layer:
-  - Specific recurring stories can be pinned to consistent headline/summary pairs.
-  - Used to keep KR/EN narrative matching stable item-by-item.
-- Summary quality guardrails:
-  - Placeholder/generic output is repaired with fallback logic.
-  - Broken cards are prevented from silently corrupting ranking output.
+## 2) 중복 제어
 
-## Tech Stack
+- 제목/본문 토큰 유사도 기반으로 근접 중복을 제거합니다.
+- 동일 이슈 복수 기사가 들어오면 소스 우선순위 및 요약 품질 점수를 반영해 대표 카드를 선택합니다.
+- 렌더 직전에도 추가 중복 제거를 수행해 카드 중복 노출을 막습니다.
+
+## 3) 에디토리얼 오버라이드
+
+- 반복적으로 다뤄지는 핵심 이슈는 오버라이드 키로 고정 매칭합니다.
+- 목적:
+  - KR/EN 문구 품질 안정화
+  - 동일 이슈의 제목/요약 톤 일관성 유지
+  - 순위별 기사-문구 매칭 붕괴 방지
+
+## 4) 요약 품질 가드레일
+
+- 플레이스홀더 문장, 지나치게 짧은 요약, 언어 혼입(한글/영문 혼재) 감지
+- 문제 감지 시:
+  - 기사 본문 리드 요약 재생성
+  - canonical summary 재활용
+  - 최종 fallback 문구 보정
+- 깨진 카드가 전체 랭킹/렌더를 망치지 않도록 방어 로직을 적용합니다.
+
+## 아키텍처 개요
+
+## 프론트엔드 (`ai4.html`)
+
+- 카드 렌더링, 토글, 필터, 랭킹/중복 제어
+- KR/EN 텍스트 전환과 카드 매칭 일관성 유지
+- 에디토리얼 오버라이드 적용 및 품질 보정
+
+## 백엔드 (`backend/`)
+
+- 피드 수집/파싱/RSS 및 HTML 정규화
+- 기사 본문 수집(`article-body`)로 요약 품질 보강
+- 요약/인사이트 API 연동(옵션)
+- 프론트에서 사용할 통합 JSON 응답 제공
+
+## 기술 스택
 
 - Frontend: HTML, CSS, Vanilla JavaScript
 - Backend: Node.js, Express
 - Parsing: `fast-xml-parser`, `cheerio`
 - HTTP: `node-fetch`, `cors`
 
-## Getting Started
+## 실행 방법
 
-## 1) Install dependencies
+## 1) 의존성 설치
 
 ```powershell
 cd backend
 npm install
 ```
 
-## 2) Start backend
+## 2) 백엔드 실행
 
 ```powershell
 cd backend
 npm start
 ```
 
-Backend default URL:
+- 기본 주소: `http://localhost:3000`
 
-- `http://localhost:3000`
+## 3) 프론트 열기
 
-## 3) Open frontend
+- 로컬 파일 직접 실행:
+  - `file:///.../ai4.html`
+- 또는 로컬 서버 환경에서 서빙
 
-Open one of the local pages in browser:
-
-- `file:///.../ai4.html`
-
-or serve from backend host if configured.
-
-## Useful Endpoints
+## 주요 API 엔드포인트
 
 - `GET /api/feed`
 - `GET /api/article-body`
@@ -74,9 +99,24 @@ or serve from backend host if configured.
 - `GET|POST /api/insight`
 - `GET /api/health`
 
-## Dev Notes
+## 운영/수정 시 권장 절차
 
-- After editing card logic/content:
-  1. Restart backend (`npm start` in `backend/`).
-  2. Reopen `ai4.html` with cache-busting query (for example `?refresh=<timestamp>`).
-- Keep KR/EN output aligned by rank and article mapping before publishing.
+카드 문구 또는 랭킹 로직 수정 후:
+
+1. `ai4.html` 저장
+2. 백엔드 재시작 (`backend`에서 `npm start`)
+3. `ai4.html` 캐시 무효화 새로고침
+   - 예: `file:///.../ai4.html?refresh=<timestamp>`
+4. KR/EN 모두에서 아래 항목 확인
+   - 순위 1~10 기사 매칭 일치
+   - 중복 카드 없음
+   - 헤드라인/요약 문구 품질
+   - KR은 한국어, EN은 영어로만 출력
+
+## 퍼블리싱 전 체크리스트
+
+- KR/EN이 같은 기사 순서로 정렬되어 있는가
+- 특정 순위 카드가 토글 시 다른 기사로 바뀌지 않는가
+- 플레이스홀더 문구(예: generic update)가 남아 있지 않은가
+- 문장부호(인용부호, 쉼표)와 고유명사 표기가 안정적인가
+- Top 10이 정확히 10개 렌더되는가
