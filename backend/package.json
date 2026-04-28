@@ -4,7 +4,10 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "start": "node server.js"
+    "dev": "node server.js",
+    "start": "node server.js",
+    "test:summary": "node scripts/test-article-summary.js",
+    "test:summary:quality": "node scripts/evaluate-summary-quality.js"
   },
   "dependencies": {
     "cheerio": "^1.0.0-rc.12",

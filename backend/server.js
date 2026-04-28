@@ -6,6 +6,7 @@ import * as cheerio from "cheerio";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
+import { summarizeArticleRuleBased } from "./utils/articleSummary.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -17,6 +18,14 @@ function stripEnvWrappingQuotes(value) {
     return raw.slice(1, -1);
   }
   return raw;
+}
+
+function parseBooleanEnv(value, defaultValue = false) {
+  const raw = String(value ?? "").trim().toLowerCase();
+  if (!raw) return !!defaultValue;
+  if (["1", "true", "yes", "y", "on"].includes(raw)) return true;
+  if (["0", "false", "no", "n", "off"].includes(raw)) return false;
+  return !!defaultValue;
 }
 
 function loadEnvFile(filePath) {
@@ -54,7 +63,7 @@ const FEEDS = [
   {
     key: "aitimes_industry",
     label: "AI Times - AI Industry",
-    url: "https://www.aitimes.com/news/articleList.html?sc_multi_code=S2&view_type=sm",
+    url: "https://www.aitimes.com/news/articleList.html?view_type=sm",
     parser: "aitimes_list",
   },
   { key: "tc_ai", label: "TechCrunch AI", url: "https://techcrunch.com/category/artificial-intelligence/feed/" },
@@ -96,6 +105,9 @@ const ARTICLE_BODY_MAX_TEXT = 5000;
 const TRANSLATE_DEFAULT_TARGET = "ko";
 const TRANSLATE_CACHE_VERSION = "v2";
 const AITIMES_MAX_PAGES = Math.max(1, Number(process.env.AITIMES_MAX_PAGES || 8));
+const ENABLE_GEMINI_PROVIDER = parseBooleanEnv(process.env.ENABLE_GEMINI_PROVIDER, false);
+const ENABLE_GROQ_PROVIDER = parseBooleanEnv(process.env.ENABLE_GROQ_PROVIDER, true);
+const USE_AI_SUMMARY = parseBooleanEnv(process.env.USE_AI_SUMMARY, true);
 const INSIGHT_PROVIDER_DEFAULT = normalizeInsightProvider(process.env.INSIGHT_PROVIDER || "auto");
 const OPENAI_API_KEY = String(process.env.OPENAI_API_KEY || "").trim();
 const OPENAI_INSIGHT_MODEL = String(process.env.OPENAI_INSIGHT_MODEL || process.env.OPENAI_MODEL || "").trim();
@@ -105,13 +117,19 @@ const GEMINI_API_KEY = String(process.env.GEMINI_API_KEY || process.env.GOOGLE_A
 const GEMINI_INSIGHT_MODEL = String(process.env.GEMINI_INSIGHT_MODEL || process.env.GEMINI_MODEL || process.env.GOOGLE_MODEL || "").trim();
 const GEMINI_SUMMARY_MODEL = String(process.env.GEMINI_SUMMARY_MODEL || process.env.GEMINI_MODEL || GEMINI_INSIGHT_MODEL || "").trim();
 const GEMINI_API_BASE_URL = String(process.env.GEMINI_API_BASE_URL || "https://generativelanguage.googleapis.com/v1beta/models").trim();
+const GROQ_API_KEY = String(process.env.GROQ_API_KEY || "").trim();
+const GROQ_MODEL = String(process.env.GROQ_MODEL || process.env.GROQ_INSIGHT_MODEL || process.env.GROQ_SUMMARY_MODEL || "").trim();
+const GROQ_API_URL = String(process.env.GROQ_API_URL || "https://api.groq.com/openai/v1/chat/completions").trim();
 const AI_REQUEST_TIMEOUT_MS = Math.max(4000, Number(process.env.AI_REQUEST_TIMEOUT_MS || 20000));
+const CARD_TEXT_SCHEMA_VERSION = "card_text_v1";
+const CARD_TEXT_CACHE_TTL_MS = 1000 * 60 * 20;
 
 const feedCache = new Map();
 const ogCache = new Map();
 const articleCache = new Map();
 const snapshotCache = new Map();
 const translateCache = new Map();
+const cardTextCache = new Map();
 const CACHE_FILE = path.join(__dirname, "cache.json");
 let saveTimer = null;
 
@@ -250,7 +268,9 @@ function normalizeLangCode(input, fallback) {
 
 function normalizeInsightProvider(input) {
   const raw = String(input || "").trim().toLowerCase();
-  if (raw === "openai" || raw === "gemini") return raw;
+  if (raw === "openai") return "openai";
+  if (raw === "gemini") return ENABLE_GEMINI_PROVIDER ? "gemini" : "auto";
+  if (raw === "groq") return ENABLE_GROQ_PROVIDER ? "groq" : "auto";
   return "auto";
 }
 
@@ -461,13 +481,30 @@ function extractGeminiResponseText(payload) {
   return parts.join(" ").replace(/\s+/g, " ").trim();
 }
 
+function extractGroqResponseText(payload) {
+  const choices = Array.isArray(payload?.choices) ? payload.choices : [];
+  const parts = [];
+  for (const choice of choices) {
+    const content = typeof choice?.message?.content === "string" ? choice.message.content : "";
+    if (content) parts.push(content.trim());
+  }
+  return parts.join(" ").replace(/\s+/g, " ").trim();
+}
+
 function normalizeInsightText(input, lang = "ko") {
   const out = decodeHtmlEntities(String(input || ""))
     .replace(/\s+/g, " ")
     .replace(/\s+([,.;!?])/g, "$1")
     .trim();
   if (!out) return "";
-  const clean = out.replace(/^["']|["']$/g, "").trim();
+  let clean = out.replace(/^["']|["']$/g, "").trim();
+  if (!clean) return "";
+  clean = clean
+    .replace(/^\*{0,2}\s*dev\s*insight\s*\*{0,2}\s*[:\-]?\s*/i, "")
+    .replace(/^\[?\s*dev\s*insight\s*\]?\s*[:\-]?\s*/i, "")
+    .replace(/^개발\s*인사이트\s*[:\-]?\s*/i, "")
+    .replace(/^인사이트\s*[:\-]?\s*/i, "")
+    .trim();
   if (!clean) return "";
   return /[.?!。！？]$/.test(clean) ? clean : `${clean}.`;
 }
@@ -521,6 +558,119 @@ function buildAiTokenSet(input, lang = "ko") {
   );
 }
 
+function buildInsightAnchorTokenSet(title, summary, articleBody = "", lang = "ko") {
+  const minLen = lang === "ko" ? 2 : 3;
+  const genericStops = new Set([
+    "ai",
+    "news",
+    "weekly",
+    "week",
+    "update",
+    "updates",
+    "release",
+    "releases",
+    "launch",
+    "launches",
+    "announced",
+    "announcement",
+    "announces",
+    "model",
+    "models",
+    "product",
+    "products",
+    "platform",
+    "technology",
+    "tech",
+    "service",
+    "services",
+    "feature",
+    "features",
+    "article",
+    "today",
+    "industry",
+    "insight",
+    "dev",
+    "report",
+    "reports",
+    "개발",
+    "뉴스",
+    "요약",
+    "업데이트",
+    "출시",
+    "발표",
+    "서비스",
+    "기능",
+    "플랫폼",
+    "기술",
+    "모델",
+    "제품",
+    "이번",
+    "관련",
+    "통해",
+    "대한",
+    "있는",
+    "했다",
+    "한다",
+  ]);
+
+  const scoreMap = new Map();
+  const addTokens = (text, weight = 1) => {
+    normalizeAiCompareText(text)
+      .split(/\s+/)
+      .forEach((token) => {
+        if (!token || token.length < minLen) return;
+        if (genericStops.has(token)) return;
+        scoreMap.set(token, (scoreMap.get(token) || 0) + weight);
+      });
+  };
+
+  const summaryLead = normalizeTranslateText(summary || "")
+    .split(/(?<=[.!?。！？])\s+|[\r\n]+/)
+    .slice(0, 3)
+    .join(" ");
+  const bodyLead = normalizeArticleBodyText(articleBody || "", 1400)
+    .split(/(?<=[.!?。！？])\s+|[\r\n]+/)
+    .slice(0, 4)
+    .join(" ");
+
+  addTokens(title || "", 4);
+  addTokens(summaryLead, 3);
+  addTokens(bodyLead, 2);
+
+  return new Set(
+    Array.from(scoreMap.entries())
+      .sort((a, b) => {
+        if (b[1] !== a[1]) return b[1] - a[1];
+        return b[0].length - a[0].length;
+      })
+      .slice(0, 20)
+      .map(([token]) => token),
+  );
+}
+
+function hasInsightContextAnchor(insight, title, summary, articleBody = "", lang = "ko") {
+  const insightTokens = buildAiTokenSet(insight, lang);
+  if (!insightTokens.size) return false;
+
+  const anchorTokens = buildInsightAnchorTokenSet(title, summary, articleBody, lang);
+  if (!anchorTokens.size) return true;
+
+  const titleTokens = buildAiTokenSet(title, lang);
+  let overlap = 0;
+  let titleOverlap = 0;
+  insightTokens.forEach((token) => {
+    if (anchorTokens.has(token)) overlap++;
+    if (titleTokens.has(token)) titleOverlap++;
+  });
+
+  const minOverlap = lang === "ko" ? 1 : 2;
+  const overlapRatio = overlap / Math.max(1, insightTokens.size);
+  const anchorCoverage = overlap / Math.max(1, Math.min(anchorTokens.size, insightTokens.size));
+  if (overlap < minOverlap) return false;
+  if (titleTokens.size >= 3 && titleOverlap < 1) return false;
+  return overlapRatio >= 0.18 || anchorCoverage >= 0.2;
+}
+
 function hasRedundantInsight(insight, summary, title, lang = "ko") {
   const insightText = decodeHtmlEntities(String(insight || "")).replace(/\s+/g, " ").trim();
   const summaryText = decodeHtmlEntities(String(summary || "")).replace(/\s+/g, " ").trim();
@@ -565,8 +715,8 @@ function buildInsightPrompts(title, summary, articleBody = "", lang = "ko", stri
   return {
     systemPrompt:
       strict
-        ? "You are an editor writing DEV INSIGHT for AI industry cards. Write exactly 2 complete sentences in the requested language. Do not restate the headline or summarize the article in generic words. Infer the deeper technical angle from the title keywords and summary: architecture, benchmark meaning, deployment consequence, inference cost, workflow change, ecosystem leverage, data advantage, product moat, or infrastructure requirement. The first sentence should identify the most meaningful technical or strategic signal behind the update. The second sentence should explain why that signal matters for developers, users, enterprise adoption, deployment, or competition. Avoid repeating company announcement phrasing. Use only the supplied title and summary. Do not speculate. Never answer with fragments."
-        : "You are an editor writing DEV INSIGHT for AI industry cards. Write exactly 2 complete sentences in the requested language. Do not repeat the headline or the first clause of the summary. Infer the technical implication from title keywords and the supplied summary, then explain why it matters. Focus on architecture, benchmark interpretation, deployment impact, inference cost, workflow integration, ecosystem leverage, data advantage, product moat, or infrastructure requirement. Avoid repeating company announcement phrasing. Use only the supplied title and summary. Do not speculate. Do not answer with fragments.",
+        ? "You write DEV INSIGHT for AI news cards. Output exactly 2 complete sentences in the requested language as plain text. Do not use labels, markdown, bullets, or prefixes. Ground both sentences in explicit terms from the input title, summary, or body (company, product, model, benchmark, API, chip, partnership, policy, or metric). Sentence 1 should state the core technical or strategic implication. Sentence 2 should explain practical impact on deployment, cost, reliability, workflow, adoption, or competition. Do not speculate beyond supplied facts."
+        : "You write DEV INSIGHT for AI news cards. Output exactly 2 complete sentences in the requested language as plain text. Do not use labels, markdown, bullets, or prefixes. Use at least one concrete anchor term from the input (company, product, model, benchmark, API, chip, policy, partnership, metric), connect it to a technical implication, then connect that implication to practical impact. Avoid generic market commentary and avoid repeating headline wording.",
     userPrompt: [
       `Language: ${languageName}`,
       strict
@@ -574,6 +724,8 @@ function buildInsightPrompts(title, summary, articleBody = "", lang = "ko", stri
         : `Target length: ${lang === "ko" ? "90-170 Korean characters" : "150-250 English characters"}`,
       "Avoid repeating the article summary. Surface the deeper technical implication instead.",
       "Prefer specific technical consequences over generic market commentary.",
+      "Include at least one concrete anchor term copied from the title or summary.",
+      "Do not start with DEV INSIGHT or any label.",
       `Title: ${normalizeTranslateText(title).slice(0, 240)}`,
       `Summary: ${normalizeTranslateText(summary).slice(0, 900)}`,
       bodyExcerpt ? `Article body excerpt: ${bodyExcerpt}` : "",
@@ -624,9 +776,9 @@ async function fetchAiJsonWithTimeout(url, options = {}, provider = "ai") {
 
 function getAiErrorStatus(message) {
   const text = String(message || "");
-  if (/(openai|gemini)_(api_key|summary_model|insight_model)_missing/i.test(text)) return 503;
-  if (/(openai|gemini)_(network_error|timeout_)/i.test(text)) return 502;
-  if (/(openai|gemini)_http_4\d\d/i.test(text)) return 502;
+  if (/(openai|gemini|groq)_(api_key|summary_model|insight_model)_missing/i.test(text)) return 503;
+  if (/(openai|gemini|groq)_(network_error|timeout_)/i.test(text)) return 502;
+  if (/(openai|gemini|groq)_http_4\d\d/i.test(text)) return 502;
   return 500;
 }
 
@@ -643,30 +795,51 @@ function hasOpenAiInsightConfig() {
 }
 
 function hasGeminiInsightConfig() {
-  return !!GEMINI_API_KEY && !!GEMINI_INSIGHT_MODEL;
+  return ENABLE_GEMINI_PROVIDER && !!GEMINI_API_KEY && !!GEMINI_INSIGHT_MODEL;
+}
+
+function hasOpenAiSummaryConfig() {
+  return !!OPENAI_API_KEY && !!OPENAI_SUMMARY_MODEL;
+}
+
+function hasGeminiSummaryConfig() {
+  return ENABLE_GEMINI_PROVIDER && !!GEMINI_API_KEY && !!GEMINI_SUMMARY_MODEL;
+}
+
+function hasGroqInsightConfig() {
+  return ENABLE_GROQ_PROVIDER && !!GROQ_API_KEY && !!GROQ_MODEL;
+}
+
+function hasGroqSummaryConfig() {
+  return ENABLE_GROQ_PROVIDER && !!GROQ_API_KEY && !!GROQ_MODEL;
 }
 
 function resolveInsightProvider(requestedProvider = "") {
   const requested = normalizeInsightProvider(requestedProvider);
-  if (requested === "openai" || requested === "gemini") return requested;
+  if (requested === "openai" || requested === "gemini" || requested === "groq") return requested;
   if (INSIGHT_PROVIDER_DEFAULT === "openai" && hasOpenAiInsightConfig()) return "openai";
   if (INSIGHT_PROVIDER_DEFAULT === "gemini" && hasGeminiInsightConfig()) return "gemini";
+  if (INSIGHT_PROVIDER_DEFAULT === "groq" && hasGroqInsightConfig()) return "groq";
+  if (hasGroqInsightConfig()) return "groq";
   if (hasOpenAiInsightConfig()) return "openai";
   if (hasGeminiInsightConfig()) return "gemini";
+  if (INSIGHT_PROVIDER_DEFAULT === "groq") return "groq";
   return INSIGHT_PROVIDER_DEFAULT === "gemini" ? "gemini" : "openai";
 }
 
 function buildInsightProviderCandidates(requestedProvider = "") {
   const requested = normalizeInsightProvider(requestedProvider);
-  if (requested === "openai" || requested === "gemini") return [requested];
+  if (requested === "openai" || requested === "gemini" || requested === "groq") return [requested];
 
   const preferred = normalizeInsightProvider(INSIGHT_PROVIDER_DEFAULT);
   const candidates = [];
   const push = (provider) => {
-    if ((provider === "openai" || provider === "gemini") && !candidates.includes(provider)) candidates.push(provider);
+    if ((provider === "openai" || provider === "gemini" || provider === "groq") && !candidates.includes(provider))
+      candidates.push(provider);
   };
 
   push(preferred);
+  if (hasGroqInsightConfig()) push("groq");
   if (hasGeminiInsightConfig()) push("gemini");
   if (hasOpenAiInsightConfig()) push("openai");
   if (!candidates.length) push(preferred || "openai");
@@ -675,6 +848,7 @@ function buildInsightProviderCandidates(requestedProvider = "") {
 
 function getInsightModelForProvider(provider, kind = "insight") {
   const resolvedKind = kind === "summary" ? "summary" : "insight";
+  if (provider === "groq") return GROQ_MODEL || "";
   if (provider === "gemini") return resolvedKind === "summary" ? GEMINI_SUMMARY_MODEL || "" : GEMINI_INSIGHT_MODEL || "";
   return resolvedKind === "summary" ? OPENAI_SUMMARY_MODEL || "" : OPENAI_INSIGHT_MODEL || "";
 }
@@ -699,10 +873,14 @@ async function generateCardTextWithProvider(kind, title, summary, lang = "ko", r
         resolvedKind === "summary"
           ? provider === "gemini"
             ? await generateGeminiSummary(title, summary, lang, articleBody)
-            : await generateOpenAiSummary(title, summary, lang, articleBody)
+            : provider === "groq"
+              ? await generateGroqSummary(title, summary, lang, articleBody)
+              : await generateOpenAiSummary(title, summary, lang, articleBody)
           : provider === "gemini"
             ? await generateGeminiInsight(title, summary, lang, articleBody)
-            : await generateOpenAiInsightStable(title, summary, lang, articleBody);
+            : provider === "groq"
+              ? await generateGroqInsight(title, summary, lang, articleBody)
+              : await generateOpenAiInsightStable(title, summary, lang, articleBody);
       return {
         text,
         provider,
@@ -710,7 +888,7 @@ async function generateCardTextWithProvider(kind, title, summary, lang = "ko", r
       };
     } catch (e) {
       errors.push(`${provider}:${String(e?.message || e)}`);
-      if (requested === "openai" || requested === "gemini") break;
+      if (requested === "openai" || requested === "gemini" || requested === "groq") break;
     }
   }
 
@@ -786,7 +964,7 @@ async function generateOpenAiInsightStable(title, summary, lang = "ko", articleB
     }
     const json = await res.json();
     return normalizeInsightText(extractOpenAiResponseText(json), lang);
-  }, (text) => !hasRedundantInsight(text, summary, title, lang));
+  }, (text) => !hasRedundantInsight(text, summary, title, lang) && hasInsightContextAnchor(text, title, summary, articleBody, lang));
 }
 
 async function generateGeminiInsight(title, summary, lang = "ko", articleBody = "") {
@@ -827,7 +1005,7 @@ async function generateGeminiInsight(title, summary, lang = "ko", articleBody = 
     }
     const json = await res.json();
     return normalizeInsightText(extractGeminiResponseText(json), lang);
-  }, (text) => !hasRedundantInsight(text, summary, title, lang));
+  }, (text) => !hasRedundantInsight(text, summary, title, lang) && hasInsightContextAnchor(text, title, summary, articleBody, lang));
 }
 
 async function generateOpenAiSummary(title, summary, lang = "ko", articleBody = "") {
@@ -899,6 +1077,272 @@ async function generateGeminiSummary(title, summary, lang = "ko", articleBody = 
     const json = await res.json();
     return normalizeSummaryText(extractGeminiResponseText(json), lang);
   });
+}
+
+async function generateGroqInsight(title, summary, lang = "ko", articleBody = "") {
+  if (!GROQ_API_KEY) throw new Error("groq_api_key_missing");
+  if (!GROQ_MODEL) throw new Error("groq_insight_model_missing");
+
+  return generateRichAiText(
+    "insight",
+    lang,
+    async (strict) => {
+      const { systemPrompt, userPrompt } = buildInsightPrompts(title, summary, articleBody, lang, strict);
+      const res = await fetchAiJsonWithTimeout(
+        GROQ_API_URL,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${GROQ_API_KEY}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            model: GROQ_MODEL,
+            messages: [
+              { role: "system", content: systemPrompt },
+              { role: "user", content: userPrompt },
+            ],
+            temperature: strict ? 0.15 : 0.2,
+            max_tokens: strict ? 180 : 140,
+          }),
+        },
+        "groq",
+      );
+      if (!res.ok) {
+        const errText = await res.text().catch(() => "");
+        throw new Error(`groq_http_${res.status}:${errText.slice(0, 200)}`);
+      }
+      const json = await res.json();
+      return normalizeInsightText(extractGroqResponseText(json), lang);
+    },
+    (text) => !hasRedundantInsight(text, summary, title, lang) && hasInsightContextAnchor(text, title, summary, articleBody, lang),
+  );
+}
+
+async function generateGroqSummary(title, summary, lang = "ko", articleBody = "") {
+  if (!GROQ_API_KEY) throw new Error("groq_api_key_missing");
+  if (!GROQ_MODEL) throw new Error("groq_summary_model_missing");
+
+  return generateRichAiText("summary", lang, async (strict) => {
+    const { systemPrompt, userPrompt } = buildSummaryPrompts(title, summary, articleBody, lang, strict);
+    const res = await fetchAiJsonWithTimeout(
+      GROQ_API_URL,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${GROQ_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: GROQ_MODEL,
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: userPrompt },
+          ],
+          temperature: strict ? 0.15 : 0.2,
+          max_tokens: strict ? 320 : 260,
+        }),
+      },
+      "groq",
+    );
+    if (!res.ok) {
+      const errText = await res.text().catch(() => "");
+      throw new Error(`groq_http_${res.status}:${errText.slice(0, 200)}`);
+    }
+    const json = await res.json();
+    return normalizeSummaryText(extractGroqResponseText(json), lang);
+  });
+}
+
+function buildCardBundlePrompts(ruleDraft, lang = "ko") {
+  const languageName = lang === "ko" ? "Korean" : "English";
+  const extraction = ruleDraft?.extraction || {};
+  const keyFacts = Array.isArray(extraction.keySentences) ? extraction.keySentences.slice(0, 8) : [];
+  const firstParagraphs = Array.isArray(extraction.firstParagraphs) ? extraction.firstParagraphs.slice(0, 3) : [];
+  const numericFacts = Array.isArray(extraction.numericSentences) ? extraction.numericSentences.slice(0, 3) : [];
+  const quoteFacts = Array.isArray(extraction.quoteSentences) ? extraction.quoteSentences.slice(0, 2) : [];
+
+  const systemPrompt =
+    "You are a newsroom editor generating AI card copy. Output ONLY strict JSON with keys headline, summary, insight. " +
+    "Do not output markdown, labels, or code fences. Use only provided facts and do not invent details. " +
+    "headline: one sentence. summary: 3 to 4 full sentences. insight: 1 to 2 full sentences with practical implication.";
+
+  const userPrompt = [
+    `Language: ${languageName}`,
+    `Rule headline seed: ${normalizeArticleBodyText(ruleDraft?.headline || "", 220)}`,
+    `Rule summary seed: ${normalizeArticleBodyText(ruleDraft?.summary || "", 1200)}`,
+    `Rule insight seed: ${normalizeArticleBodyText(ruleDraft?.insight || "", 400)}`,
+    keyFacts.length ? `Key sentences: ${keyFacts.join(" | ")}` : "",
+    firstParagraphs.length ? `First paragraphs: ${firstParagraphs.join(" | ")}` : "",
+    numericFacts.length ? `Numeric facts: ${numericFacts.join(" | ")}` : "",
+    quoteFacts.length ? `Quote facts: ${quoteFacts.join(" | ")}` : "",
+    extraction?.conclusion ? `Conclusion: ${normalizeArticleBodyText(extraction.conclusion, 280)}` : "",
+    'Output JSON example: {"headline":"...","summary":"...","insight":"..."}',
+  ]
+    .filter(Boolean)
+    .join("\n");
+
+  return { systemPrompt, userPrompt };
+}
+
+function extractJsonObjectText(rawText) {
+  const text = String(rawText || "").trim();
+  if (!text) return "";
+  if (text.startsWith("{") && text.endsWith("}")) return text;
+  const start = text.indexOf("{");
+  const end = text.lastIndexOf("}");
+  if (start === -1 || end === -1 || end <= start) return "";
+  return text.slice(start, end + 1).trim();
+}
+
+function parseAiCardBundle(rawText, lang = "ko") {
+  const jsonText = extractJsonObjectText(rawText);
+  if (!jsonText) return null;
+  let parsed = null;
+  try {
+    parsed = JSON.parse(jsonText);
+  } catch (_e) {
+    return null;
+  }
+  if (!parsed || typeof parsed !== "object") return null;
+  const headline = normalizeArticleBodyText(parsed.headline || parsed.title || "", 220);
+  const summary = normalizeSummaryText(parsed.summary || "", lang);
+  const insight = normalizeInsightText(parsed.insight || "", lang);
+  if (!headline && !summary && !insight) return null;
+  return {
+    headline: headline || "",
+    summary: summary || "",
+    insight: insight || "",
+  };
+}
+
+function resolveBundleProvider(requestedProvider = "") {
+  const requested = normalizeInsightProvider(requestedProvider);
+  if (requested === "openai") return hasOpenAiSummaryConfig() ? "openai" : "";
+  if (requested === "gemini") return hasGeminiSummaryConfig() ? "gemini" : "";
+  if (requested === "groq") return hasGroqSummaryConfig() ? "groq" : "";
+  const preferred = resolveInsightProvider(requestedProvider);
+  if (preferred === "openai" && hasOpenAiSummaryConfig()) return "openai";
+  if (preferred === "gemini" && hasGeminiSummaryConfig()) return "gemini";
+  if (preferred === "groq" && hasGroqSummaryConfig()) return "groq";
+  if (hasGroqSummaryConfig()) return "groq";
+  if (hasOpenAiSummaryConfig()) return "openai";
+  if (hasGeminiSummaryConfig()) return "gemini";
+  return "";
+}
+
+async function generateAiCardBundleSinglePass(ruleDraft, lang = "ko", requestedProvider = "auto") {
+  const provider = resolveBundleProvider(requestedProvider);
+  if (!provider) throw new Error("ai_provider_unavailable");
+
+  const { systemPrompt, userPrompt } = buildCardBundlePrompts(ruleDraft, lang);
+  if (provider === "openai") {
+    const model = OPENAI_SUMMARY_MODEL || OPENAI_INSIGHT_MODEL;
+    if (!OPENAI_API_KEY || !model) throw new Error("openai_summary_model_missing");
+    const res = await fetchAiJsonWithTimeout(
+      OPENAI_RESPONSES_URL,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${OPENAI_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model,
+          input: [
+            { role: "system", content: [{ type: "input_text", text: systemPrompt }] },
+            { role: "user", content: [{ type: "input_text", text: userPrompt }] },
+          ],
+          max_output_tokens: 420,
+          temperature: 0.2,
+        }),
+      },
+      "openai",
+    );
+    if (!res.ok) {
+      const errText = await res.text().catch(() => "");
+      throw new Error(`openai_http_${res.status}:${errText.slice(0, 200)}`);
+    }
+    const json = await res.json();
+    const parsed = parseAiCardBundle(extractOpenAiResponseText(json), lang);
+    if (!parsed) throw new Error("openai_invalid_card_json");
+    return { ...parsed, provider: "openai", model };
+  }
+
+  if (provider === "groq") {
+    const model = GROQ_MODEL;
+    if (!GROQ_API_KEY || !model) throw new Error("groq_summary_model_missing");
+    const res = await fetchAiJsonWithTimeout(
+      GROQ_API_URL,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${GROQ_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model,
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: userPrompt },
+          ],
+          temperature: 0.2,
+          max_tokens: 460,
+          response_format: { type: "json_object" },
+        }),
+      },
+      "groq",
+    );
+    if (!res.ok) {
+      const errText = await res.text().catch(() => "");
+      throw new Error(`groq_http_${res.status}:${errText.slice(0, 200)}`);
+    }
+    const json = await res.json();
+    const parsed = parseAiCardBundle(extractGroqResponseText(json), lang);
+    if (!parsed) throw new Error("groq_invalid_card_json");
+    return { ...parsed, provider: "groq", model };
+  }
+
+  const model = GEMINI_SUMMARY_MODEL || GEMINI_INSIGHT_MODEL;
+  if (!GEMINI_API_KEY || !model) throw new Error("gemini_summary_model_missing");
+  const baseUrl = GEMINI_API_BASE_URL.replace(/\/+$/g, "");
+  const apiUrl = `${baseUrl}/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(GEMINI_API_KEY)}`;
+  const res = await fetchAiJsonWithTimeout(
+    apiUrl,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        systemInstruction: {
+          parts: [{ text: systemPrompt }],
+        },
+        contents: [
+          {
+            role: "user",
+            parts: [{ text: userPrompt }],
+          },
+        ],
+        generationConfig: {
+          temperature: 0.2,
+          maxOutputTokens: 460,
+          thinkingConfig: {
+            thinkingBudget: 0,
+          },
+        },
+      }),
+    },
+    "gemini",
+  );
+  if (!res.ok) {
+    const errText = await res.text().catch(() => "");
+    throw new Error(`gemini_http_${res.status}:${errText.slice(0, 200)}`);
+  }
+  const json = await res.json();
+  const parsed = parseAiCardBundle(extractGeminiResponseText(json), lang);
+  if (!parsed) throw new Error("gemini_invalid_card_json");
+  return { ...parsed, provider: "gemini", model };
 }
 
 function getSnapshot(feedKey, date) {
@@ -1060,23 +1504,107 @@ function extractLink(linkField) {
   return "";
 }
 
+function stripNewsNoiseText(text) {
+  let out = decodeHtmlEntities(String(text || ""));
+  if (!out) return "";
+
+  const cutMarkers = [
+    /MostPopular/i,
+    /Most Popular/i,
+    /Top Stories/i,
+    /Trending/i,
+    /Related Articles/i,
+    /인기기사/,
+    /많이 본 기사/,
+    /많이 본 뉴스/,
+    /관련기사/,
+    /추천기사/,
+    /무단전재/,
+    /재배포 금지/,
+    /Copyright/i,
+  ];
+
+  for (const marker of cutMarkers) {
+    const idx = out.search(marker);
+    if (idx > 0) {
+      out = out.slice(0, idx);
+      break;
+    }
+  }
+
+  out = out
+    .replace(/\b[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[A-Za-z]{2,}\b/g, " ")
+    .replace(/(?:^|\s)(?:AI\s*Times|AITimes|AI타임스)\s*[^\n.!?]{0,120}\b기자\b[^\n.!?]*[.!?]?/gi, " ")
+    .replace(/(?:^|\s)[가-힣]{2,6}\s*기자(?:\s*[^\n.!?]{0,80})?[.!?]?/g, " ")
+    .replace(/\b(?:입력|수정)\s*\d{4}\.\s*\d{1,2}\.\s*\d{1,2}[^.!?]*[.!?]?/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  return out;
+}
+
+function isNoisyNewsText(text) {
+  const normalized = decodeHtmlEntities(String(text || ""))
+    .replace(/\s+/g, " ")
+    .trim();
+  if (!normalized) return false;
+
+  const hasSidebarKeyword = /(?:MostPopular|Most Popular|Top Stories|Trending|Related Articles|인기기사|많이 본 기사|많이 본 뉴스|관련기사|추천기사)/i.test(
+    normalized,
+  );
+  const startsWithSidebar = /^(?:MostPopular|Most Popular|인기기사|많이 본 기사|많이 본 뉴스)\b/i.test(normalized);
+  const rankMarkerCount = (normalized.match(/(?:^|\s)(?:[1-9]|1[0-5])\s+(?=[^0-9])/g) || []).length;
+  const hasReporterByline =
+    /\b[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[A-Za-z]{2,}\b/.test(normalized) ||
+    /(?:^|\s)(?:AI\s*Times|AITimes|AI타임스)\s*[^\n.!?]{0,120}\b기자\b/i.test(normalized) ||
+    /(?:^|\s)[가-힣]{2,6}\s*기자(?:\s|$)/.test(normalized);
+
+  if (startsWithSidebar) return true;
+  if (hasSidebarKeyword && /\b1\b.*\b2\b.*\b3\b/.test(normalized)) return true;
+  if (rankMarkerCount >= 6) return true;
+  if (hasReporterByline && (hasSidebarKeyword || rankMarkerCount >= 2)) return true;
+  return false;
+}
+
 function cleanSummaryText(text) {
   if (!text) return "";
-  return String(text)
+  const cleaned = stripNewsNoiseText(String(text))
     .replace(/https?:\/\/\S+/gi, " ")
     .replace(/\b\S+\.(png|jpe?g|gif|webp|svg)\b/gi, " ")
     .replace(/\b\d{2,4}x\d{2,4}\b/g, " ")
     .replace(/\s+/g, " ")
     .trim();
+  if (!cleaned || isNoisyNewsText(cleaned)) return "";
+  return cleaned;
 }
 
 function normalizeArticleBodyText(text, maxLen = ARTICLE_BODY_MAX_TEXT) {
   if (!text) return "";
-  return decodeHtmlEntities(String(text))
+  const cleaned = stripNewsNoiseText(String(text))
     .replace(/\u00a0/g, " ")
     .replace(/\s+/g, " ")
-    .trim()
-    .slice(0, Math.max(1, maxLen));
+    .trim();
+  if (!cleaned || isNoisyNewsText(cleaned)) return "";
+  return cleaned.slice(0, Math.max(1, maxLen));
+}
+
+function takeLeadSentences(text, maxSentences = 2, maxChars = 360) {
+  const normalized = normalizeArticleBodyText(text || "", ARTICLE_BODY_MAX_TEXT);
+  if (!normalized) return "";
+  const parts = normalized
+    .split(/(?<=[.!?。！？])\s+|\n+/)
+    .map((part) => normalizeArticleBodyText(part, 260))
+    .filter((part) => part && part.length >= 20 && !isNoisyNewsText(part));
+  if (!parts.length) return "";
+  const picked = [];
+  for (const sentence of parts) {
+    if (picked.length >= Math.max(1, maxSentences)) break;
+    const joined = [...picked, sentence].join(" ");
+    if (joined.length > Math.max(80, maxChars) && picked.length) break;
+    picked.push(sentence);
+  }
+  const out = picked.join(" ").replace(/\s+/g, " ").trim();
+  return cleanSummaryText(out);
 }
 
 function getRequestField(req, key, fallback = "") {
@@ -1086,12 +1614,268 @@ function getRequestField(req, key, fallback = "") {
   return value == null ? fallback : value;
 }
 
+function splitTextIntoSentences(text, maxLen = 420) {
+  const normalized = normalizeArticleBodyText(text || "", ARTICLE_BODY_MAX_TEXT);
+  if (!normalized) return [];
+  return normalized
+    .split(/(?<=[.!?。！？])\s+|(?<=다\.)\s+|(?<=니다\.)\s+|(?<=했다\.)\s+/)
+    .map((part) => normalizeArticleBodyText(part, maxLen))
+    .filter((part) => part && part.length >= 20);
+}
+
+function dedupeSentences(sentences = []) {
+  const out = [];
+  const seen = new Set();
+  for (const sentence of Array.isArray(sentences) ? sentences : []) {
+    const clean = normalizeArticleBodyText(sentence, 420);
+    if (!clean) continue;
+    const sig = normalizeAiCompareText(clean);
+    if (!sig || seen.has(sig)) continue;
+    seen.add(sig);
+    out.push(clean);
+  }
+  return out;
+}
+
+function ensureSentenceEnding(text = "", lang = "ko") {
+  const clean = normalizeArticleBodyText(text, 420);
+  if (!clean) return "";
+  if (/[.!?]$/.test(clean)) return clean;
+  if (lang === "ko" && /[가-힣]$/.test(clean)) return `${clean}.`;
+  return `${clean}.`;
+}
+
+function buildRuleBasedExtraction(title, summary, articleBody) {
+  const titleText = normalizeArticleBodyText(title || "", 220);
+  const summaryText = normalizeArticleBodyText(summary || "", 1200);
+  const bodyText = normalizeArticleBodyText(articleBody || "", ARTICLE_BODY_MAX_TEXT);
+  const bodySentences = splitTextIntoSentences(bodyText, 420);
+  const summarySentences = splitTextIntoSentences(summaryText, 320);
+  const allSentences = dedupeSentences([...bodySentences, ...summarySentences]);
+
+  const firstParagraphs = dedupeSentences(allSentences.slice(0, 3));
+  const numericSentences = dedupeSentences(
+    allSentences.filter((s) =>
+      /(?:\d|%|퍼센트|억원|만명|건|달러|원|million|billion|trillion|ms|sec|seconds?|minutes?|hours?|days?|x|배|v\d+)/i.test(s),
+    ),
+  ).slice(0, 4);
+  const quoteSentences = dedupeSentences(
+    allSentences.filter((s) => /["“”'‘’]|(?:라고|라며|밝혔다|말했다|전했다|said|according to|stated|noted|wrote)/i.test(s)),
+  ).slice(0, 3);
+  const conclusion = allSentences.length ? allSentences[allSentences.length - 1] : "";
+
+  const prioritized = [];
+  const push = (value) => {
+    const sentence = ensureSentenceEnding(value || "", "en");
+    if (!sentence) return;
+    const sig = normalizeAiCompareText(sentence);
+    if (!sig || prioritized.some((x) => normalizeAiCompareText(x) === sig)) return;
+    prioritized.push(sentence);
+  };
+
+  push(titleText);
+  firstParagraphs.forEach(push);
+  numericSentences.forEach(push);
+  quoteSentences.forEach(push);
+  push(conclusion);
+  summarySentences.forEach(push);
+
+  return {
+    title: titleText,
+    firstParagraphs,
+    numericSentences,
+    quoteSentences,
+    conclusion,
+    keySentences: prioritized.slice(0, 8),
+    bodyText,
+    summaryText,
+  };
+}
+
+function composeRuleSummary(extraction, lang = "ko") {
+  const minSentences = 3;
+  const maxSentences = 4;
+  const minChars = lang === "ko" ? 170 : 240;
+  const genericTail =
+    lang === "ko"
+      ? [
+          "핵심 업데이트의 의미는 기능 공개 자체보다 적용 범위와 운영 조건이 얼마나 구체적인지에 달려 있다.",
+          "배포 대상과 통합 경로가 명확할수록 실제 서비스 전환 속도와 자동화 품질을 동시에 높일 수 있다.",
+        ]
+      : [
+          "The practical impact depends less on the announcement itself and more on rollout scope and operating constraints.",
+          "When target users and integration paths are explicit, teams can scale deployment with better reliability and automation quality.",
+        ];
+
+  const pool = dedupeSentences([
+    ...(extraction?.keySentences || []),
+    ...(extraction?.firstParagraphs || []),
+    ...(extraction?.numericSentences || []),
+    extraction?.conclusion || "",
+  ]).map((s) => ensureSentenceEnding(s, lang));
+  const picked = [];
+  for (const sentence of pool) {
+    if (picked.length >= maxSentences) break;
+    picked.push(sentence);
+    const joinedLen = normalizeAiCompareText(picked.join(" ")).length;
+    if (picked.length >= minSentences && joinedLen >= minChars) break;
+  }
+  while (picked.length < minSentences) {
+    const next = genericTail[picked.length % genericTail.length];
+    picked.push(ensureSentenceEnding(next, lang));
+  }
+  const joined = picked.join(" ").replace(/\s+/g, " ").trim();
+  return normalizeSummaryText(joined, lang) || joined;
+}
+
+function composeRuleInsight(extraction, lang = "ko") {
+  const numericLead = extraction?.numericSentences?.[0] || "";
+  const quoteLead = extraction?.quoteSentences?.[0] || "";
+  const conclusionLead = extraction?.conclusion || extraction?.firstParagraphs?.[0] || "";
+
+  let insight = "";
+  if (numericLead) {
+    insight =
+      lang === "ko"
+        ? `${numericLead} 이 수치는 홍보 지표를 넘어 실제 배포 규모, 비용 구조, 또는 성능 개선 폭을 판단하는 핵심 신호다.`
+        : `${numericLead} This metric is more than publicity and acts as a concrete signal of deployment scale, cost profile, or performance gain.`;
+  } else if (quoteLead) {
+    insight =
+      lang === "ko"
+        ? `${quoteLead} 핵심은 발표 문구보다 실제 통합 방식과 운영 조건이 명확한지이며, 이 지점이 도입 속도를 결정한다.`
+        : `${quoteLead} The key is not the announcement wording itself but whether integration and operating constraints are concrete enough for real adoption.`;
+  } else if (conclusionLead) {
+    insight =
+      lang === "ko"
+        ? `${conclusionLead} 결국 이번 이슈의 실효성은 기능 설명보다 배포 가능성과 재현 가능한 운영 시나리오에 달려 있다.`
+        : `${conclusionLead} Ultimately, the real value depends less on feature claims and more on deployability and repeatable operating workflows.`;
+  } else {
+    insight =
+      lang === "ko"
+        ? "이번 이슈의 핵심은 기능 공개보다 실제 적용 범위와 운영 조건을 얼마나 구체적으로 제시했는지에 있다."
+        : "The core signal is not the launch itself but how concretely the article defines real rollout scope and operating constraints.";
+  }
+  return normalizeInsightText(insight, lang) || ensureSentenceEnding(insight, lang);
+}
+
+function composeRuleHeadline(title, extraction, lang = "ko") {
+  const titleText = normalizeArticleBodyText(title || extraction?.title || "", 200);
+  if (titleText) return titleText;
+  const lead = extraction?.firstParagraphs?.[0] || extraction?.keySentences?.[0] || "";
+  const cleanLead = normalizeArticleBodyText(lead, 180).replace(/[.!?]+$/g, "").trim();
+  if (cleanLead) return cleanLead;
+  return lang === "ko" ? "AI 업데이트 요약" : "AI Update Brief";
+}
+
+function buildRuleBasedCardDraft(title, summary, articleBody, lang = "ko") {
+  const extraction = buildRuleBasedExtraction(title, summary, articleBody);
+  const headline = composeRuleHeadline(title, extraction, lang);
+  const summaryText = composeRuleSummary(extraction, lang);
+  const insight = composeRuleInsight(extraction, lang);
+  return {
+    headline: normalizeArticleBodyText(headline, 220),
+    summary: normalizeArticleBodyText(summaryText, 1400),
+    insight: normalizeArticleBodyText(insight, 600),
+    extraction: {
+      title: extraction.title || "",
+      firstParagraphs: extraction.firstParagraphs || [],
+      numericSentences: extraction.numericSentences || [],
+      quoteSentences: extraction.quoteSentences || [],
+      conclusion: extraction.conclusion || "",
+      keySentences: extraction.keySentences || [],
+    },
+  };
+}
+
+function buildCardTextResponse({
+  kind = "summary",
+  lang = "ko",
+  headline = "",
+  summary = "",
+  insight = "",
+  source = "rule",
+  provider = "rule",
+  model = "rule",
+  usedAi = false,
+  fallback = true,
+  extraction = null,
+}) {
+  return {
+    schemaVersion: CARD_TEXT_SCHEMA_VERSION,
+    ok: true,
+    kind: kind === "insight" ? "insight" : "summary",
+    lang: normalizeLangCode(lang, "ko").startsWith("en") ? "en" : "ko",
+    source: source || "rule",
+    usedAi: !!usedAi,
+    fallback: !!fallback,
+    provider: provider || "rule",
+    model: model || "rule",
+    headline: normalizeArticleBodyText(headline, 220),
+    summary: normalizeArticleBodyText(summary, 1400),
+    insight: normalizeArticleBodyText(insight, 600),
+    extraction: extraction && typeof extraction === "object"
+      ? {
+          title: normalizeArticleBodyText(extraction.title || "", 220),
+          firstParagraphs: Array.isArray(extraction.firstParagraphs) ? extraction.firstParagraphs.map((x) => normalizeArticleBodyText(x, 320)).filter(Boolean) : [],
+          numericSentences: Array.isArray(extraction.numericSentences) ? extraction.numericSentences.map((x) => normalizeArticleBodyText(x, 320)).filter(Boolean) : [],
+          quoteSentences: Array.isArray(extraction.quoteSentences) ? extraction.quoteSentences.map((x) => normalizeArticleBodyText(x, 320)).filter(Boolean) : [],
+          conclusion: normalizeArticleBodyText(extraction.conclusion || "", 320),
+          keySentences: Array.isArray(extraction.keySentences) ? extraction.keySentences.map((x) => normalizeArticleBodyText(x, 320)).filter(Boolean) : [],
+        }
+      : {
+          title: "",
+          firstParagraphs: [],
+          numericSentences: [],
+          quoteSentences: [],
+          conclusion: "",
+          keySentences: [],
+        },
+  };
+}
+
+function hashText32(input = "") {
+  const text = String(input || "");
+  let h = 2166136261;
+  for (let i = 0; i < text.length; i++) {
+    h ^= text.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return (h >>> 0).toString(36);
+}
+
+function buildCardTextCacheKey({ title = "", summary = "", articleBody = "", lang = "ko", provider = "auto" }) {
+  const raw = [
+    normalizeLangCode(lang, "ko"),
+    normalizeInsightProvider(provider || "auto"),
+    normalizeArticleBodyText(title, 260),
+    normalizeArticleBodyText(summary, 1200),
+    normalizeArticleBodyText(articleBody, ARTICLE_BODY_MAX_TEXT),
+  ].join("|");
+  return `card:${hashText32(raw)}`;
+}
+
+function getCardTextCache(key) {
+  const cached = cardTextCache.get(String(key || ""));
+  if (!cached) return null;
+  if (Date.now() - (cached.ts || 0) > CARD_TEXT_CACHE_TTL_MS) {
+    cardTextCache.delete(String(key || ""));
+    return null;
+  }
+  return cached.value || null;
+}
+
+function setCardTextCache(key, value) {
+  if (!key || !value) return;
+  cardTextCache.set(String(key), { value, ts: Date.now() });
+}
+
 function dedupeTextBlocks(blocks = []) {
   const out = [];
   const seen = new Set();
   for (const block of Array.isArray(blocks) ? blocks : []) {
     const text = normalizeArticleBodyText(block, ARTICLE_BODY_MAX_TEXT);
     if (!text || text.length < 30) continue;
+    if (isNoisyNewsText(text)) continue;
     const sig = text.toLowerCase();
     if (seen.has(sig)) continue;
     seen.add(sig);
@@ -1103,17 +1887,18 @@ function dedupeTextBlocks(blocks = []) {
 function extractTextBlocksFromRoot($, root) {
   if (!root || !root.length) return [];
   const clone = root.clone();
-  clone.find("script, style, noscript, svg, iframe, form, button, figure, figcaption, aside, nav, footer, .ad, .ads, .advertisement, .related, .newsletter, .social-share, .share, .toolbar, .caption").remove();
+  clone.find("script, style, noscript, svg, iframe, form, button, figure, figcaption, aside, nav, footer, .ad, .ads, .advertisement, .related, .newsletter, .social-share, .share, .toolbar, .caption, .rank, .ranking, .popular, .most-popular, .article-list, .related-list, .news-list").remove();
   const blocks = [];
   clone.find("p, h2, h3, li").each((_, node) => {
     const text = normalizeArticleBodyText($(node).text(), 700);
     if (!text) return;
     if (/^(related|read more|recommended|subscribe|follow us|advertisement)$/i.test(text)) return;
+    if (isNoisyNewsText(text)) return;
     blocks.push(text);
   });
   if (!blocks.length) {
     const raw = normalizeArticleBodyText(clone.text(), ARTICLE_BODY_MAX_TEXT);
-    if (raw) blocks.push(raw);
+    if (raw && !isNoisyNewsText(raw)) blocks.push(raw);
   }
   return dedupeTextBlocks(blocks);
 }
@@ -1369,7 +2154,7 @@ function parseAiTimesList(htmlText, source) {
     updated: "",
   };
 
-  const items = $("li.altlist-webzine-item")
+  const strictItems = $("li.altlist-webzine-item")
     .map((_idx, row) => {
       const $row = $(row);
       let $subjectLink = $row.find("h2.altlist-subject a").first();
@@ -1377,7 +2162,11 @@ function parseAiTimesList(htmlText, source) {
       if (!$subjectLink.length) $subjectLink = $row.find("a[href*='articleView.html']").first();
       const href = toAbsoluteUrl($subjectLink.attr("href") || "", feedUrl);
       const titleText = decodeHtmlEntities($subjectLink.text() || "").replace(/\s+/g, " ").trim();
-      const summaryText = cleanSummaryText(decodeHtmlEntities($row.find(".altlist-summary").first().text() || ""));
+      let summaryText = cleanSummaryText(decodeHtmlEntities($row.find(".altlist-summary").first().text() || ""));
+      if (!summaryText || isNoisyNewsText(summaryText)) {
+        const rowFallback = cleanSummaryText(decodeHtmlEntities($row.text() || "").replace(titleText, " "));
+        summaryText = takeLeadSentences(rowFallback, 2, 340);
+      }
       const $imgNode = $row.find("a.altlist-image img, .altlist-image img").first();
       const imgRaw = toAbsoluteUrl(
         $imgNode.attr("src") || $imgNode.attr("data-src") || $imgNode.attr("data-original") || "",
@@ -1407,7 +2196,74 @@ function parseAiTimesList(htmlText, source) {
     .get()
     .filter(Boolean);
 
-  return { meta, items: dedupeFeedItems(items) };
+  const strictDeduped = dedupeFeedItems(strictItems);
+  if (strictDeduped.length) {
+    return { meta, items: strictDeduped };
+  }
+
+  // Fallback parser: recover items even when list classes/layout change.
+  const seen = new Set();
+  const fallbackItems = [];
+  $("a[href*='articleView.html']").each((_idx, anchor) => {
+    if (fallbackItems.length >= 120) return false;
+    const $anchor = $(anchor);
+    const href = toAbsoluteUrl($anchor.attr("href") || "", feedUrl);
+    if (!href || !/[?&]idxno=\d+/i.test(href)) return;
+    const idxMatch = href.match(/[?&]idxno=(\d+)/i);
+    const guid = idxMatch?.[1] ? `aitimes-${idxMatch[1]}` : href;
+    if (!guid || seen.has(guid)) return;
+
+    const titleText = cleanSummaryText(decodeHtmlEntities($anchor.text() || ""));
+    if (!titleText || titleText.length < 10) return;
+
+    const $scope = $anchor.closest("li,article,section,div");
+    const $block = $scope.length ? $scope.first() : $anchor.parent();
+
+    const blockText = decodeHtmlEntities($block.text() || "").replace(/\s+/g, " ").trim();
+    let summaryText = cleanSummaryText(
+      decodeHtmlEntities(
+        $block.find(".altlist-summary, .summary, .article-summary, .list-summary, p").first().text() || "",
+      ),
+    );
+    if (!summaryText && blockText) {
+      const fallbackRaw = cleanSummaryText(blockText.replace(titleText, " "));
+      summaryText = takeLeadSentences(fallbackRaw, 2, 340);
+    }
+    if (isNoisyNewsText(summaryText)) summaryText = "";
+
+    const $imgNode = $block.find("img").first();
+    const imgRaw = toAbsoluteUrl(
+      $imgNode.attr("src") || $imgNode.attr("data-src") || $imgNode.attr("data-original") || firstSrcsetUrl($imgNode.attr("srcset")),
+      feedUrl,
+    );
+
+    const dateMatch = blockText.match(
+      /(\d{4}[./-]\d{1,2}[./-]\d{1,2}\s+\d{1,2}:\d{2})|(\d{2}[./-]\d{2}\s+\d{1,2}:\d{2})/,
+    );
+    const creatorMatch = blockText.match(/([가-힣]{2,4}\s*기자)/);
+    const categoryMatch = blockText.match(/(산업일반|메타버스|AI 기업|AI기업|영어뉴스|English News|기타|정책|AI산업)/i);
+
+    const creator = cleanSummaryText(creatorMatch?.[1] || "AI Times");
+    const category = cleanSummaryText(categoryMatch?.[1] || "AI Industry");
+    const pubDate =
+      normalizeAiTimesPubDate(dateMatch?.[0] || "") ||
+      normalizeLooseHtmlPubDate(dateMatch?.[0] || "") ||
+      new Date().toISOString();
+
+    seen.add(guid);
+    fallbackItems.push({
+      title: titleText,
+      link: href,
+      guid,
+      pubDate,
+      creator,
+      categories: category ? [category] : ["AI Industry"],
+      summaryText,
+      imgUrl: normalizeUrl(imgRaw),
+    });
+  });
+
+  return { meta, items: dedupeFeedItems(fallbackItems) };
 }
 
 function parseGenericAnchorFeed(htmlText, source, options = {}) {
@@ -1825,24 +2681,107 @@ async function handleSummaryRoute(req, res) {
     const summary = normalizeTranslateText(getRequestField(req, "summary", "")).slice(0, 1200);
     const articleBody = normalizeArticleBodyText(getRequestField(req, "bodyText", ""), ARTICLE_BODY_MAX_TEXT);
     const lang = normalizeLangCode(getRequestField(req, "lang", "ko"), "ko").startsWith("en") ? "en" : "ko";
-    const provider = getRequestField(req, "provider", "");
-    if (!title && !summary && !articleBody) {
-      res.status(400).json({ error: "title_or_summary_required" });
-      return;
-    }
-    const result = await generateCardTextWithProvider("summary", title, summary, lang, provider, articleBody);
-    res.json({ summary: result.text, lang, model: result.model, provider: result.provider });
-  } catch (e) {
-    const message = String(e?.message || e);
-    const status = getAiErrorStatus(message);
-    logAiRouteError("summary", {
-      provider: String(getRequestField(req, "provider", "auto") || "auto"),
-      lang: normalizeLangCode(getRequestField(req, "lang", "ko"), "ko"),
-      title: normalizeTranslateText(getRequestField(req, "title", "")).slice(0, 120),
-      status,
-      error: message,
+    const provider = String(getRequestField(req, "provider", "auto") || "auto");
+    const rawText = [articleBody, summary].filter(Boolean).join("\n\n");
+    const result = summarizeArticleRuleBased({
+      title,
+      rawText,
+      lang,
     });
-    res.status(status).json({ error: message });
+
+    // Debug visibility for operations without exposing errors to users.
+    console.log(
+      `[summary-rule] quality=${result.qualityScore} fallback=${result.usedFallback} skip=${result.shouldSkip} selected=${JSON.stringify(result.debug?.selectedSentences || [])}`,
+    );
+
+    let finalSummary = result.summary || "";
+    let qualityScore = Number(result.qualityScore || 0);
+    let shouldSkip = Boolean(result.shouldSkip);
+    let usedFallback = Boolean(result.usedFallback);
+    let source = "rule";
+    let providerName = "rule";
+    let modelName = "extractive-v1";
+
+    if (USE_AI_SUMMARY) {
+      try {
+        const ai = await generateCardTextWithProvider(
+          "summary",
+          title,
+          summary || result.summary || "",
+          lang,
+          provider,
+          articleBody,
+        );
+        const aiText = normalizeSummaryText(ai?.text || "", lang);
+        if (aiText && !isWeakAiText(aiText, "summary", lang)) {
+          finalSummary = aiText;
+          qualityScore = Math.max(72, Number(qualityScore || 0));
+          shouldSkip = false;
+          usedFallback = false;
+          source = "ai";
+          providerName = ai?.provider || "ai";
+          modelName = ai?.model || "unknown";
+        }
+      } catch (e) {
+        const message = String(e?.message || e);
+        const status = getAiErrorStatus(message);
+        logAiRouteError("summary_ai", {
+          provider: provider || "auto",
+          lang,
+          title: normalizeTranslateText(title).slice(0, 120),
+          status,
+          error: message,
+        });
+      }
+    }
+
+    res.json({
+      schemaVersion: "summary_rule_v1",
+      ok: true,
+      kind: "summary",
+      source,
+      provider: providerName,
+      model: modelName,
+      lang,
+      summary: finalSummary,
+      qualityScore,
+      usedFallback,
+      shouldSkip,
+      debug: {
+        cleanedLength: Number(result.debug?.cleanedLength || 0),
+        candidateCount: Number(result.debug?.candidateCount || 0),
+        selectedSentences: Array.isArray(result.debug?.selectedSentences) ? result.debug.selectedSentences : [],
+        topScored: Array.isArray(result.debug?.topScored) ? result.debug.topScored : [],
+      },
+    });
+  } catch (e) {
+    const lang = normalizeLangCode(getRequestField(req, "lang", "ko"), "ko").startsWith("en") ? "en" : "ko";
+    const title = normalizeTranslateText(getRequestField(req, "title", "")).slice(0, 260);
+    const fallback = summarizeArticleRuleBased({
+      title,
+      rawText: "",
+      lang,
+    });
+    // Never expose backend errors to end-user payload. Keep fixed schema.
+    res.json({
+      schemaVersion: "summary_rule_v1",
+      ok: true,
+      kind: "summary",
+      source: "rule",
+      provider: "rule",
+      model: "extractive-v1",
+      lang,
+      summary: fallback.summary || (title ? `${title}.` : ""),
+      qualityScore: Number(fallback.qualityScore || 0),
+      usedFallback: true,
+      shouldSkip: true,
+      debug: {
+        cleanedLength: Number(fallback.debug?.cleanedLength || 0),
+        candidateCount: Number(fallback.debug?.candidateCount || 0),
+        selectedSentences: Array.isArray(fallback.debug?.selectedSentences) ? fallback.debug.selectedSentences : [],
+        topScored: Array.isArray(fallback.debug?.topScored) ? fallback.debug.topScored : [],
+      },
+    });
   }
 }
 
@@ -1852,24 +2791,92 @@ async function handleInsightRoute(req, res) {
     const summary = normalizeTranslateText(getRequestField(req, "summary", "")).slice(0, 1000);
     const articleBody = normalizeArticleBodyText(getRequestField(req, "bodyText", ""), ARTICLE_BODY_MAX_TEXT);
     const lang = normalizeLangCode(getRequestField(req, "lang", "ko"), "ko").startsWith("en") ? "en" : "ko";
-    const provider = getRequestField(req, "provider", "");
-    if (!title && !summary && !articleBody) {
-      res.status(400).json({ error: "title_or_summary_required" });
-      return;
+    const provider = String(getRequestField(req, "provider", "auto") || "auto");
+
+    const ruleDraft = buildRuleBasedCardDraft(title, summary, articleBody, lang);
+    let finalHeadline = ruleDraft.headline;
+    let finalSummary = ruleDraft.summary;
+    let finalInsight = ruleDraft.insight;
+    let usedAi = false;
+    let source = "rule";
+    let providerName = "rule";
+    let modelName = "rule";
+
+    if (USE_AI_SUMMARY) {
+      const cacheKey = buildCardTextCacheKey({ title, summary, articleBody, lang, provider });
+      let aiBundle = getCardTextCache(cacheKey);
+      if (!aiBundle) {
+        try {
+          aiBundle = await generateAiCardBundleSinglePass(ruleDraft, lang, provider);
+          setCardTextCache(cacheKey, aiBundle);
+        } catch (e) {
+          const message = String(e?.message || e);
+          const status = getAiErrorStatus(message);
+          logAiRouteError("insight_bundle", {
+            provider: provider || "auto",
+            lang,
+            title: normalizeTranslateText(title).slice(0, 120),
+            status,
+            error: message,
+          });
+        }
+      }
+
+      if (aiBundle && typeof aiBundle === "object") {
+        const aiHeadline = normalizeArticleBodyText(aiBundle.headline || "", 220);
+        const aiSummary = normalizeSummaryText(aiBundle.summary || "", lang);
+        const aiInsight = normalizeInsightText(aiBundle.insight || "", lang);
+        if (aiHeadline && aiHeadline.length >= 8) finalHeadline = aiHeadline;
+        if (aiSummary && !isWeakAiText(aiSummary, "summary", lang)) finalSummary = aiSummary;
+        if (aiInsight && !isWeakAiText(aiInsight, "insight", lang)) {
+          finalInsight = aiInsight;
+          usedAi = true;
+        }
+        if (usedAi) {
+          source = "ai";
+          providerName = aiBundle.provider || "ai";
+          modelName = aiBundle.model || "unknown";
+        }
+      }
     }
-    const result = await generateCardTextWithProvider("insight", title, summary, lang, provider, articleBody);
-    res.json({ insight: result.text, lang, model: result.model, provider: result.provider });
-  } catch (e) {
-    const message = String(e?.message || e);
-    const status = getAiErrorStatus(message);
-    logAiRouteError("insight", {
-      provider: String(getRequestField(req, "provider", "auto") || "auto"),
-      lang: normalizeLangCode(getRequestField(req, "lang", "ko"), "ko"),
-      title: normalizeTranslateText(getRequestField(req, "title", "")).slice(0, 120),
-      status,
-      error: message,
+
+    const payload = buildCardTextResponse({
+      kind: "insight",
+      lang,
+      headline: finalHeadline,
+      summary: finalSummary,
+      insight: finalInsight,
+      source,
+      provider: providerName,
+      model: modelName,
+      usedAi,
+      fallback: !usedAi,
+      extraction: ruleDraft.extraction,
     });
-    res.status(status).json({ error: message });
+    res.json(payload);
+  } catch (e) {
+    const lang = normalizeLangCode(getRequestField(req, "lang", "ko"), "ko").startsWith("en") ? "en" : "ko";
+    const fallbackDraft = buildRuleBasedCardDraft(
+      normalizeTranslateText(getRequestField(req, "title", "")).slice(0, 260),
+      normalizeTranslateText(getRequestField(req, "summary", "")).slice(0, 1200),
+      normalizeArticleBodyText(getRequestField(req, "bodyText", ""), ARTICLE_BODY_MAX_TEXT),
+      lang,
+    );
+    res.json(
+      buildCardTextResponse({
+        kind: "insight",
+        lang,
+        headline: fallbackDraft.headline,
+        summary: fallbackDraft.summary,
+        insight: fallbackDraft.insight,
+        source: "rule",
+        provider: "rule",
+        model: "rule",
+        usedAi: false,
+        fallback: true,
+        extraction: fallbackDraft.extraction,
+      }),
+    );
   }
 }
 

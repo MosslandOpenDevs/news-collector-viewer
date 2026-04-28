@@ -646,7 +646,8 @@
       const OG_CACHE_TTL_MS = 1000 * 60 * 60 * 24 * 7;
       const IMG_PRELOAD_CONCURRENCY = 2;
       const HOT_WINDOW_DAYS = 7;
-      const HOT_LIMIT = 10;
+      const HOT_LIMIT = 15;
+      const HOT_MIN_LIMIT = 10;
 
       const elCategory = document.getElementById("category");
       const elGrid = document.getElementById("grid");
@@ -759,6 +760,7 @@
 
 /** @type {Array<ReturnType<typeof mapItem>>} */
       let lastItems = [];
+      let lastHotLimit = HOT_MIN_LIMIT;
       let lastFeedMeta = { title: "", link: "", updated: "" };
       const ogImageCache = new Map();
       let currentIndex = 0;
@@ -1154,7 +1156,8 @@
         const rangeStart = new Date(startMs).toLocaleDateString(getLocale(), { month: "2-digit", day: "2-digit" });
         const rangeEnd = new Date(endExclusiveMs - 1).toLocaleDateString(getLocale(), { month: "2-digit", day: "2-digit" });
         const windowLabel = `${t("meta_hot_window")} ${rangeStart}~${rangeEnd}`;
-        return { items: sorted.slice(0, HOT_LIMIT), sortBasis, windowLabel };
+        const dynamicLimit = Math.min(HOT_LIMIT, Math.max(HOT_MIN_LIMIT, deduped.length));
+        return { items: sorted.slice(0, dynamicLimit), sortBasis, windowLabel, limit: dynamicLimit };
       }
 
       async function fetchWeeklyHotItems(feedKey, endDateStr) {
@@ -1173,10 +1176,11 @@
         const sourceItems = weeklyItems.length ? weeklyItems : latest.items || [];
         const bundle = buildHotBundleFromItems(sourceItems, endDateStr);
 
-        return { meta: latest.meta || {}, items: bundle.items, windowLabel: bundle.windowLabel, sortBasis: bundle.sortBasis };
+        return { meta: latest.meta || {}, items: bundle.items, windowLabel: bundle.windowLabel, sortBasis: bundle.sortBasis, limit: bundle.limit };
       }
 
-      function render(items) {
+      function render(items, hotLimit) {
+        const actualLimit = hotLimit || items.length || HOT_MIN_LIMIT;
         const q = (elQ.value || "").trim().toLowerCase();
         const filtered = !q
           ? items
@@ -1243,10 +1247,10 @@
         elGrid.innerHTML = `
           <div class="hotHeader">
             <div>
-              <h3 class="hotTitle">${t("hot_title")}</h3>
+              <h3 class="hotTitle">${t("hot_title").replace(/\d+$/, String(filtered.length))}</h3>
               <p class="hotSub">${t("hot_subtitle")}</p>
             </div>
-            <div class="pill">${filtered.length}/${HOT_LIMIT}</div>
+            <div class="pill">${filtered.length} / ${actualLimit}</div>
           </div>
           <div class="hotScroller">${cards.join("")}</div>
         `;
@@ -1321,6 +1325,7 @@
               lastItems = weekly.items || [];
               hotWindowLabel = weekly.windowLabel || "";
               hotSortBasis = weekly.sortBasis || "recent";
+              lastHotLimit = weekly.limit || HOT_MIN_LIMIT;
             } catch (backendErr) {
               log("backend-fallback", { error: String(backendErr?.message || backendErr) });
               const xmlText = await fetchRssXml(selected.url);
@@ -1329,6 +1334,7 @@
               lastItems = bundle.items;
               hotSortBasis = bundle.sortBasis;
               hotWindowLabel = bundle.windowLabel;
+              lastHotLimit = bundle.limit || HOT_MIN_LIMIT;
             }
           } else {
             const xmlText = await fetchRssXml(selected.url);
@@ -1337,11 +1343,12 @@
             lastItems = bundle.items;
             hotSortBasis = bundle.sortBasis;
             hotWindowLabel = bundle.windowLabel;
+            lastHotLimit = bundle.limit || HOT_MIN_LIMIT;
           }
           log("load-feed-done", { items: lastItems.length });
           setStatus("ok", t("status_done"), "status_done");
           setMetaText();
-          render(lastItems);
+          render(lastItems, lastHotLimit);
         } catch (err) {
           console.error(err);
           log("load-feed-error", { error: String(err?.message || err) });
@@ -1380,7 +1387,7 @@
         elCategory.addEventListener("change", loadCurrentFeed);
         elDatePick.addEventListener("change", loadCurrentFeed);
         elReload.addEventListener("click", loadCurrentFeed);
-        elQ.addEventListener("input", () => render(lastItems));
+        elQ.addEventListener("input", () => render(lastItems, lastHotLimit));
         elLangToggle?.addEventListener("click", () => {
           currentLang = currentLang === "ko" ? "en" : "ko";
           localStorage.setItem("lang", currentLang);

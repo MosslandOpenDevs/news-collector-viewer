@@ -1,9 +1,9 @@
 ﻿<!doctype html>
-<html lang="en">
+<html lang="ko">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>WEEKLY AI HOT 10</title>
+    <title>WEEKLY AI HOT 10 - Medium Layout</title>
     <style>
       :root {
         --bg: #0b0d12;
@@ -1503,7 +1503,7 @@
         background:
           var(--card-bg),
           linear-gradient(140deg, rgba(229, 239, 255, 0.96), rgba(236, 244, 255, 0.94));
-        background-size: cover, 100% 100%;
+        background-size: 100% 100%, 100% 100%;
         background-repeat: no-repeat, no-repeat;
         background-position: center, center;
       }
@@ -1519,20 +1519,12 @@
         background-position: center, center, center, center;
       }
 
-      /* Cards with a source image: light scrim so the photo shows through clearly */
-      .hotCardBg.hasImage .hotCardOverlay {
-        /* Force visible 50% scrim on cards that have source images */
-        background: linear-gradient(0deg, rgba(247, 251, 255, 0.50), rgba(247, 251, 255, 0.50));
-      }
-
       .hotCardOverlay {
         position: absolute;
         inset: 0;
-        opacity: 1;
-        /* Default overlay for no-image cards — keeps text readable over the gradient background */
         background:
-          linear-gradient(180deg, rgba(247, 251, 255, 0.22), rgba(240, 247, 255, 0.50)),
-          linear-gradient(90deg, rgba(247, 251, 255, 0.38) 0%, rgba(240, 247, 255, 0.22) 58%, rgba(240, 247, 255, 0.36) 100%);
+          linear-gradient(180deg, rgba(247, 251, 255, 0.28), rgba(240, 247, 255, 0.58)),
+          linear-gradient(90deg, rgba(247, 251, 255, 0.48) 0%, rgba(240, 247, 255, 0.3) 58%, rgba(240, 247, 255, 0.46) 100%);
         border-radius: inherit;
         pointer-events: none;
       }
@@ -1915,10 +1907,11 @@
               <select id="aiProviderSelect" class="aiProviderSelect" aria-label="AI Provider">
                 <option value="auto" data-i18n="ai_provider_auto">Auto</option>
                 <option value="openai">OpenAI</option>
+                <option value="groq">Groq</option>
               </select>
             </label>
             <span id="aiNetworkStatus" class="globalAiStatus" hidden data-i18n="ai_network_badge">AI Issue</span>
-            <button id="langToggle" class="langToggleBtn" type="button" aria-label="Toggle language">EN</button>
+            <button id="langToggle" class="langToggleBtn" type="button" aria-label="Toggle language">KR</button>
           </div>
         </div>
         <div class="heroThumb" role="img" aria-label="WEEKLY AI HOT 10">
@@ -2066,10 +2059,8 @@
       const USE_BACKEND = true;
       const BACKEND_API = "http://localhost:3000/api/feed";
       const BACKEND_TRANSLATE_API = BACKEND_API.replace(/\/feed$/i, "/translate");
-      const BACKEND_SUMMARY_API   = BACKEND_API.replace(/\/feed$/i, "/summary");
-      const BACKEND_INSIGHT_API   = BACKEND_API.replace(/\/feed$/i, "/insight");
-      // Bilingual bundle: Korean source → Korean version → English version (single endpoint, two Groq calls)
-      const BACKEND_BILINGUAL_API = BACKEND_API.replace(/\/feed$/i, "/bundle/bilingual");
+      const BACKEND_SUMMARY_API = BACKEND_API.replace(/\/feed$/i, "/summary");
+      const BACKEND_INSIGHT_API = BACKEND_API.replace(/\/feed$/i, "/insight");
       const BACKEND_ARTICLE_BODY_API = BACKEND_API.replace(/\/feed$/i, "/article-body");
       const CORS_PROXY = "https://api.allorigins.win/raw?url=";
       const CORS_PROXIES = [
@@ -2093,6 +2084,7 @@
       const HOT_WINDOW_DAYS = 7;
       const HOT_LIMIT = 10;
       const ENABLE_GEMINI_PROVIDER = false;
+      // EN canonical -> KO translation only (API usage reduction mode)
       const BILINGUAL_CONTENT_SYNC = true;
       const DEV_INSIGHT_ENABLED = false;
       const AITIMES_SNAPSHOT_FALLBACK_DAYS = 42;
@@ -2127,8 +2119,8 @@
       const CARD_BG_FALLBACKS = REAL_AI_PHOTO_POOLS.general || [];
       const LOCAL_AI_FALLBACKS = ["./HUMAN-AI.jpg"];
       const FALLBACK_SESSION_SEED = Math.floor(Math.random() * 1000000000);
-      const KO_TRANSLATE_CACHE_KEY = "ai2_ko_translate_cache_v6";
-      const EN_TRANSLATE_CACHE_KEY = "ai2_en_translate_cache_v2";
+      const KO_TRANSLATE_CACHE_KEY = "ai2_ko_translate_cache_v7";
+      const EN_TRANSLATE_CACHE_KEY = "ai2_en_translate_cache_v3";
       const KO_TRANSLATE_MAX_TEXT = 1200;
       const KO_TRANSLATE_CONCURRENCY = 4;
       const NETWORK_FETCH_TIMEOUT_MS = 12000;
@@ -2270,22 +2262,6 @@
         "ships",
         "shipping",
         "업그레이드",
-        // 협업·파트너십·통합
-        "partnership",
-        "partners with",
-        "partnered",
-        "collaboration",
-        "collaborates",
-        "deal",
-        "agreement",
-        "integration",
-        "integrates",
-        "파트너십",
-        "협업",
-        "협력",
-        "제휴",
-        "통합",
-        "연동",
       ];
       const TECH_DEPTH_KEYWORDS = [
         "model",
@@ -2690,16 +2666,16 @@
           hot_title: "AI HOT TOP 10",
           hot_subtitle: "아래로 스크롤하며 이번 주 AI 주요 소식을 확인하세요.",
           hot_metric_views: "조회수",
-          hot_metric_issue: "트렌드 점수",
+          hot_metric_issue: "이슈 점수",
           hot_metric_recent: "최신 발행순",
           hot_rank: "순위",
           summary_label: "요약",
           source_label: "출처",
           dev_insight_label: "DEV INSIGHT",
           dev_insight_loading: "생성 중...",
-          dev_insight_network: "네트워크 오류로 AI 인사이트를 생성하지 못했습니다.",
-          dev_insight_unavailable: "AI 인사이트를 아직 생성하지 못했습니다.",
-          ai_network_badge: "AI 알림",
+          dev_insight_network: "AI 네트워크 문제로 인사이트를 생성하지 못했습니다.",
+          dev_insight_unavailable: "AI 인사이트를 아직 불러오지 못했습니다.",
+          ai_network_badge: "AI 이슈",
           ai_provider_label: "AI",
           ai_provider_auto: "Auto",
           source_toggle_title: "집계 소스 선택",
@@ -2708,16 +2684,16 @@
           note_title: "중요:",
           note_body_1: "브라우저에서 외부 RSS를 직접 <code>fetch</code>하면 CORS 때문에 실패할 수 있습니다.",
           note_body_2: "예시는 공개 CORS 프록시(<code>api.allorigins.win</code>)를 사용합니다. 안정성이 필요하면 자체 서버나 서버리스(Cloudflare Workers, Vercel, Netlify)로 RSS를 프록시하는 방식을 권장합니다.",
-          err_title: "피드를 불러오지 못했습니다.",
+          err_title: "가져오기에 실패했습니다.",
           err_label: "에러:",
           err_tip1: "공개 CORS 프록시(AllOrigins)가 일시적으로 느리거나 차단되었을 수 있어요.",
           err_tip2: "안정성이 필요하면 서버/서버리스에서 RSS를 받아 JSON으로 내려주는 방식을 권장합니다.",
           err_tip3: "또는 <code>CORS_PROXY</code>를 다른 프록시로 교체해 보세요.",
-          page_footer_sources_title: "선정 출처",
-          page_footer_sources_desc: "이번 주 AI Hot 10은 글로벌 주요 AI 기술·연구 미디어 및 공식 제품·랩 블로그에서 큐레이션했습니다.",
+          page_footer_sources_title: "Curated Sources",
+          page_footer_sources_desc: "이번 주 HOT 10은 글로벌 주요 AI 기술/연구 미디어 및 공식 블로그 데이터를 기반으로 구성했습니다.",
           page_footer_brand: "Weekly AI Hot 10",
-          page_footer_ai_notice_short: "AI 생성 콘텐츠",
-          page_footer_curated_by_prefix: "큐레이션:",
+          page_footer_ai_notice_short: "AI Generated Content",
+          page_footer_curated_by_prefix: "Curated by",
           page_footer_curated_by_brand: "MOSSLAND",
           page_footer_copyright: "© 2026 MOSSLAND. All rights reserved.",
         },
@@ -2736,7 +2712,7 @@
           meta_count_suffix: " items",
           meta_hot_window: "Week",
           meta_basis_views: "Views first",
-          meta_basis_issue: "Trending score first",
+          meta_basis_issue: "By trending score",
           meta_basis_recent: "Newest first",
           meta_sources: "sources",
           meta_ai_provider: "AI",
@@ -2746,7 +2722,7 @@
           footer_link: "Read article",
           nav_prev: "Previous",
           nav_next: "Next",
-          hot_title: "AI TOP 10",
+          hot_title: "AI HOT TOP 10",
           hot_subtitle: "Scroll down to explore this week's top AI stories.",
           hot_metric_views: "Views",
           hot_metric_issue: "Trending score",
@@ -2763,7 +2739,7 @@
           ai_provider_auto: "Auto",
           source_toggle_title: "Aggregated Sources",
           source_toggle_hint: "Click to include or exclude",
-          summary_empty: "No summary available.",
+          summary_empty: "Summary unavailable.",
           note_title: "Note:",
           note_body_1: "Fetching external RSS feeds directly in the browser may fail due to CORS.",
           note_body_2: "This demo uses the public CORS proxy (<code>api.allorigins.win</code>). For stability, proxy RSS with your own server/serverless (Cloudflare Workers, Vercel, Netlify).",
@@ -2773,15 +2749,15 @@
           err_tip2: "For stability, proxy RSS on a server/serverless and return JSON.",
           err_tip3: "Or replace <code>CORS_PROXY</code> with another proxy.",
           page_footer_sources_title: "Curated Sources",
-          page_footer_sources_desc: "This week's AI Hot 10 is curated from major global AI technology and research media, along with official product and lab blogs.",
+          page_footer_sources_desc: "This week's HOT 10 is curated from major global AI technology and research media sources, along with official product and lab blogs.",
           page_footer_brand: "Weekly AI Hot 10",
-          page_footer_ai_notice_short: "AI-Generated Content",
+          page_footer_ai_notice_short: "AI Generated Content",
           page_footer_curated_by_prefix: "Curated by",
           page_footer_curated_by_brand: "MOSSLAND",
           page_footer_copyright: "© 2026 MOSSLAND. All rights reserved.",
         },
       };
-      let currentLang = "en"; // English-first: Korean is a translation toggle
+      let currentLang = "ko";
       const t = (key) => I18N[currentLang]?.[key] ?? I18N.en[key] ?? key;
       const getLocale = () => (currentLang === "ko" ? "ko-KR" : "en-US");
 
@@ -2798,9 +2774,7 @@
           el.innerHTML = t(el.getAttribute("data-i18n-html"));
         });
         if (elLangToggle) {
-          // Show the target language on the toggle button (EN -> KR, KR -> EN).
           elLangToggle.textContent = currentLang === "ko" ? "EN" : "KR";
-          elLangToggle.setAttribute("aria-label", currentLang === "ko" ? "Switch to English" : "Switch to Korean");
         }
       }
 
@@ -2808,6 +2782,7 @@
         const raw = String(input || "").trim().toLowerCase();
         if (raw === "openai") return "openai";
         if (raw === "gemini") return ENABLE_GEMINI_PROVIDER ? "gemini" : "auto";
+        if (raw === "groq") return "groq";
         return "auto";
       }
 
@@ -3008,14 +2983,22 @@
 
       function shouldSkipCardByAiSummary(item, provider = currentAiProvider, lang = currentLang) {
         const globalSkipMeta = getAiCardMetaGlobal(item, "__aiSummarySkip", provider);
-        if (globalSkipMeta === "1") return true;
+        const forcedSkip = globalSkipMeta === "1";
         const skipMeta = getAiCardMeta(item, "__aiSummarySkip", provider, lang);
-        if (skipMeta === "1") return true;
+        const localSkip = skipMeta === "1";
         const score = getAiSummaryQualityScore(item, provider, lang);
-        return Number.isFinite(score) && score < 40;
+        const severeLowScore = Number.isFinite(score) && score < 25;
+        if (forcedSkip || localSkip || severeLowScore) {
+          // Keep card when non-AI summary is still usable.
+          if (hasAnyUsableSummary(item) || hasRelaxedArticleSummary(item)) return false;
+          return true;
+        }
+        return false;
       }
 
       function shouldPreferFallbackSummary(item, provider = currentAiProvider, lang = currentLang) {
+        const isAiTimesSource = String(item?.sourceFeed || "").trim() === "aitimes_industry";
+        if (isAiTimesSource) return false;
         const globalFallbackMeta = getAiCardMetaGlobal(item, "__aiSummaryFallbackPreferred", provider);
         if (globalFallbackMeta === "1") return true;
         const fallbackMeta = getAiCardMeta(item, "__aiSummaryFallbackPreferred", provider, lang);
@@ -3703,15 +3686,13 @@
         );
       }
 
-      async function fetchAiSummaryFromBackend(titleText, summaryText, bodyText = "", lang = currentLang, provider = currentAiProvider, rawKorean = "") {
+      async function fetchAiSummaryFromBackend(titleText, summaryText, bodyText = "", lang = currentLang, provider = currentAiProvider) {
         const payload = {
           title: decodeHtmlEntitiesText(titleText || "").replace(/\s+/g, " ").trim().slice(0, 240),
           summary: decodeHtmlEntitiesText(summaryText || "").replace(/\s+/g, " ").trim().slice(0, 1200),
           bodyText: normalizeArticleBodyText(bodyText || "", 3600),
           lang: lang === "en" ? "en" : "ko",
           provider: normalizeAiProvider(provider),
-          // rawKorean: original Korean source text (it.summaryText) for Groq-powered Korean→English summarization
-          rawKorean: decodeHtmlEntitiesText(rawKorean || "").replace(/\s+/g, " ").trim().slice(0, 1800),
         };
         const res = await fetchWithTimeout(
           BACKEND_SUMMARY_API,
@@ -3740,45 +3721,6 @@
           qualityScore: Number.isFinite(qualityScore) ? qualityScore : Number.NaN,
           shouldSkip: Boolean(json?.shouldSkip),
           usedFallback: Boolean(json?.usedFallback),
-        };
-      }
-
-      /**
-       * fetchBilingualBundleFromBackend
-       * Calls /api/bundle/bilingual with the Korean source text.
-       * The backend runs two sequential Groq calls:
-       *   Step 1 — Korean source → finalized Korean headline + summary
-       *   Step 2 — finalized Korean → English headline + summary
-       * Returns { ko: { headline, summary }, en: { headline, summary } }
-       * The English is ALWAYS derived from the Korean; the Korean is NEVER
-       * regenerated from the English.
-       */
-      async function fetchBilingualBundleFromBackend(koreanTitle, rawKorean, bodyText = "") {
-        const payload = {
-          title:      decodeHtmlEntitiesText(koreanTitle  || "").replace(/\s+/g, " ").trim().slice(0, 240),
-          rawKorean:  decodeHtmlEntitiesText(rawKorean    || "").replace(/\s+/g, " ").trim().slice(0, 1800),
-          bodyText:   normalizeArticleBodyText(bodyText   || "", 3600),
-        };
-        const res = await fetchWithTimeout(
-          BACKEND_BILINGUAL_API,
-          {
-            method: "POST",
-            cache: "no-store",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload),
-          },
-          TRANSLATE_FETCH_TIMEOUT_MS,
-        );
-        if (!res.ok) {
-          const details = await res.json().then((j) => j?.error || "").catch(() => "");
-          throw new Error(`BILINGUAL_HTTP_${res.status}${details ? `:${details}` : ""}`);
-        }
-        const json = await res.json();
-        if (!json?.ok || !json?.ko || !json?.en) throw new Error("BILINGUAL_EMPTY_RESPONSE");
-        const clean = (s) => decodeHtmlEntitiesText(s || "").replace(/\s+/g, " ").trim();
-        return {
-          ko: { headline: clean(json.ko.headline), summary: clean(json.ko.summary) },
-          en: { headline: clean(json.en.headline), summary: clean(json.en.summary) },
         };
       }
 
@@ -3818,8 +3760,12 @@
         if (!item || !USE_BACKEND) return false;
         const requestedProvider = normalizeAiProvider(provider);
         const requestedLang = lang === "en" ? "en" : "ko";
-        // Groq(AI)은 항상 영어로 생성, 한국어는 번역
-        const fetchLang = "en";
+        const sourceFeedKey = String(item?.sourceFeed || "").trim();
+        const sourceTitleRaw = decodeHtmlEntitiesText(item?.title || "").trim();
+        const isKoreanSourceItem = sourceFeedKey === "aitimes_industry" || /[가-힣]/.test(sourceTitleRaw);
+        // Korean sources: KO first then EN translation. Others: EN first then KO translation.
+        const fetchLang = isKoreanSourceItem ? "ko" : "en";
+        const mirrorLang = fetchLang === "ko" ? "en" : "ko";
         let changed = false;
         const articleBodyUpdated = await ensureArticleBodyTextForItem(item);
         if (articleBodyUpdated) {
@@ -3841,158 +3787,171 @@
           clearAiCardMetaGlobal(item, "__aiSummaryUsedFallback", requestedProvider);
           changed = true;
         }
-        const { titleText, summaryText, bodyText } = buildAiCardRequestText(item, "en");
+        const { titleText, summaryText, bodyText } = buildAiCardRequestText(item, fetchLang);
         if (!titleText && !summaryText && !bodyText) return false;
 
-        let nextSummary = getAiCardText(item, "__aiSummary", requestedProvider, "en");
-
-        const needsSummary =
-          !hasAiCardText(item, "__aiSummary", requestedProvider, "en") ||
-          (!hasAiCardText(item, "__aiSummaryQuality", requestedProvider, "en") &&
-            !getAiCardMetaGlobal(item, "__aiSummaryQuality", requestedProvider));
-
-        if (needsSummary) {
-          // ── Determine whether this item has a Korean source ─────────────────
-          const rawKoreanSource = decodeHtmlEntitiesText(item?.summaryText || "").replace(/\s+/g, " ").trim();
-          const hasKoreanSource = /[가-힣]/.test(rawKoreanSource) && rawKoreanSource.length >= 30;
-
-          // ── Path A: Korean source → bilingual bundle (Korean first, then English)
-          // Implements the editorial workflow:
-          //   1. Read Korean source
-          //   2. Write Korean headline + summary from Korean
-          //   3. Derive English headline + summary from finalized Korean
-          //   Korean is NEVER regenerated from English.
-          if (hasKoreanSource) {
-            try {
-              const bundle = await fetchBilingualBundleFromBackend(titleText, rawKoreanSource, bodyText);
-
-              const rawEn = bundle?.en?.summary || "";
-              const rawKo = bundle?.ko?.summary || "";
-
-              const validEn = rawEn && isReliableEnglishText(rawEn, 18) && !isWeakGeneratedSummary(rawEn, "en") && !isSummarySameAsTitle(rawEn, titleText);
-              const validKo = rawKo && isReliableKoreanText(rawKo, 10);
-
-              if (validEn && validKo) {
-                const polishedEn = proofreadEnglishSummaryText(rawEn, titleText) || rawEn;
-                const polishedKo = proofreadKoreanSummaryText(stylizeKoreanSummaryText(rawKo, titleText) || rawKo) || rawKo;
-                setAiCardText(item, "__aiSummary", polishedEn, requestedProvider, "en");
+        // Base-language AI summary exists: populate mirror language by translation.
+        let nextSummary = getAiCardText(item, "__aiSummary", requestedProvider, fetchLang);
+        if (nextSummary && isNoisySummaryText(nextSummary)) {
+          clearAiCardText(item, "__aiSummary", requestedProvider, fetchLang);
+          clearAiCardText(item, "__aiSummary", requestedProvider, mirrorLang);
+          setAiCardMeta(item, "__aiSummaryError", "offtopic", requestedProvider, fetchLang);
+          nextSummary = "";
+          changed = true;
+        }
+        if (nextSummary && !hasAiCardText(item, "__aiSummary", requestedProvider, mirrorLang)) {
+          try {
+            if (mirrorLang === "ko") {
+              const translatedKo = await translateTextToKo(nextSummary, "summary");
+              if (translatedKo && isReliableKoreanText(translatedKo, 10)) {
+                const polishedKo = proofreadKoreanSummaryText(stylizeKoreanSummaryText(translatedKo, titleText) || translatedKo) || translatedKo;
                 setAiCardText(item, "__aiSummary", polishedKo, requestedProvider, "ko");
-                setAiCardMeta(item, "__aiSummaryError", "", requestedProvider, "en");
-                setAiCardMeta(item, "__aiSummaryQuality", "90", requestedProvider, "en");
-                setAiCardMeta(item, "__aiSummarySkip", "", requestedProvider, "en");
-                setAiCardMeta(item, "__aiSummaryFallbackPreferred", "", requestedProvider, "en");
-                setAiCardMeta(item, "__aiSummaryUsedFallback", "", requestedProvider, "en");
-                setAiCardMetaGlobal(item, "__aiSummaryQuality", "90", requestedProvider, false);
-                setAiCardMetaGlobal(item, "__aiSummarySkip", "", requestedProvider, false);
-                setAiCardMetaGlobal(item, "__aiSummaryFallbackPreferred", "", requestedProvider, false);
-                setAiCardMetaGlobal(item, "__aiSummaryUsedFallback", "", requestedProvider, false);
-                nextSummary = polishedEn;
-                // Also pin the bilingual headlines to the item so Korean and English titles
-                // come from the same bundle — preventing title/summary mismatch.
-                const rawHeadlineEn = bundle?.en?.headline || "";
-                const rawHeadlineKo = bundle?.ko?.headline || "";
-                if (rawHeadlineEn && isReliableEnglishText(rawHeadlineEn, 3) && !/[가-힣]/.test(rawHeadlineEn)) {
-                  const pinnedEn = proofreadEnglishHeadlineText(rawHeadlineEn) || rawHeadlineEn;
-                  item.cardTitleEn = pinnedEn;
-                  item.titleEn = pinnedEn;
-                }
-                if (rawHeadlineKo && isReliableKoreanText(rawHeadlineKo, 2)) {
-                  const pinnedKo = proofreadKoreanHeadlineText(stylizeKoreanHeadlineText(rawHeadlineKo) || rawHeadlineKo) || rawHeadlineKo;
-                  item.cardTitleKo = pinnedKo;
-                  item.titleKo = pinnedKo;
-                }
-                changed = true;
-              } else {
-                // Bundle came back but content is unusable — mark as error and fall through
-                setAiCardText(item, "__aiSummary", "", requestedProvider, "en");
-                setAiCardText(item, "__aiSummary", "", requestedProvider, "ko");
-                const errorKind = !rawEn ? "empty" : !validEn ? "offtopic" : "ko_invalid";
-                setAiCardMeta(item, "__aiSummaryError", errorKind, requestedProvider, "en");
                 changed = true;
               }
-            } catch (e) {
-              console.warn("[bilingual-bundle fallback]", requestedProvider, String(e?.message || e));
-              // Fall through to Path B (English-only)
+            } else {
+              const translatedEn = await translateTextToEn(nextSummary, "summary");
+              if (translatedEn && isReliableEnglishText(translatedEn, 18) && !/[가-힣]/.test(translatedEn)) {
+                const polishedEn = proofreadEnglishSummaryText(translatedEn, titleText) || translatedEn;
+                setAiCardText(item, "__aiSummary", polishedEn, requestedProvider, "en");
+                changed = true;
+              }
             }
-          }
+          } catch (_e) {}
+        }
+        nextSummary =
+          getAiCardText(item, "__aiSummary", requestedProvider, fetchLang) ||
+          getAiCardText(item, "__aiSummary", requestedProvider, requestedLang);
+        if (
+          !hasAiCardText(item, "__aiSummary", requestedProvider, fetchLang) ||
+          (!hasAiCardText(item, "__aiSummaryQuality", requestedProvider, fetchLang) &&
+            !getAiCardMetaGlobal(item, "__aiSummaryQuality", requestedProvider))
+        ) {
+          try {
+            const generatedSummaryResult = await fetchAiSummaryFromBackend(titleText, summaryText, bodyText, fetchLang, requestedProvider);
+            const generatedSummaryRaw = decodeHtmlEntitiesText(generatedSummaryResult?.summary || "").replace(/\s+/g, " ").trim();
+            const generatedSummary = stripSummaryNoiseText(generatedSummaryRaw);
+            const isAiTimesSource = String(item?.sourceFeed || "").trim() === "aitimes_industry";
+            const generatedQuality = Number(generatedSummaryResult?.qualityScore);
+            const qualityScore = Number.isFinite(generatedQuality) ? generatedQuality : Number.NaN;
+            const lowQualitySkip =
+              Boolean(generatedSummaryResult?.shouldSkip) || (Number.isFinite(qualityScore) && qualityScore < 40);
+            const fallbackPreferredRaw = Number.isFinite(qualityScore) && qualityScore >= 40 && qualityScore < 60;
+            const fallbackPreferred = !isAiTimesSource && fallbackPreferredRaw;
 
-          // ── Path B: English-only Groq path (non-Korean sources, or bilingual fallback) ──
-          if (!hasAiCardText(item, "__aiSummary", requestedProvider, "en")) {
-            try {
-              const generatedSummaryResult = await fetchAiSummaryFromBackend(titleText, summaryText, bodyText, "en", requestedProvider, "");
-              const generatedSummary = decodeHtmlEntitiesText(generatedSummaryResult?.summary || "").replace(/\s+/g, " ").trim();
-              const generatedQuality = Number(generatedSummaryResult?.qualityScore);
-              const qualityScore = Number.isFinite(generatedQuality) ? generatedQuality : Number.NaN;
-              const lowQualitySkip =
-                Boolean(generatedSummaryResult?.shouldSkip) || (Number.isFinite(qualityScore) && qualityScore < 40);
-              const fallbackPreferred = Number.isFinite(qualityScore) && qualityScore >= 40 && qualityScore < 60;
+            setAiCardMeta(item, "__aiSummaryQuality", Number.isFinite(qualityScore) ? String(Math.round(qualityScore)) : "", requestedProvider, fetchLang);
+            setAiCardMeta(item, "__aiSummarySkip", lowQualitySkip ? "1" : "", requestedProvider, fetchLang);
+            setAiCardMeta(
+              item,
+              "__aiSummaryFallbackPreferred",
+              !lowQualitySkip && fallbackPreferred ? "1" : "",
+              requestedProvider,
+              fetchLang,
+            );
+            setAiCardMeta(
+              item,
+              "__aiSummaryUsedFallback",
+              generatedSummaryResult?.usedFallback ? "1" : "",
+              requestedProvider,
+              fetchLang,
+            );
+            setAiCardMetaGlobal(
+              item,
+              "__aiSummaryQuality",
+              Number.isFinite(qualityScore) ? String(Math.round(qualityScore)) : "",
+              requestedProvider,
+              false,
+            );
+            setAiCardMetaGlobal(item, "__aiSummarySkip", lowQualitySkip ? "1" : "", requestedProvider, false);
+            setAiCardMetaGlobal(
+              item,
+              "__aiSummaryFallbackPreferred",
+              !lowQualitySkip && fallbackPreferred ? "1" : "",
+              requestedProvider,
+              false,
+            );
+            setAiCardMetaGlobal(
+              item,
+              "__aiSummaryUsedFallback",
+              generatedSummaryResult?.usedFallback ? "1" : "",
+              requestedProvider,
+              false,
+            );
 
-              setAiCardMeta(item, "__aiSummaryQuality", Number.isFinite(qualityScore) ? String(Math.round(qualityScore)) : "", requestedProvider, "en");
-              setAiCardMeta(item, "__aiSummarySkip", lowQualitySkip ? "1" : "", requestedProvider, "en");
-              setAiCardMeta(item, "__aiSummaryFallbackPreferred", !lowQualitySkip && fallbackPreferred ? "1" : "", requestedProvider, "en");
-              setAiCardMeta(item, "__aiSummaryUsedFallback", generatedSummaryResult?.usedFallback ? "1" : "", requestedProvider, "en");
-              setAiCardMetaGlobal(item, "__aiSummaryQuality", Number.isFinite(qualityScore) ? String(Math.round(qualityScore)) : "", requestedProvider, false);
-              setAiCardMetaGlobal(item, "__aiSummarySkip", lowQualitySkip ? "1" : "", requestedProvider, false);
-              setAiCardMetaGlobal(item, "__aiSummaryFallbackPreferred", !lowQualitySkip && fallbackPreferred ? "1" : "", requestedProvider, false);
-              setAiCardMetaGlobal(item, "__aiSummaryUsedFallback", generatedSummaryResult?.usedFallback ? "1" : "", requestedProvider, false);
+            if (lowQualitySkip) {
+              setAiCardText(item, "__aiSummary", "", requestedProvider, fetchLang);
+              setAiCardText(item, "__aiSummary", "", requestedProvider, mirrorLang);
+              setAiCardMeta(item, "__aiSummaryError", "skip", requestedProvider, fetchLang);
+              changed = true;
+              return changed;
+            }
 
-              if (lowQualitySkip) {
-                setAiCardText(item, "__aiSummary", "", requestedProvider, "en");
-                setAiCardText(item, "__aiSummary", "", requestedProvider, "ko");
-                setAiCardMeta(item, "__aiSummaryError", "skip", requestedProvider, "en");
-                changed = true;
-                return changed;
-              }
-              if (fallbackPreferred) {
-                setAiCardText(item, "__aiSummary", "", requestedProvider, "en");
-                setAiCardText(item, "__aiSummary", "", requestedProvider, "ko");
-                setAiCardMeta(item, "__aiSummaryError", "fallback_preferred", requestedProvider, "en");
-                changed = true;
-                return changed;
-              }
+            if (fallbackPreferred) {
+              setAiCardText(item, "__aiSummary", "", requestedProvider, fetchLang);
+              setAiCardText(item, "__aiSummary", "", requestedProvider, mirrorLang);
+              setAiCardMeta(item, "__aiSummaryError", "fallback_preferred", requestedProvider, fetchLang);
+              changed = true;
+              return changed;
+            }
 
-              const generatedLooksEnglish =
-                !/[가-힣]/.test(generatedSummary || "") &&
-                isReliableEnglishText(generatedSummary || "", 18) &&
-                !isWeakGeneratedSummary(generatedSummary, "en");
-
-              if (generatedSummary && generatedLooksEnglish && !isSummarySameAsTitle(generatedSummary, titleText)) {
+            const generatedHasHangul = /[가-힣]/.test(generatedSummary || "");
+            const generatedLooksEnglish =
+              !generatedHasHangul && isReliableEnglishText(generatedSummary || "", 18) && !isWeakGeneratedSummary(generatedSummary, "en");
+            const generatedLooksKorean =
+              generatedHasHangul && isReliableKoreanText(generatedSummary || "", 10) && !isWeakGeneratedSummary(generatedSummary, "ko");
+            const languageValid =
+              (fetchLang === "en" ? generatedLooksEnglish : generatedLooksKorean) && !isNoisySummaryText(generatedSummary);
+            if (
+              generatedSummary &&
+              languageValid &&
+              !isSummarySameAsTitle(generatedSummary, titleText) &&
+              !isWeakGeneratedSummary(generatedSummary, fetchLang)
+            ) {
+              if (fetchLang === "en") {
                 const polishedEn = proofreadEnglishSummaryText(generatedSummary, titleText) || generatedSummary;
                 setAiCardText(item, "__aiSummary", polishedEn, requestedProvider, "en");
                 setAiCardMeta(item, "__aiSummaryError", "", requestedProvider, "en");
                 nextSummary = polishedEn;
-                // Korean: translate from English (only for non-Korean sources; Korean sources use Path A)
-                if (!hasKoreanSource) {
-                  try {
-                    let translatedKo = await translateTextToKo(polishedEn, "summary");
-                    if (!translatedKo || !isReliableKoreanText(translatedKo, 10)) {
-                      try { translatedKo = await translateTextViaPublicGoogle(polishedEn, "en", "ko"); } catch (_ge) {}
-                    }
-                    if (translatedKo && isReliableKoreanText(translatedKo, 10)) {
-                      const polishedKo = proofreadKoreanSummaryText(stylizeKoreanSummaryText(translatedKo, titleText) || translatedKo) || translatedKo;
-                      setAiCardText(item, "__aiSummary", polishedKo, requestedProvider, "ko");
-                    }
-                  } catch (_e) {}
-                }
-                changed = true;
               } else {
-                setAiCardText(item, "__aiSummary", "", requestedProvider, "en");
-                setAiCardText(item, "__aiSummary", "", requestedProvider, "ko");
-                const errorKind = !generatedSummary ? "empty" : generatedLooksEnglish ? "short" : "offtopic";
-                setAiCardMeta(item, "__aiSummaryError", errorKind, requestedProvider, requestedLang);
-                changed = true;
+                const polishedKo =
+                  proofreadKoreanSummaryText(stylizeKoreanSummaryText(generatedSummary, titleText) || generatedSummary) ||
+                  generatedSummary;
+                setAiCardText(item, "__aiSummary", polishedKo, requestedProvider, "ko");
+                setAiCardMeta(item, "__aiSummaryError", "", requestedProvider, "ko");
+                nextSummary = polishedKo;
               }
-            } catch (e) {
-              console.warn("[AI summary fallback]", requestedProvider, requestedLang, String(e?.message || e));
-              setAiCardText(item, "__aiSummary", "", requestedProvider, "en");
-              setAiCardText(item, "__aiSummary", "", requestedProvider, "ko");
-              setAiCardMeta(item, "__aiSummaryError", classifyAiCardError(e), requestedProvider, "en");
-              setAiCardMeta(item, "__aiSummaryQuality", "", requestedProvider, "en");
-              setAiCardMeta(item, "__aiSummarySkip", "", requestedProvider, "en");
-              setAiCardMeta(item, "__aiSummaryFallbackPreferred", "", requestedProvider, "en");
-              setAiCardMeta(item, "__aiSummaryUsedFallback", "", requestedProvider, "en");
+              try {
+                if (mirrorLang === "ko") {
+                  const translatedKo = await translateTextToKo(nextSummary, "summary");
+                  if (translatedKo && isReliableKoreanText(translatedKo, 10)) {
+                    const polishedKo = proofreadKoreanSummaryText(stylizeKoreanSummaryText(translatedKo, titleText) || translatedKo) || translatedKo;
+                    setAiCardText(item, "__aiSummary", polishedKo, requestedProvider, "ko");
+                  }
+                } else {
+                  const translatedEn = await translateTextToEn(nextSummary, "summary");
+                  if (translatedEn && isReliableEnglishText(translatedEn, 18) && !/[가-힣]/.test(translatedEn)) {
+                    const polishedEn = proofreadEnglishSummaryText(translatedEn, titleText) || translatedEn;
+                    setAiCardText(item, "__aiSummary", polishedEn, requestedProvider, "en");
+                  }
+                }
+              } catch (_e) {}
+              changed = true;
+            } else {
+              setAiCardText(item, "__aiSummary", "", requestedProvider, fetchLang);
+              setAiCardText(item, "__aiSummary", "", requestedProvider, mirrorLang);
+              const errorKind = !generatedSummary ? "empty" : languageValid ? "short" : "offtopic";
+              setAiCardMeta(item, "__aiSummaryError", errorKind, requestedProvider, fetchLang);
               changed = true;
             }
+          } catch (e) {
+            console.warn("[AI summary fallback]", requestedProvider, requestedLang, String(e?.message || e));
+            setAiCardText(item, "__aiSummary", "", requestedProvider, fetchLang);
+            setAiCardText(item, "__aiSummary", "", requestedProvider, mirrorLang);
+            setAiCardMeta(item, "__aiSummaryError", classifyAiCardError(e), requestedProvider, fetchLang);
+            setAiCardMeta(item, "__aiSummaryQuality", "", requestedProvider, fetchLang);
+            setAiCardMeta(item, "__aiSummarySkip", "", requestedProvider, fetchLang);
+            setAiCardMeta(item, "__aiSummaryFallbackPreferred", "", requestedProvider, fetchLang);
+            setAiCardMeta(item, "__aiSummaryUsedFallback", "", requestedProvider, fetchLang);
+            changed = true;
           }
         }
 
@@ -4037,33 +3996,13 @@
         if (aiCardTextRefreshPending || !USE_BACKEND) return;
         const provider = normalizeAiProvider(currentAiProvider);
         const lang = currentLang === "en" ? "en" : "ko";
-        const pool = (filteredItems || []).slice(0, HOT_LIMIT);
-
-        // Primary targets: items missing AI summary for current language
-        const primaryTargets = pool.filter(
+        const targets = (filteredItems || []).slice(0, HOT_LIMIT).filter(
           (it) =>
             !hasAiCardText(it, "__aiSummary", provider, lang) ||
             (!hasAiCardText(it, "__aiSummaryQuality", provider, lang) &&
               !getAiCardMetaGlobal(it, "__aiSummaryQuality", provider)) ||
             (DEV_INSIGHT_ENABLED && !hasAiCardText(it, "__aiInsight", provider, lang)),
         );
-
-        // BILINGUAL_CONTENT_SYNC: also pre-generate Korean AI translation for any item that
-        // already has an English AI summary but is missing the Korean one.
-        // This ensures the Korean tab shows the Groq AI content instead of just the RSS translation.
-        const seenKeys = new Set(primaryTargets.map((it) => it.guid || it.link || it.title || ""));
-        const bilingualTargets = BILINGUAL_CONTENT_SYNC
-          ? pool.filter((it) => {
-              const key = it.guid || it.link || it.title || "";
-              if (seenKeys.has(key)) return false; // already in primary
-              return (
-                hasAiCardText(it, "__aiSummary", provider, "en") &&
-                !hasAiCardText(it, "__aiSummary", provider, "ko")
-              );
-            })
-          : [];
-
-        const targets = [...primaryTargets, ...bilingualTargets];
         if (!targets.length) return;
         aiCardTextRefreshPending = true;
 
@@ -4079,40 +4018,14 @@
             if (!item) continue;
             const updated = await ensureAiCardTextsForItem(item, lang, provider);
             if (updated) changed = true;
-            // If we just generated English AI, immediately queue Korean translation
-            if (
-              BILINGUAL_CONTENT_SYNC &&
-              hasAiCardText(item, "__aiSummary", provider, "en") &&
-              !hasAiCardText(item, "__aiSummary", provider, "ko")
-            ) {
-              const koUpdated = await ensureAiCardTextsForItem(item, "ko", provider);
-              if (koUpdated) changed = true;
-            }
           }
           return changed;
         };
 
         Promise.allSettled(Array.from({ length: concurrency }, () => worker()))
-          .then(async (results) => {
+          .then((results) => {
             const hasChanged = results.some((r) => r.status === "fulfilled" && r.value);
-            if (hasChanged) {
-              // Re-sync bilingual content for items that now have AI English.
-              // synchronizeBilingualCardTexts reads __aiSummary[en] as baseEn source,
-              // so running it again ensures cardSummaryKo matches the AI-generated English.
-              // This prevents the divergence where English shows Groq AI content but
-              // Korean falls back to the pre-AI cardSummaryKo (based on different source).
-              if (BILINGUAL_CONTENT_SYNC) {
-                const needResync = pool.filter((it) =>
-                  hasAiCardText(it, "__aiSummary", provider, "en") &&
-                  getAiCardText(it, "__aiSummary", provider, "en") &&
-                  !isSummaryEmptyText(getAiCardText(it, "__aiSummary", provider, "en"))
-                );
-                if (needResync.length) {
-                  try { await synchronizeBilingualCardTexts(needResync); } catch (_e) {}
-                }
-              }
-              render(sourceItems);
-            }
+            if (hasChanged) render(sourceItems);
           })
           .finally(() => {
             aiCardTextRefreshPending = false;
@@ -4199,6 +4112,7 @@
       function isReliableEnglishText(value, minLetters = 6) {
         const text = decodeHtmlEntitiesText(value || "").replace(/\s+/g, " ").trim();
         if (!text) return false;
+        if (isNoisySummaryText(text)) return false;
         if (/[가-힣]/.test(text)) return false;
         const letters = (text.match(/[A-Za-z]/g) || []).length;
         if (letters < Math.max(1, minLetters)) return false;
@@ -4206,6 +4120,14 @@
         const ratio = letters / compactLen;
         if (ratio >= 0.18) return true;
         return /\b(ai|api|sdk|model|launch|release|update|feature|platform|technology|product|service)\b/i.test(text);
+      }
+
+      function isStrictEnglishCardText(titleText, summaryText) {
+        const title = decodeHtmlEntitiesText(titleText || "").replace(/\s+/g, " ").trim();
+        const summary = decodeHtmlEntitiesText(summaryText || "").replace(/\s+/g, " ").trim();
+        if (!title || !summary) return false;
+        if (/[가-힣]/.test(`${title} ${summary}`)) return false;
+        return isReliableEnglishText(title, 3) && isReliableEnglishText(summary, 14);
       }
 
       function loadKoTranslateCacheFromStorage() {
@@ -4461,31 +4383,143 @@
       }
 
       function buildEnglishFallbackTitleFromItem(item) {
-        const sourceTitle = decodeHtmlEntitiesText(item?.title || "").replace(/\s+/g, " ").trim();
-        if (sourceTitle && !/[가-힣]/.test(sourceTitle) && isReliableEnglishText(sourceTitle, 3)) {
-          const polished = proofreadEnglishHeadlineText(sourceTitle) || sourceTitle;
-          if (polished && !isGenericEnglishFallbackTitle(polished)) return polished;
+        const canonical = ensureCanonicalCardText(item);
+        const rawTitle = decodeHtmlEntitiesText(item?.title || canonical.titleEn || "")
+          .replace(/\s+/g, " ")
+          .trim();
+        if (rawTitle && !/[가-힣]/.test(rawTitle) && rawTitle.length >= 12) {
+          return proofreadEnglishHeadlineText(rawTitle) || rawTitle;
         }
-        const localizedCats = getLocalizedCategories(item, "en");
-        const categoryHint = toSafeEnglishLabel(localizedCats[0] || item?.categories?.[0] || "", "AI Industry");
+
+        const summarySeed = stripSummaryNoiseText(
+          decodeHtmlEntitiesText(
+            canonical.summaryEn || item?.summaryEn || item?.summaryText || item?.__articleBodySummary || "",
+          ),
+        );
+        const derived = deriveEnglishTitleFromSummary(summarySeed, "");
+        if (derived && !isGenericEnglishFallbackTitle(derived)) {
+          return proofreadEnglishHeadlineText(derived) || derived;
+        }
+
+        const sourceLabel = toSafeEnglishLabel(
+          decodeHtmlEntitiesText(item?.sourceFeedTitle || item?.creator || ""),
+          "AI",
+        );
         const topicHint = getEnglishTopicHintFromItem(item);
-        const categoryNorm = normalizeCompareText(categoryHint);
-        const topicNorm = normalizeCompareText(topicHint);
-        if (categoryNorm && topicNorm && (categoryNorm.includes(topicNorm) || topicNorm.includes(categoryNorm))) {
-          return `${categoryHint} update`;
-        }
-        return `${categoryHint} ${topicHint} update`;
+        return `${sourceLabel} ${topicHint} update`
+          .replace(/\bAI\s+AI\b/gi, "AI")
+          .replace(/\s+/g, " ")
+          .trim();
       }
 
       function buildEnglishFallbackSummaryFromItem(item, titleEn) {
-        const sourceHint =
-          String(item?.sourceFeed || "") === "aitimes_industry"
-            ? "AI Times"
-            : toSafeEnglishLabel(decodeHtmlEntitiesText(item?.sourceFeedTitle || "").trim(), "AI source");
-        const categoryHint = toSafeEnglishLabel(getLocalizedCategories(item, "en")[0] || item?.categories?.[0] || "", "AI industry").toLowerCase();
-        const topicHint = getEnglishTopicHintFromItem(item);
-        const titleHint = toSafeEnglishLabel(decodeHtmlEntitiesText(titleEn || "").trim(), `${topicHint} update`);
-        return `${sourceHint} reports a recent ${categoryHint} update involving ${titleHint}.`;
+        const canonical = ensureCanonicalCardText(item);
+        const fallbackTitle = toSafeEnglishLabel(
+          decodeHtmlEntitiesText(titleEn || canonical.titleEn || item?.title || "").trim(),
+          "AI update",
+        );
+        const sourceCandidates = [
+          decodeHtmlEntitiesText(canonical.summaryEn || ""),
+          decodeHtmlEntitiesText(item?.summaryEn || ""),
+          decodeHtmlEntitiesText(item?.summaryText || ""),
+          decodeHtmlEntitiesText(item?.__articleBodySummary || ""),
+          decodeHtmlEntitiesText(item?.__articleBodyText || ""),
+        ]
+          .map((v) => stripSummaryNoiseText(v || ""))
+          .filter(Boolean);
+
+        const sentences = [];
+        const seen = new Set();
+        for (const chunk of sourceCandidates) {
+          const parts = chunk
+            .split(/(?<=[.!?])\s+|\n+/)
+            .map((s) => decodeHtmlEntitiesText(s || "").replace(/\s+/g, " ").trim())
+            .filter((s) => s && s.length >= 22 && !/[가-힣]/.test(s));
+          for (const part of parts) {
+            const line = /[.!?]$/.test(part) ? part : `${part}.`;
+            const key = normalizeCompareText(line);
+            if (!key || seen.has(key)) continue;
+            seen.add(key);
+            sentences.push(line);
+            if (sentences.length >= 2) break;
+          }
+          if (sentences.length >= 2) break;
+        }
+
+        if (!sentences.length) {
+          const expanded = sanitizeEnglishCardSummaryText(
+            buildExpandedEnglishSummary(
+              sourceCandidates.join(" "),
+              decodeHtmlEntitiesText(item?.summaryText || item?.__articleBodyText || ""),
+              fallbackTitle,
+            ),
+            item,
+            fallbackTitle,
+          );
+          return expanded || "";
+        }
+        const merged = sentences.slice(0, 2).join(" ").replace(/\s+/g, " ").trim();
+        const polished = proofreadEnglishSummaryText(merged, fallbackTitle) || merged;
+        return sanitizeEnglishCardSummaryText(polished, item, fallbackTitle) || "";
+      }
+
+      function buildMinimalEnglishSummaryFromTitle(titleText) {
+        const base = proofreadEnglishHeadlineText(
+          decodeHtmlEntitiesText(titleText || "")
+            .replace(/\s+/g, " ")
+            .trim(),
+        );
+        if (!base || /[가-힣]/.test(base)) return "";
+        const sentence = base.replace(/[.!?]+$/g, "").trim();
+        if (!sentence) return "";
+        if (isReliableEnglishText(sentence, 14)) {
+          return `${sentence}. The update clarifies the scope, deployment path, and practical impact for teams adopting this capability.`;
+        }
+        return "An AI update was announced this week. The report explains what changed, who is affected, and why the rollout matters in practice.";
+      }
+
+      function buildMinimalKoreanSummaryFromTitle(titleText) {
+        const base = decodeHtmlEntitiesText(titleText || "")
+          .replace(/\s+/g, " ")
+          .replace(/[“”"']/g, "")
+          .replace(/[.?!]+$/g, "")
+          .trim();
+        if (!base) return "이번 AI 업데이트의 핵심 변경 사항이 발표됐다. 적용 대상과 실제 도입 영향까지 함께 확인할 필요가 있다.";
+        if (/[가-힣]/.test(base)) {
+          return `${base} 관련 핵심 업데이트가 발표됐다. 이번 변화는 적용 범위와 도입 방식, 실무 영향까지 함께 검토해야 의미가 분명해진다.`;
+        }
+        return "이번 AI 업데이트의 핵심 변경 사항이 발표됐다. 적용 대상과 실제 도입 영향까지 함께 확인할 필요가 있다.";
+      }
+
+      function buildTitleBasedFallbackSummary(item, titleText, lang = currentLang) {
+        const titleRaw =
+          decodeHtmlEntitiesText(titleText || "") ||
+          decodeHtmlEntitiesText(item?.cardTitleKo || item?.titleKo || item?.cardTitleEn || item?.titleEn || item?.title || "");
+        const cleanTitle = titleRaw
+          .replace(/\s+/g, " ")
+          .replace(/[“”"']/g, "")
+          .replace(/[.?!]+$/g, "")
+          .trim();
+
+        if (lang === "ko") {
+          const sourceKo = stripSummaryNoiseText(
+            decodeHtmlEntitiesText(item?.cardSummaryKo || item?.summaryKo || item?.summaryText || item?.__articleBodySummary || ""),
+          );
+          const sentences = sourceKo
+            .split(/(?<=[.!?。！？])\s+|\n+/)
+            .map((s) => decodeHtmlEntitiesText(s || "").replace(/\s+/g, " ").trim())
+            .filter((s) => s && s.length >= 16 && /[가-힣]/.test(s))
+            .slice(0, 2)
+            .map((s) => (/[.!?]$/.test(s) ? s : `${s}.`));
+          if (sentences.length) return sentences.join(" ");
+          const fromBody = sanitizeKoreanCardSummaryText(
+            buildArticleLeadSummaryText(item?.__articleBodyText || item?.summaryText || "", cleanTitle, "ko"),
+            cleanTitle,
+          );
+          return fromBody || "";
+        }
+
+        return buildEnglishFallbackSummaryFromItem(item, cleanTitle);
       }
 
       function getLocalizedCreatorText(item, lang = currentLang) {
@@ -4498,393 +4532,9 @@
         return toSafeEnglishLabel(sourceHint, "AI Times");
       }
 
-      const EDITORIAL_EN_CARD_OVERRIDES = Object.freeze([
-        {
-          key: "claude_managed_agents",
-          topicLabel: "PLATFORM",
-          mustAnyGroups: [
-            ["anthropic", "antropic"],
-            ["claude managed agents", "claude managed agent", "클로드 매니지드 에이전트"],
-          ],
-          any: ["composable api", "multi agent", "cloud environments", "enterprise ai", "distribution", "조합형 api", "멀티 에이전트", "클라우드"],
-          titleEn: "Anthropic unveils \"Claude Managed Agents\" platform for enterprise AI development",
-          titleKo: "앤트로픽, 엔터프라이즈 AI 개발 위한 '클로드 매니지드 에이전트' 플랫폼 공개",
-          summaryEn:
-            "Anthropic has unveiled Claude Managed Agents, a new platform aimed at simplifying how AI agents are developed and deployed in cloud environments. Built on a composable API framework, it supports use cases ranging from single-task agents to complex multi-agent systems, a move widely seen as a strategic step to accelerate its enterprise AI push.",
-          summaryKo:
-            "앤트로픽은 클라우드 환경에서 AI 에이전트의 개발과 배포를 간소화하기 위한 새 플랫폼 '클로드 매니지드 에이전트'를 공개했다. 이 플랫폼은 조합형 API 프레임워크를 기반으로 단일 작업 에이전트부터 복잡한 멀티 에이전트 시스템까지 구축할 수 있도록 지원하며, 기업용 AI 시장 공략을 본격화하는 전략적 행보로 해석된다.",
-        },
-        {
-          key: "intel_sambanova_inference",
-          topicLabel: "ARCHITECTURE",
-          mustAnyGroups: [["intel", "인텔"], ["sambanova", "삼바노바"]],
-          any: ["heterogeneous", "inference", "prefill", "decode", "nvidia", "이기종", "추론", "프리필", "디코드", "엔비디아"],
-          titleEn: "Intel and SambaNova partner to build a heterogeneous AI inference platform",
-          titleKo: "인텔-삼바노바, 이기종 AI 추론 플랫폼 구축 협력",
-          summaryEn:
-            "Intel and SambaNova are partnering to develop a heterogeneous AI inference platform aimed at countering Nvidia's lead in AI infrastructure. The architecture distributes inference workloads across multiple hardware components, assigning phases such as prefill and decode to specialized processors to improve efficiency and operating economics.",
-          summaryKo:
-            "인텔은 AI 인프라에서 엔비디아의 우위를 겨냥해 삼바노바와 함께 이기종 AI 추론 플랫폼을 개발하고 있다. 이 시스템은 추론 워크로드를 여러 하드웨어 구성요소에 분산하고, '프리필'과 '디코드' 같은 단계를 각각의 특화 프로세서에 배정해 효율을 높이는 방식이다.",
-        },
-        {
-          key: "openai_chatgpt_pro_codex",
-          topicLabel: "PLATFORM",
-          mustAnyGroups: [
-            ["openai"],
-            ["chatgpt pro", "pro plan", "100 per month", "$100", "codex", "코덱스"],
-          ],
-          any: ["coding war", "usage restrictions", "developer", "anthropic", "코딩 전쟁", "사용 제한", "개발자"],
-          titleEn: "OpenAI launches $100-per-month ChatGPT Pro plan and ramps up coding competition",
-          titleKo: "오픈AI, 월 100달러 ChatGPT Pro 출시로 코딩 시장 경쟁 가속",
-          summaryEn:
-            "OpenAI has introduced a $100-per-month ChatGPT Pro tier that expands access for heavy users of coding workflows, including Codex-related usage. The move positions OpenAI more aggressively in developer tooling competition as enterprise demand for AI coding assistance grows.",
-          summaryKo:
-            "오픈AI는 코딩 워크플로우 고사용자층을 겨냥해 월 100달러의 ChatGPT Pro 요금제를 공개했다. Codex 관련 사용 한도를 완화하는 방향의 이번 조치는 기업 개발 수요 확대 국면에서 개발자 도구 경쟁을 한층 강화하려는 전략으로 해석된다.",
-        },
-        {
-          key: "anthropic_claude_for_word",
-          topicLabel: "PLATFORM",
-          mustAnyGroups: [
-            ["anthropic", "antropic", "앤트로픽"],
-            ["claude for word", "클로드 포 워드", "for word"],
-          ],
-          any: ["microsoft office", "ms office", "copilot", "워드", "오피스", "코파일럿", "productivity"],
-          titleEn: "Anthropic launches \"Claude for Word\" to compete with Microsoft Copilot in Office workflows",
-          titleKo: "앤트로픽, '클로드 포 워드' 출시… MS 오피스 내 코파일럿과 경쟁",
-          summaryEn:
-            "Anthropic has launched Claude for Word, a writing-focused assistant aimed at Microsoft Office-style productivity workflows. With drafting, editing, and summarization features tailored to document work, the release positions Anthropic more directly against Copilot in enterprise office software.",
-          summaryKo:
-            "앤트로픽은 문서 작성 업무에 특화한 '클로드 포 워드'를 출시하며 MS 오피스 환경에서 코파일럿과의 경쟁에 본격적으로 나섰다. 초안 작성·편집·요약 기능을 중심으로 문서 생산성 워크플로를 겨냥했으며, 기업용 오피스 소프트웨어 시장에서 입지를 확대하려는 전략으로 해석된다.",
-        },
-        {
-          key: "superbai_physical_ai_os",
-          topicLabel: "PLATFORM",
-          mustAnyGroups: [
-            ["superb", "superb ai", "슈퍼브", "슈퍼브ai"],
-            ["physical ai", "integrated control", "통합 관제", "피지컬 ai"],
-          ],
-          any: ["coex", "conference 2026", "data automation", "business vision", "코엑스", "컨퍼런스", "데이터 자동화"],
-          titleEn: "[Physical AI 2026] SuperbAI highlights expansion strategy around an integrated-control Physical AI OS",
-          titleKo: "[Physical AI 2026] 슈퍼브AI, 통합 관제형 피지컬 AI OS 중심 확장 전략 제시",
-          summaryEn:
-            "At Physical AI Conference 2026, SuperbAI said it plans to expand the integrated-control market for Physical AI by leveraging its data automation capabilities. The company framed the strategy as the next phase of commercial growth for real-world AI operations.",
-          summaryKo:
-            "슈퍼브AI는 Physical AI Conference 2026에서 데이터 자동화 기술을 기반으로 통합 관제형 피지컬 AI 시장을 확대하겠다는 전략을 제시했다. 회사는 이를 실세계 AI 운영 상용화를 본격 확장하는 다음 단계로 설명했다.",
-        },
-        {
-          key: "french_government_linux_transition",
-          topicLabel: "SECURITY",
-          mustAnyGroups: [
-            ["french", "france", "프랑스"],
-            ["linux"],
-          ],
-          any: ["windows", "digital sovereignty", "dinum", "administrative system", "디지털 주권", "행정 시스템", "윈도우"],
-          titleEn: "French government outlines shift from Windows to Linux in public administration",
-          titleKo: "프랑스 정부, 공공 행정 시스템의 윈도우 이탈·리눅스 전환 방침 공식화",
-          summaryEn:
-            "France's digital agency DINUM said the government will move administrative workstations away from Windows and toward Linux-based systems. Officials positioned the transition as part of a broader digital-sovereignty strategy, not just a routine IT refresh.",
-          summaryKo:
-            "프랑스 디지털청(DINUM)은 정부 행정 워크스테이션을 윈도우 중심 구조에서 벗어나 리눅스 기반으로 전환하겠다는 방침을 밝혔다. 당국은 이번 결정을 단순한 IT 교체가 아니라 디지털 주권 강화를 위한 국가 전략으로 규정했다.",
-        },
-        {
-          key: "lg_ai_research_kiwoom",
-          topicLabel: "PLATFORM",
-          mustAnyGroups: [
-            ["lg ai research", "lg ai연구원", "lg ai 연구원", "lg ai"],
-            ["kiwoom", "키움", "키움증권"],
-          ],
-          any: ["finance", "securities", "증권", "금융", "파트너십", "collaboration"],
-          titleEn: "LG AI Research and Kiwoom Securities advance AI collaboration in financial workflows",
-          titleKo: "LG AI연구원-키움증권, 금융 워크플로 고도화를 위한 AI 협력 확대",
-          summaryEn:
-            "LG AI Research and Kiwoom Securities are expanding their collaboration to apply AI across core securities operations. The initiative focuses on accelerating decision-support workflows, improving operational efficiency, and raising service quality, and is viewed as a step toward deeper AI integration across front-to-back financial processes.",
-          summaryKo:
-            "LG AI연구원과 키움증권은 증권 업무 전반에 AI를 적용하기 위한 협력을 확대하고 있다. 이번 협업은 의사결정 지원 속도와 운영 효율을 높이고 서비스 품질을 개선하는 데 초점을 두며, 금융 워크플로 전반의 AI 내재화를 가속하는 움직임으로 해석된다.",
-        },
-        {
-          key: "dayone_vla_education",
-          topicLabel: "PLATFORM",
-          mustAnyGroups: [
-            ["dayone", "dayone company", "데이원컴퍼니", "데이원"],
-          ],
-          any: ["physical ai", "vla", "피지컬 ai", "교육 콘텐츠", "robotics", "로보틱스", "협력", "partnership", "education", "training"],
-          titleEn: "Dayone Company expands Physical AI/VLA education content and explores robotics partnerships",
-          titleKo: "데이원컴퍼니, 피지컬 AI·VLA 교육 콘텐츠 확장… 로보틱스 협력 논의",
-          summaryEn:
-            "Dayone Company said it is expanding education content focused on Physical AI and VLA capabilities while discussing partnerships with robotics companies. The move is interpreted as an effort to connect workforce-oriented AI training with real deployment requirements and to broaden commercialization pathways for applied robotics learning.",
-          summaryKo:
-            "데이원컴퍼니는 피지컬 AI 및 VLA 중심 교육 콘텐츠를 확대하고 로보틱스 기업과의 협력을 논의하고 있다고 밝혔다. 이는 현장형 AI 역량 교육의 상용화를 확장하려는 전략적 행보로 풀이된다.",
-        },
-        {
-          key: "google_paper_orchestra",
-          topicLabel: "PLATFORM",
-          mustAnyGroups: [
-            ["google", "구글"],
-            ["paper orchestra", "페이퍼 오케스트라"],
-          ],
-          any: ["multi-agent", "research papers", "journal", "experimental data", "아이디어", "논문 작성", "멀티 에이전트"],
-          titleEn: "Google unveils \"Paper Orchestra,\" a multi-agent system for writing research papers",
-          titleKo: "구글, 연구 논문 작성용 멀티 에이전트 시스템 '페이퍼 오케스트라' 공개",
-          summaryEn:
-            "Google introduced Paper Orchestra, a multi-agent framework designed to automate key stages of research-paper drafting. By coordinating specialized agents across data interpretation, idea structuring, and manuscript composition, the system aims to produce outputs that are closer to journal-submission quality with less manual overhead.",
-          summaryKo:
-            "구글은 연구 논문 초안 작성 과정의 상당 부분을 자동화하도록 설계된 멀티 에이전트 프레임워크 '페이퍼 오케스트라'를 공개했다. 데이터·아이디어·문서 구조를 역할별 에이전트가 분담해 저널 제출 가능한 형태의 산출물을 만드는 접근이다.",
-        },
-        {
-          key: "meta_ai_app_ranking_surge",
-          topicLabel: "PRODUCT UPDATE",
-          mustAnyGroups: [
-            ["meta", "메타"],
-            ["ai app", "앱"],
-          ],
-          any: ["installs", "appfigures", "muse spark", "superintelligence labs", "랭킹", "다운로드", "설치"],
-          titleEn: "Meta AI app sees a sharp rankings jump after latest model launch",
-          titleKo: "메타 AI 앱, 최신 모델 출시 후 앱 순위 급등",
-          summaryEn:
-            "Meta's AI app recorded a notable increase in installs after the launch of its latest model, Muse Spark. Appfigures data indicates a sharp rise in app-store ranking, suggesting that model-release momentum is translating directly into near-term consumer demand and distribution performance.",
-          summaryKo:
-            "메타 AI 앱은 최신 모델 '뮤즈 스파크' 공개 이후 설치 수가 크게 늘었다. Appfigures 데이터에 따르면 앱 스토어 순위가 뚜렷하게 상승해, 단기적으로 소비자 수요가 빠르게 확대된 것으로 나타났다.",
-        },
-        {
-          key: "google_intel_infra_partnership",
-          topicLabel: "ARCHITECTURE",
-          mustAnyGroups: [
-            ["google", "구글"],
-            ["intel", "인텔"],
-          ],
-          any: ["google cloud", "xeon", "xeon 6", "multiyear partnership", "processor", "inference tasks", "클라우드", "제온"],
-          titleEn: "Google and Intel deepen their AI infrastructure partnership",
-          titleKo: "구글·인텔, AI 인프라 파트너십 심화",
-          summaryEn:
-            "Google and Intel announced an expanded multiyear agreement under which Google Cloud will continue using Intel infrastructure, including Xeon 6 chips, for AI and cloud workloads. The partnership also includes ongoing co-development on processor roadmaps.",
-          summaryKo:
-            "구글과 인텔은 AI·클라우드 워크로드를 위한 인프라 협력을 확대하는 다년 파트너십을 발표했다. 구글 클라우드는 Xeon 6를 포함한 인텔 프로세서를 지속 활용하고, 양사는 차세대 프로세서 로드맵 공동 개발도 이어갈 계획이다.",
-        },
-        {
-          key: "anthropic_mythos_limited_preview",
-          topicLabel: "PRODUCT UPDATE",
-          mustAnyGroups: [
-            ["anthropic", "antropic"],
-            ["mythos", "misos", "미토스"],
-          ],
-          any: [
-            "limited preview",
-            "big tech",
-            "technology partners",
-            "no general release",
-            "not to make the model publicly available",
-            "amazon",
-            "apple",
-            "google",
-          ],
-          titleEn: "Anthropic unveils \"Claude Mythos,\" its most powerful model yet, in limited preview",
-          titleKo: "앤트로픽, 역대 최고 성능 모델 '클로드 미토스' 제한 프리뷰 공개",
-          summaryEn:
-            "Anthropic has announced a limited preview of Claude Mythos, described as its most advanced model to date, for a select group of major technology partners. The company said it is not moving to a broad public release at this stage due to potential cybersecurity risks associated with frontier-level capabilities.",
-          summaryKo:
-            "앤트로픽은 자사 최고 성능 모델 '클로드 미토스'를 주요 빅테크를 포함한 일부 기술 파트너에게 제한적으로 프리뷰 공개했다. 잠재적인 사이버보안 위험에 대한 우려로 인해, 일반 대중에게는 공개하지 않기로 결정했다.",
-        },
-        {
-          key: "zhipu_glm_5_1",
-          topicLabel: "PRODUCT UPDATE",
-          mustAnyGroups: [
-            ["zhipu", "zipu", "즈푸", "지푸"],
-            ["glm 5 1", "glm-5.1", "glm-5 1"],
-          ],
-          any: ["open source", "eight hours", "754", "mixture of experts", "hugging face", "modelscope", "오픈소스", "8시간", "754", "모델스코프", "허깅페이스"],
-          titleEn: "Zhipu AI releases open-source model \"GLM-5.1\" with extended autonomous capabilities",
-          titleKo: "즈푸 AI, 자율 작업 시간을 확장한 오픈소스 모델 'GLM-5.1' 공개",
-          summaryEn:
-            "Zhipu AI has released GLM-5.1, an open-source model capable of operating autonomously for up to eight hours. Built on a 754-billion-parameter Mixture-of-Experts architecture, it is positioned for large-scale task automation and is available on Hugging Face and ModelScope for modification and commercial use.",
-          summaryKo:
-            "즈푸 AI는 최대 8시간까지 자율적으로 동작할 수 있는 오픈소스 모델 'GLM-5.1'을 출시했다. 약 7,540억 파라미터 규모의 MoE(전문가 혼합) 아키텍처를 기반으로 대규모 작업 자동화를 지원하며, 허깅페이스와 모델스코프에서 수정 및 상업적 활용이 가능하다.",
-        },
-        {
-          key: "socra_education_platform",
-          topicLabel: "PLATFORM",
-          mustAnyGroups: [
-            ["socra", "소크라"],
-          ],
-          any: ["education", "educational", "school", "students", "platform", "middle", "high school", "comparative thinking", "critical analysis", "chatgpt", "gemini", "multiple answers", "ai-generated answers", "중고등학생", "중 고등학생", "중학생", "고등학생", "학생", "교육", "플랫폼"],
-          titleEn: "Socra AI launches education platform for middle and high school students",
-          titleKo: "소크라 AI, 중·고등학생 대상 교육 플랫폼 출시",
-          summaryEn:
-            "Socra AI has launched an AI-powered education platform designed for middle and high school students. By presenting multiple AI-generated answers to a single question, the service encourages comparative reasoning and critical analysis, and it currently runs on models including ChatGPT and Gemini.",
-          summaryKo:
-            "소크라 AI는 중·고등학생을 위한 AI 기반 교육 플랫폼을 공개했다. 하나의 질문에 여러 AI 답변을 제시해 관점을 비교하고 비판적 사고를 기를 수 있도록 설계됐으며, 현재는 ChatGPT와 Gemini 등 주요 모델을 기반으로 운영된다.",
-        },
-        {
-          key: "pika_avatar_conferencing",
-          topicLabel: "PLATFORM",
-          mustAnyGroups: [["pika", "피카", "피카랩스"]],
-          any: ["pikastream", "video conference", "avatar", "digital participants", "화상회의", "아바타", "실시간 영상"],
-          titleEn: "Pika Labs introduces avatar-based AI agents for video conferencing",
-          titleKo: "피카랩스, 화상회의용 아바타 기반 AI 에이전트 기능 출시",
-          summaryEn:
-            "Pika Labs has launched a feature that allows AI agents to participate in video conferences as realistic avatars. Powered by its real-time video generation model, PikaStream 1.0, the system enables AI participants to appear in meetings with voice, memory, and visual presence.",
-          summaryKo:
-            "피카랩스는 AI 에이전트가 사실적인 아바타 형태로 화상회의에 참여할 수 있는 새 기능을 선보였다. 실시간 영상 생성 모델인 PikaStream 1.0을 기반으로, AI가 음성·기억·시각적 존재감을 갖춘 디지털 참가자로 회의에 들어올 수 있도록 구현했다.",
-        },
-        {
-          key: "anthropic_mythos_security_preview",
-          topicLabel: "SECURITY",
-          mustAnyGroups: [
-            ["anthropic", "antropic"],
-            ["mythos", "misos", "미토스"],
-          ],
-          any: ["cybersecurity initiative", "defensive security research", "partner organizations", "사이버보안", "방어적 보안 연구", "파트너 기관"],
-          titleEn: "Anthropic previews its powerful new AI model \"Mythos\" under a cybersecurity initiative",
-          titleKo: "앤트로픽, 사이버보안 이니셔티브 하에 고성능 신모델 '미토스' 프리뷰 공개",
-          summaryEn:
-            "Anthropic has released a preview of its frontier model Mythos through a cybersecurity-focused initiative. Access is limited to partner organizations conducting defensive security research, reflecting the company's view that advanced model capabilities should be evaluated in controlled settings before broader release.",
-          summaryKo:
-            "앤트로픽은 사이버보안 중심 이니셔티브의 일환으로 차세대 모델 '미토스'를 제한된 파트너 기관에 방어적 보안 연구 목적으로 공개했다. 이 선택적 배포는 고도화된 AI가 실제 위협으로 전환되기 전에 통제 아래 운용 및 모니터링해야 한다는 앤트로픽의 판단을 반영한다.",
-        },
-        {
-          key: "tubi_chatgpt_native_app",
-          topicLabel: "PLATFORM",
-          mustAnyGroups: [["tubi", "투비"], ["chatgpt"]],
-          any: ["native app", "rabbit ai", "300 000", "movies and tv shows", "네이티브 앱", "영화", "tv"],
-          titleEn: "Tubi launches native app within ChatGPT to enhance content discovery",
-          titleKo: "투비, 콘텐츠 탐색 강화를 위해 ChatGPT 내 네이티브 앱 출시",
-          summaryEn:
-            "Tubi has introduced a native app within ChatGPT, allowing users to explore its catalog of more than 300,000 movies and TV shows more easily. The launch builds on its earlier Rabbit AI feature, which supports personalized recommendations through conversational queries.",
-          summaryKo:
-            "투비는 ChatGPT 안에서 동작하는 네이티브 앱을 출시해 30만 편 이상의 영화·TV 콘텐츠 탐색을 더 쉽게 만들었다. 이번 출시는 대화형 질의를 통한 개인화 추천 기능인 기존 'Rabbit AI'를 확장한 행보다.",
-        },
-        {
-          key: "anthropic_google_broadcom_compute",
-          topicLabel: "PRODUCT UPDATE",
-          mustAnyGroups: [["anthropic", "antropic"], ["google", "구글"], ["broadcom", "브로드컴"]],
-          any: ["tpu", "october 2025", "2027", "compute", "컴퓨트", "파트너십"],
-          titleEn: "Anthropic expands compute partnership with Google and Broadcom",
-          titleKo: "앤트로픽, 구글·브로드컴과 컴퓨트 파트너십 확대",
-          summaryEn:
-            "Anthropic is expanding its infrastructure partnership with Google and Broadcom to meet rising demand for AI compute. The agreement increases access to Google Cloud TPUs, extends a deal first signed in October 2025, and includes additional capacity expected to come online in 2027.",
-          summaryKo:
-            "앤트로픽은 증가하는 AI 컴퓨트 수요에 대응하기 위해 구글·브로드컴과의 인프라 파트너십을 확대하고 있다. 이번 계약으로 구글 클라우드 TPU 접근성이 커지며, 2025년 10월 체결한 기존 계약을 기반으로 2027년에 추가 용량이 순차 가동될 예정이다.",
-        },
-        {
-          key: "anthropic_coefficient_bio",
-          topicLabel: "SECURITY",
-          mustAnyGroups: [
-            ["anthropic", "antropic"],
-            ["coefficient bio", "coefficient", "biotech startup", "biotech", "코이피션트", "바이오"],
-          ],
-          any: ["400 million", "$400m", "4억", "stock deal", "healthcare", "life sciences", "scientific research", "stealth biotech"],
-          titleEn: "Anthropic acquires biotech startup Coefficient Bio in $400M deal",
-          titleKo: "앤트로픽, 바이오테크 스타트업 코이피션트 바이오 4억 달러에 인수",
-          summaryEn:
-            "Anthropic has acquired stealth biotech AI startup Coefficient Bio in a $400 million stock deal. The acquisition signals continued expansion into healthcare and life sciences following Anthropic's earlier launch of AI tools for scientific research.",
-          summaryKo:
-            "앤트로픽은 비공개로 운영되던 바이오테크 AI 스타트업 코이피션트 바이오를 4억 달러 규모의 주식 거래로 인수했다. 이번 인수는 과학 연구용 AI 도구 출시에 이은 행보로, 헬스케어와 생명과학 분야로의 확장을 가속화하려는 전략을 보여준다.",
-        },
-      ]);
-
-      function resolveEditorialEnglishCardOverride(item, titleText = "", summaryText = "") {
-        const corpus = normalizeCompareText([
-          item?.title || "",
-          item?.summaryText || "",
-          item?.cardTitleEn || "",
-          item?.cardSummaryEn || "",
-          item?.titleEn || "",
-          item?.summaryEn || "",
-          titleText || "",
-          summaryText || "",
-          item?.link || "",
-          (item?.categories || []).join(" "),
-        ].join(" "));
-        if (!corpus) return null;
-
-        for (const override of EDITORIAL_EN_CARD_OVERRIDES) {
-          const mustTokens = (override.must || []).map((t) => normalizeCompareText(t)).filter(Boolean);
-          const mustAnyTokens = (override.mustAny || []).map((t) => normalizeCompareText(t)).filter(Boolean);
-          const mustAnyGroups = Array.isArray(override.mustAnyGroups)
-            ? override.mustAnyGroups
-                .map((group) => (Array.isArray(group) ? group : [group]))
-                .map((group) => group.map((t) => normalizeCompareText(t)).filter(Boolean))
-                .filter((group) => group.length)
-            : [];
-          const anyTokens = (override.any || []).map((t) => normalizeCompareText(t)).filter(Boolean);
-          if (mustTokens.length && !mustTokens.every((token) => corpus.includes(token))) continue;
-          if (mustAnyTokens.length && !mustAnyTokens.some((token) => corpus.includes(token))) continue;
-          if (mustAnyGroups.length && !mustAnyGroups.every((group) => group.some((token) => corpus.includes(token)))) continue;
-          if (anyTokens.length && !anyTokens.some((token) => corpus.includes(token))) continue;
-          return override;
-        }
-        return null;
-      }
-
-      function getEditorialOverrideKeyForItem(item) {
-        if (!item) return "";
-        const canonical = ensureCanonicalCardText(item);
-        const probes = [
-          [canonical?.titleEn || "", canonical?.summaryEn || ""],
-          [item?.cardTitleEn || item?.titleEn || "", item?.cardSummaryEn || item?.summaryEn || ""],
-          [item?.title || "", item?.summaryText || ""],
-          [item?.cardTitleKo || item?.titleKo || "", item?.cardSummaryKo || item?.summaryKo || ""],
-        ];
-        for (const [t, s] of probes) {
-          const resolved = resolveEditorialEnglishCardOverride(item, t, s);
-          if (resolved?.key) return String(resolved.key);
-        }
-        return "";
-      }
-
-      function getEditorialOverrideByKey(key) {
-        const k = String(key || "").trim();
-        if (!k) return null;
-        return EDITORIAL_EN_CARD_OVERRIDES.find((ov) => String(ov?.key || "").trim() === k) || null;
-      }
-
-      function reorderPoolByEditorialTop10(items, limit = HOT_LIMIT) {
-        const list = Array.isArray(items) ? items.filter(Boolean) : [];
-        if (!list.length) return [];
-
-        const orderKeys = EDITORIAL_EN_CARD_OVERRIDES.map((ov) => String(ov?.key || "").trim()).filter(Boolean);
-        const byKey = new Map();
-        const withoutKey = [];
-
-        for (const it of list) {
-          const ovKey = getEditorialOverrideKeyForItem(it);
-          if (!ovKey) {
-            withoutKey.push(it);
-            continue;
-          }
-          if (!byKey.has(ovKey)) {
-            byKey.set(ovKey, it);
-          } else {
-            byKey.set(ovKey, pickBetterDuplicateItem(byKey.get(ovKey), it));
-          }
-        }
-
-        const out = [];
-        const seen = new Set();
-        for (const key of orderKeys) {
-          const it = byKey.get(key);
-          if (!it) continue;
-          const id = getItemIdentityKey(it);
-          if (!id || seen.has(id)) continue;
-          seen.add(id);
-          out.push(it);
-          if (out.length >= limit) return out.slice(0, limit);
-        }
-
-        for (const it of [...withoutKey, ...list]) {
-          if (out.length >= limit) break;
-          const id = getItemIdentityKey(it);
-          if (!id || seen.has(id)) continue;
-          seen.add(id);
-          out.push(it);
-        }
-        return out.slice(0, limit);
-      }
-
-      function getCardTopicLabel(item, titleText = "", summaryText = "") {
-        const editorialOverride = resolveEditorialEnglishCardOverride(item, titleText, summaryText);
-        if (editorialOverride?.topicLabel) return editorialOverride.topicLabel;
+      function getCardTopicLabel(item) {
         const merged = normalizeCompareText(
-          `${item?.title || ""} ${item?.summaryText || ""} ${titleText || ""} ${summaryText || ""} ${(item?.categories || []).join(" ")}`,
+          `${item?.title || ""} ${item?.summaryText || ""} ${(item?.categories || []).join(" ")}`,
         );
         if (!merged) return "PRODUCT UPDATE";
         if (/(benchmark|swe-bench|state of the art|sota|record|score|달성|최고 점수|기록)/i.test(merged)) return "SOTA MODEL";
@@ -4897,22 +4547,18 @@
       }
 
       function buildLooseSourceTopupPool(sourceItems = []) {
-        const baseFilter = (it) =>
-          !isBlockedCardSourceKey(it?.sourceFeed || "") &&
-          !isNewsDigestCard(it) &&
-          !isPromotionalSelfPost(it) &&
-          !isSubjectiveStyleStory(it) &&
-          !isKoreanDomesticArticle(it);
-        // launch 신호 있는 기사 우선, 나머지 뒤에
-        const withLaunch = (sourceItems || []).filter((it) => baseFilter(it) && isLaunchFocusedItem(it));
-        const withoutLaunch = (sourceItems || []).filter((it) => baseFilter(it) && !isLaunchFocusedItem(it));
-        const sortedAll = [...withLaunch, ...withoutLaunch].sort((a, b) => getLaunchPriorityScore(b) - getLaunchPriorityScore(a));
         const relaxedPool = dedupeByGuidOrLink(
-          sortedAll
-            .filter((it) => hasAnyUsableSummary(it) || hasRelaxedArticleSummary(it)),
+          (sourceItems || [])
+            .filter((it) => !isBlockedCardSourceKey(it?.sourceFeed || ""))
+            .filter((it) => !isNewsDigestCard(it) && !isPromotionalSelfPost(it) && !isSubjectiveStyleStory(it))
+            .filter((it) => hasAnyUsableSummary(it) || hasRelaxedArticleSummary(it))
+            .sort(compareItemsBySourceOrder),
         );
         const loosePool = dedupeByGuidOrLink(
-          sortedAll,
+          (sourceItems || [])
+            .filter((it) => !isBlockedCardSourceKey(it?.sourceFeed || ""))
+            .filter((it) => !isNewsDigestCard(it) && !isPromotionalSelfPost(it) && !isSubjectiveStyleStory(it))
+            .sort(compareItemsBySourceOrder),
         );
         return dedupeByGuidOrLink([...(relaxedPool || []), ...(loosePool || [])]);
       }
@@ -5298,12 +4944,8 @@
 
       function getWeekOfMonthUtc(date) {
         const d = date instanceof Date ? date : new Date(date || Date.now());
-        // Calendar-correct week of month: count which Monday-starting week the date falls in.
-        // e.g. if April 1 is Wednesday, April 6 (first Monday) starts week 2, April 13 starts week 3.
-        const firstOfMonth = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), 1));
-        // Monday = 0, ..., Sunday = 6
-        const firstDayOffset = (firstOfMonth.getUTCDay() + 6) % 7;
-        return Math.ceil((d.getUTCDate() + firstDayOffset) / 7);
+        // Month week as simple day buckets: 1-7, 8-14, 15-21, 22-28, 29-31.
+        return Math.ceil(d.getUTCDate() / 7);
       }
 
       function buildMonthWeekMeta(date) {
@@ -5318,9 +4960,7 @@
       function formatMonthWeekLabel(meta) {
         if (!meta) return "";
         if (currentLang === "ko") return `${meta.year}년 ${meta.month}월 ${meta.week}주차`;
-        const monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December"];
-        const monthName = monthNames[(meta.month - 1)] || String(meta.month);
-        return `${monthName} ${meta.year}, Week ${meta.week}`;
+        return `${meta.year}-${String(meta.month).padStart(2, "0")} Week ${meta.week}`;
       }
 
       function buildWindowDates(endDate, days) {
@@ -5488,14 +5128,9 @@
         const titleNorm = (item?.title || "").toLowerCase();
         const summaryNorm = (item?.summaryText || "").toLowerCase();
         const corpus = `${titleNorm} ${summaryNorm}`;
-        const collabBoost = /\b(?:partner(?:ship)?|collaboration|collaborat|deal|agreement|integrat|제휴|협업|협력|파트너)\b/.test(corpus) ? 120 : 0;
-        const updateBoost = /\b(?:update[sd]?|upgrade[sd]?|new\s+version|v\d+\.\d+|업데이트|새\s*버전|신규\s*기능)\b/.test(titleNorm) ? 100 : 0;
-        const announcementBoost = /\b(?:announc|reveal[sed]?|공개|발표|출시|런칭|launch)\b/.test(titleNorm) ? 90 : 0;
-
-        // 해외 기술 기사 부스트 / 국내 단독 기사 감점 (aitimes 소스 한정)
-        const isAiTimes = String(item?.sourceFeed || "") === "aitimes_industry";
-        const globalTechBoost = isAiTimes && GLOBAL_AI_COMPANY_PATTERNS.some((re) => re.test(corpus)) ? 160 : 0;
-        const domesticPenalty = isAiTimes && !globalTechBoost && KR_DOMESTIC_COMPANY_PATTERNS.some((re) => re.test(corpus)) ? -80 : 0;
+        const collabBoost = /\b(?:partner(?:ship)?|collaboration|collaborat|deal|agreement|integrat|제휴|협업|협력|파트너)\b/.test(corpus) ? 40 : 0;
+        const updateBoost = /\b(?:update[sd]?|upgrade[sd]?|new\s+version|v\d+\.\d+|업데이트|새\s*버전|신규\s*기능)\b/.test(titleNorm) ? 30 : 0;
+        const announcementBoost = /\b(?:announc|reveal[sed]?|공개|발표|출시)\b/.test(titleNorm) ? 20 : 0;
 
         const score =
           launchHits * 72 +
@@ -5507,9 +5142,7 @@
           recencyBoost +
           collabBoost +
           updateBoost +
-          announcementBoost +
-          globalTechBoost +
-          domesticPenalty -
+          announcementBoost -
           Math.min(120, nonProductHits * 18);
         return Math.max(0, score);
       }
@@ -5577,52 +5210,6 @@
           if (productHits >= 2 && techHits >= 1) return false;
           return true;
         }
-        return false;
-      }
-
-      // 잘 알려지지 않은 국내 중소 업체·공공기관만 필터링
-      // (네이버·카카오·삼성·LG·SKT·KT·현대·뤼튼·업스테이지·KAIST·과기부 등 대형/유명 업체는 제외)
-      const KR_DOMESTIC_COMPANY_PATTERNS = [
-        // 소규모 국내 AI 스타트업
-        /솔트룩스/, /마인즈앤컴퍼니/, /코어닷투데이/, /스캐터랩/, /노타(?:AI)?/, /리벨리온/,
-        /딥노이드/, /에이모/, /뷰노/, /루닛/, /제이엘케이/, /코난테크놀로지/,
-        /라온피플/, /수아랩/, /알체라/, /셀바스AI/, /한컴(?:AI|MDS|위드)?/, /아이오로라/,
-        /메가존클라우드/, /클루닉스/, /포티투마루/, /원프레딕트/, /에이블클라우드/,
-        // 금융권 (AI 전문 기업 아님)
-        /신한(?:\s*(?:은행|금융|카드|라이프))\s/, /KB(?:\s*(?:국민|금융|은행|카드|생명))\s/,
-        /하나(?:\s*(?:은행|금융|카드))\s/, /우리(?:\s*(?:은행|금융|카드))\s/,
-        /IBK기업은행/, /케이뱅크/, /수협은행/, /농협(?:\s*(?:은행|생명|손보))/,
-        // AI와 무관한 공공기관·공기업
-        /한국(?:\s*(?:전력공사|가스공사|공항공사|도로공사|수자원공사|철도공사|방송공사))/,
-        /코레일/, /한전/, /국방부/, /특허청/, /공정거래위원회/,
-        /산업통상자원부/, /중소벤처기업부/, /행정안전부/, /국토교통부/, /기획재정부/,
-        /금융위원회/, /금융감독원/, /방송통신위원회/,
-        // AI와 무관한 게임·엔터 소기업
-        /컴투스/, /넷마블(?!\s*(?:AI|메타버스|ai))/, /위메이드/, /펄어비스/, /카카오게임즈/,
-      ];
-      // 글로벌 빅테크/AI 업체 (이게 주인공이면 국내 기사로 분류하지 않음)
-      const GLOBAL_AI_COMPANY_PATTERNS = [
-        /OpenAI|오픈\s*AI/, /Google|구글|DeepMind|딥마인드|Gemini|제미나이/,
-        /Microsoft|마이크로소프트|Copilot|코파일럿/, /Meta(?!\s*버스)|메타(?!\s*버스)/,
-        /NVIDIA|엔비디아/, /Anthropic|앤트로픽|클로드|Claude/,
-        /Amazon|아마존|AWS/, /Apple|애플/, /HuggingFace|허깅\s*페이스/,
-        /Alibaba|알리바바|Qwen|큐원/, /Baidu|바이두/, /Tencent|텐센트/,
-        /Mistral|Llama|Grok|Gemma|xAI|Perplexity/, /IBM/, /Oracle|오라클/,
-        /Salesforce|세일즈포스/, /SAP/, /Adobe|어도비/,
-      ];
-
-      function isKoreanDomesticArticle(item) {
-        // aitimes_industry 소스에만 적용
-        if (String(item?.sourceFeed || "") !== "aitimes_industry") return false;
-        const title = stripHtml(decodeHtmlEntitiesText(item?.title || "")).trim();
-        const summary = stripHtml(decodeHtmlEntitiesText(item?.summaryText || "")).trim();
-        const corpus = `${title} ${summary}`;
-        // 글로벌 AI 업체가 주인공이면 국내 기사 아님 (통과)
-        const hasGlobalAiCompany = GLOBAL_AI_COMPANY_PATTERNS.some((re) => re.test(corpus));
-        if (hasGlobalAiCompany) return false;
-        // 국내 업체 명칭이 제목에 포함되면 국내 기사로 판단
-        const hasDomesticInTitle = KR_DOMESTIC_COMPANY_PATTERNS.some((re) => re.test(title));
-        if (hasDomesticInTitle) return true;
         return false;
       }
 
@@ -6194,142 +5781,84 @@
 
       function isKeywordFallbackSummary(summary) {
         const s = decodeHtmlEntitiesText(summary);
-        if (s.startsWith("핵심 키워드:") || s.startsWith("Key topics:")) return true;
-        const n = normalizeCompareText(s);
-        if (!n) return false;
-        return (
-          n.includes("this update introduces concrete changes to") ||
-          n.includes("affecting its target scope and capabilities")
-        );
-      }
-
-      function isGenericEnglishFallbackTitle(text) {
-        const n = normalizeCompareText(text || "");
-        if (!n) return false;
-        return /^ai (company|industry|models|platforms|infrastructure|healthcare)( ai (company|industry|models|platforms|infrastructure|healthcare))? update$/.test(n);
-      }
-
-      function isLikelyTruncatedEnglishHeadline(text) {
-        const s = decodeHtmlEntitiesText(text || "").replace(/\s+/g, " ").trim();
-        if (!s) return true;
-        if (/\.\.\.$/.test(s)) return true;
-        if (/[,:;'"]$/.test(s)) return true;
-        if (/\bNo\.?$/i.test(s)) return true;
-        if (/\bto No\.?$/i.test(s)) return true;
-        return false;
-      }
-
-      function isLikelyTruncatedEnglishSummary(text) {
-        const s = decodeHtmlEntitiesText(text || "").replace(/\s+/g, " ").trim();
-        if (!s) return true;
-        if (/\.\.\.$/.test(s)) return true;
-        if (/[,:;'"]$/.test(s)) return true;
-        if (/\b(?:to|from)\s+No\.?$/i.test(s)) return true;
-        return false;
-      }
-
-      function getEnglishRenderIssue(titleText, summaryText) {
-        const title = decodeHtmlEntitiesText(titleText || "").replace(/\s+/g, " ").trim();
-        const summary = decodeHtmlEntitiesText(summaryText || "").replace(/\s+/g, " ").trim();
-        if (!title) return "missing headline";
-        if (!summary) return "missing summary";
-        if (/[가-힣]/.test(`${title} ${summary}`)) return "contains Korean text";
-        if (isGenericEnglishFallbackTitle(title)) return "placeholder headline";
-        if (isKeywordFallbackSummary(summary)) return "placeholder summary";
-        if (isLikelyTruncatedEnglishHeadline(title)) return "truncated headline";
-        if (isLikelyTruncatedEnglishSummary(summary)) return "truncated summary";
-        if (isSummarySameAsTitle(summary, title)) return "summary duplicates headline";
-        return "";
-      }
-
-      function regenerateEnglishCardText(item, canonical, titleText, summaryText) {
-        let nextTitle = decodeHtmlEntitiesText(titleText || "").replace(/\s+/g, " ").trim();
-        let nextSummary = decodeHtmlEntitiesText(summaryText || "").replace(/\s+/g, " ").trim();
-        const editorialOverride =
-          resolveEditorialEnglishCardOverride(item, nextTitle, nextSummary) ||
-          resolveEditorialEnglishCardOverride(item, decodeHtmlEntitiesText(item?.title || ""), decodeHtmlEntitiesText(item?.summaryText || ""));
-
-        const isBadTitle = (v) => {
-          const t = decodeHtmlEntitiesText(v || "").replace(/\s+/g, " ").trim();
-          return !t || /[가-힣]/.test(t) || isGenericEnglishFallbackTitle(t);
-        };
-        const isBadSummary = (v) => {
-          const s = decodeHtmlEntitiesText(v || "").replace(/\s+/g, " ").trim();
-          return !s || /[가-힣]/.test(s) || isKeywordFallbackSummary(s);
-        };
-
-        // 0) Editorial source-of-truth override
-        if (editorialOverride?.titleEn && !isBadTitle(editorialOverride.titleEn) && !isLikelyTruncatedEnglishHeadline(editorialOverride.titleEn)) {
-          nextTitle = decodeHtmlEntitiesText(editorialOverride.titleEn).replace(/\s+/g, " ").trim();
-        }
-        if (editorialOverride?.summaryEn && !isBadSummary(editorialOverride.summaryEn) && !isLikelyTruncatedEnglishSummary(editorialOverride.summaryEn)) {
-          nextSummary = decodeHtmlEntitiesText(editorialOverride.summaryEn).replace(/\s+/g, " ").trim();
-        }
-
-        // 1) Canonical English generated from the source item
-        if (isBadTitle(nextTitle) || isBadSummary(nextSummary) || isLikelyTruncatedEnglishHeadline(nextTitle) || isLikelyTruncatedEnglishSummary(nextSummary)) {
-          const canonicalTitle = decodeHtmlEntitiesText(canonical?.titleEn || "").replace(/\s+/g, " ").trim();
-          const canonicalSummary = decodeHtmlEntitiesText(canonical?.summaryEn || "").replace(/\s+/g, " ").trim();
-          if (!isBadTitle(canonicalTitle) && !isLikelyTruncatedEnglishHeadline(canonicalTitle)) nextTitle = canonicalTitle;
-          if (!isBadSummary(canonicalSummary) && !isLikelyTruncatedEnglishSummary(canonicalSummary)) nextSummary = canonicalSummary;
-        }
-
-        // 2) English AI summary cache as an additional repair source
-        if (isBadSummary(nextSummary) || isLikelyTruncatedEnglishSummary(nextSummary)) {
-          const aiSummaryEn = decodeHtmlEntitiesText(getAiCardText(item, "__aiSummary", currentAiProvider, "en") || "")
-            .replace(/\s+/g, " ")
-            .trim();
-          if (!isBadSummary(aiSummaryEn) && !isLikelyTruncatedEnglishSummary(aiSummaryEn)) nextSummary = aiSummaryEn;
-        }
-
-        // 3) Emergency English summary derived from raw source text (if still needed)
-        if ((isBadSummary(nextSummary) || isLikelyTruncatedEnglishSummary(nextSummary)) && !isBadTitle(nextTitle)) {
-          const leadSummary = decodeHtmlEntitiesText(
-            buildArticleLeadSummaryText(item?.__articleBodyText || item?.summaryText || "", nextTitle, "en"),
-          ).replace(/\s+/g, " ").trim();
-          if (!isBadSummary(leadSummary) && !isLikelyTruncatedEnglishSummary(leadSummary)) {
-            nextSummary = leadSummary;
-          }
-        }
-        if ((isBadSummary(nextSummary) || isLikelyTruncatedEnglishSummary(nextSummary)) && !isBadTitle(nextTitle)) {
-          const emergency = decodeHtmlEntitiesText(
-            buildEmergencySummaryText(item?.summaryText || item?.__articleBodyText || "", nextTitle),
-          ).replace(/\s+/g, " ").trim();
-          if (!isBadSummary(emergency) && !isLikelyTruncatedEnglishSummary(emergency)) nextSummary = emergency;
-        }
-
-        // 4) Last resort headline/summary without placeholders
-        if (isBadTitle(nextTitle) || isLikelyTruncatedEnglishHeadline(nextTitle)) {
-          const rebuiltTitle = proofreadEnglishHeadlineText(buildHeadlineText(item?.title || nextTitle, item?.summaryText || nextSummary)) || "";
-          if (rebuiltTitle && !isBadTitle(rebuiltTitle) && !isLikelyTruncatedEnglishHeadline(rebuiltTitle)) {
-            nextTitle = rebuiltTitle;
-          }
-        }
-        if ((isBadSummary(nextSummary) || isLikelyTruncatedEnglishSummary(nextSummary)) && !isBadTitle(nextTitle)) {
-          const genericSummary = decodeHtmlEntitiesText(buildEnglishFallbackSummaryFromItem(item, nextTitle)).replace(/\s+/g, " ").trim();
-          if (!isBadSummary(genericSummary) && !isLikelyTruncatedEnglishSummary(genericSummary)) nextSummary = genericSummary;
-        }
-
-        if (!isBadTitle(nextTitle)) {
-          nextTitle = proofreadEnglishHeadlineText(nextTitle) || nextTitle;
-        }
-        if (!isBadSummary(nextSummary) && !isBadTitle(nextTitle)) {
-          nextSummary = proofreadEnglishSummaryText(nextSummary, nextTitle) || nextSummary;
-        }
-
-        const issue = getEnglishRenderIssue(nextTitle, nextSummary);
-        return {
-          ok: !issue,
-          titleText: nextTitle,
-          summaryText: nextSummary,
-          issue,
-        };
+        return s.startsWith("핵심 키워드:") || s.startsWith("Key topics:");
       }
 
       function isSummaryEmptyText(summary) {
         const s = decodeHtmlEntitiesText(summary || "").trim();
         if (!s) return true;
+        if (isNoisySummaryText(s)) return true;
         return s === I18N.ko.summary_empty || s === I18N.en.summary_empty;
+      }
+
+      function isNoisySummaryText(summary) {
+        const text = decodeHtmlEntitiesText(summary || "")
+          .replace(/\s+/g, " ")
+          .trim();
+        if (!text) return false;
+
+        const hasReporterByline =
+          /\b[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[A-Za-z]{2,}\b/.test(text) ||
+          /(?:^|\s)(?:AI\s*Times|AITimes|AI타임스)\s+[^\n.!?]{0,120}\b기자\b/i.test(text) ||
+          /(?:^|\s)[가-힣]{2,6}\s*기자(?:\s|$)/.test(text);
+        const rankMarkerCount = (text.match(/(?:^|\s)(?:[1-9]|1[0-5])\s+(?=[^0-9])/g) || []).length;
+        const dateTagCount = (text.match(/\[\s*\d{1,2}월\s*\d{1,2}일\s*\]/g) || []).length;
+        const hasSidebarKeyword = /(?:MostPopular|Most Popular|Top Stories|Trending|Related Articles|인기기사|많이 본 기사|많이 본 뉴스|관련기사|추천기사)/i.test(
+          text,
+        );
+        const startsWithSidebar = /^(?:MostPopular|Most Popular|인기기사|많이 본 기사|많이 본 뉴스)\b/i.test(text);
+
+        if (startsWithSidebar) return true;
+        if (hasReporterByline && (hasSidebarKeyword || rankMarkerCount >= 2)) return true;
+        if (hasSidebarKeyword && /\b1\b.*\b2\b.*\b3\b/.test(text)) return true;
+        if (rankMarkerCount >= 6) return true;
+        if (rankMarkerCount >= 4 && dateTagCount >= 1) return true;
+
+        return false;
+      }
+
+      function stripSummaryNoiseText(input) {
+        let text = decodeHtmlEntitiesText(input || "")
+          .replace(/\s+/g, " ")
+          .trim();
+        if (!text) return "";
+
+        const markers = [
+          /MostPopular/i,
+          /Most Popular/i,
+          /Top Stories/i,
+          /Trending/i,
+          /인기기사/,
+          /많이 본 기사/,
+          /많이 본 뉴스/,
+          /관련기사/,
+          /추천기사/,
+        ];
+        for (const re of markers) {
+          const idx = text.search(re);
+          if (idx > 0) {
+            text = text.slice(0, idx).trim();
+            break;
+          }
+        }
+
+        // Remove reporter byline / email style boilerplate that often leaks from scraped pages.
+        text = text
+          .replace(/\b[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[A-Za-z]{2,}\b/g, " ")
+          .replace(/(?:^|\s)(?:AI\s*Times|AITimes|AI타임스)\s+[^\n.!?]{0,120}\b기자\b[^\n.!?]*[.!?]?/gi, " ")
+          .replace(/(?:^|\s)[가-힣]{2,6}\s*기자(?:\s*[^\n.!?]{0,80})?[.!?]?/g, " ")
+          .replace(/\b(?:입력|수정)\s*\d{4}\.\s*\d{1,2}\.\s*\d{1,2}[^.!?]*[.!?]?/g, " ")
+          .replace(/\s+/g, " ")
+          .trim();
+
+        text = text
+          .replace(/(?:MostPopular|Most Popular)\s*/gi, " ")
+          .replace(/\s+/g, " ")
+          .trim();
+
+        if (text && normalizeCompareText(text).length < 32) return "";
+        if (!text || isNoisySummaryText(text)) return "";
+        return text;
       }
 
       function getNormalizedSummaryForItem(item, scoringLang = "en") {
@@ -6351,7 +5880,7 @@
       }
 
       function buildSummaryText(raw, titleText, categories) {
-        const txt = decodeHtmlEntitiesText(raw);
+        const txt = stripSummaryNoiseText(raw);
         if (!txt) return t("summary_empty");
 
         const stripTitlePrefix = (summary, title) => {
@@ -6497,7 +6026,7 @@
       }
 
       function buildEmergencySummaryText(raw, titleText = "") {
-        const txt = decodeHtmlEntitiesText(raw || "")
+        const txt = stripSummaryNoiseText(raw || "")
           .replace(/https?:\/\/\S+/gi, " ")
           .replace(/\b\S+\.(png|jpe?g|gif|webp|svg)\b/gi, " ")
           .replace(/\b\d{2,4}x\d{2,4}\b/g, " ")
@@ -6506,7 +6035,7 @@
           .replace(/\s*(\.\.\.|…)+\s*$/g, "")
           .replace(/\s+/g, " ")
           .trim();
-        if (!txt) return "";
+        if (!txt || isNoisySummaryText(txt)) return "";
 
         const titleNorm = normalizeCompareText(titleText || "");
         const captionLikePatterns = [
@@ -6598,6 +6127,102 @@
         return normalized.length < Math.max(110, MIN_CARD_SUMMARY_EN_CHARS) || sentenceCount < 2;
       }
 
+      function shouldSkipCardForWeakSummary(text, lang = currentLang) {
+        const normalized = decodeHtmlEntitiesText(text || "").replace(/\s+/g, " ").trim();
+        if (!normalized) return true;
+        if (isSummaryEmptyText(normalized) || isNoisySummaryText(normalized)) return true;
+
+        // Relaxed skip rule: only drop clearly unusable summaries.
+        const unitCount = normalized
+          .split(/(?<=[.!?。！？])\s+|\n+/)
+          .map((part) => part.trim())
+          .filter(Boolean).length;
+        if (lang === "ko") {
+          if (normalized.length < 48 || unitCount < 1) return true;
+        } else if (normalized.length < 80 || unitCount < 1) {
+          return true;
+        }
+
+        const koWeakPatterns = [
+          /^한국어 요약을 준비 중입니다\./,
+          /^원문 핵심 내용을 정제 중입니다\./,
+        ];
+        const enWeakPatterns = [
+          /^Summary is being refined\./i,
+          /^See the source link for full details\./i,
+        ];
+
+        if (lang === "ko" && koWeakPatterns.some((re) => re.test(normalized))) return true;
+        if (lang === "en" && enWeakPatterns.some((re) => re.test(normalized))) return true;
+        return false;
+      }
+
+      function sanitizeEnglishCardSummaryText(summaryText, item = null, titleText = "") {
+        const src = stripSummaryNoiseText(summaryText || "");
+        if (!src || /[가-힣]/.test(src)) return "";
+
+        const weakPatterns = [
+          /^The key point is\b/i,
+          /^For implementation details\b/i,
+          /^Check the (?:original )?source(?: article| link)\b/i,
+          /^In [^,]{2,60}, the key point is\b/i,
+          /^From [A-Z][A-Za-z0-9 .'-]{2,40},\s*/i,
+          /^TechCrunch\b/i,
+          /was announced in a recent report\.$/i,
+        ];
+        const captionPatterns = [
+          /\b(?:photo|pictured|image|images|screenshot|render(?:ing)?|illustration|on the left|on the right|background)\b/i,
+        ];
+        const titleNorm = normalizeCompareText(titleText || item?.title || "");
+        const sentences = decodeHtmlEntitiesText(src)
+          .replace(/\s+/g, " ")
+          .trim()
+          .split(/(?<=[.!?])\s+|\n+/)
+          .map((s) => decodeHtmlEntitiesText(s || "").replace(/\s+/g, " ").trim())
+          .filter((s) => s && s.length >= 20);
+
+        const picked = [];
+        for (const raw of sentences) {
+          let sentence = raw
+            .replace(/^\s*(?:and|but|so|also)\s+/i, "")
+            .replace(/\s+/g, " ")
+            .trim();
+          if (!sentence) continue;
+          if (!/[.!?]$/.test(sentence)) sentence += ".";
+          const norm = normalizeCompareText(sentence);
+          if (!norm) continue;
+          if (titleNorm && norm === titleNorm) continue;
+          if (weakPatterns.some((re) => re.test(sentence))) continue;
+          if (captionPatterns.some((re) => re.test(sentence)) && sentence.length < 86) continue;
+          if (
+            picked.some((prev) => {
+              const p = normalizeCompareText(prev);
+              if (!p) return false;
+              if (p === norm) return true;
+              if (p.length >= 26 && norm.length >= 26 && (p.includes(norm) || norm.includes(p))) return true;
+              return jaccardSimilarity(tokenSetFromNormalizedText(p), tokenSetFromNormalizedText(norm)) >= 0.74;
+            })
+          ) {
+            continue;
+          }
+          picked.push(sentence);
+          const joined = picked.join(" ").replace(/\s+/g, " ").trim();
+          const joinedLen = normalizeCompareText(joined).length;
+          if (picked.length >= 3 || (picked.length >= 2 && joinedLen >= 220)) break;
+        }
+
+        if (!picked.length) return "";
+        let out = picked.join(" ").replace(/\s+/g, " ").trim();
+        if (!out || out.length < 70) return "";
+        if (out.length > 520) {
+          const clipped = out.slice(0, 520);
+          const cut = clipped.lastIndexOf(" ");
+          out = (cut > 300 ? clipped.slice(0, cut) : clipped).trim();
+          if (!/[.!?]$/.test(out)) out += ".";
+        }
+        return out;
+      }
+
       function ensureCardSummaryDisplayLines(summaryText, item, lang = currentLang, titleText = "") {
         const isKo = lang === "ko";
         let normalized = decodeHtmlEntitiesText(summaryText || "")
@@ -6642,11 +6267,7 @@
           .slice(0, isKo ? 4 : 6)
           .join(" ")
           .trim();
-        const genericFallbacks = isKo
-          ? [
-              `${titleAnchor || topicLabel || "이번 이슈"}는 기능 변화와 적용 대상 범위 측면에서 주목할 만한 업데이트입니다.`,
-            ]
-          : [];
+        const genericFallbacks = [];
 
         const units = [];
         const seen = new Set();
@@ -6709,7 +6330,7 @@
         pushFromText(buildDetailSupplementText(item?.summaryText || "", titleText || item?.title || ""));
         pushFromText(buildEmergencySummaryText(item?.summaryText || item?.__articleBodyText || "", titleText || item?.title || ""));
 
-        if (units.length < minUnits || normalizeCompareText(units.join(" ")).length < minChars) {
+        if ((units.length < minUnits || normalizeCompareText(units.join(" ")).length < minChars) && genericFallbacks.length) {
           genericFallbacks.forEach(pushUnit);
         }
 
@@ -6723,7 +6344,7 @@
         }
 
         if (!picked.length) return normalized;
-        while (picked.length < minUnits) {
+        while (picked.length < minUnits && genericFallbacks.length) {
           const fallback = genericFallbacks.find((line) => !seen.has(normalizeCompareText(line)));
           if (!fallback) break;
           pushUnit(fallback);
@@ -6753,6 +6374,74 @@
           .replace(/(?:\s|\n)+(especially|also|and|but|however)\.\s*$/gi, "")
           .trim();
         return outText || (lines.length ? lines.join("\n") : picked.join(" "));
+      }
+
+      function compactCardSummaryForDisplay(summaryText, titleText = "", lang = currentLang) {
+        const isKo = lang === "ko";
+        let normalized = decodeHtmlEntitiesText(summaryText || "")
+          .replace(/\s+/g, " ")
+          .trim();
+        if (!normalized) return "";
+
+        const titleNorm = normalizeCompareText(titleText || "");
+        const minUnitChars = isKo ? 16 : 26;
+        const maxUnitChars = isKo ? 220 : 280;
+        const targetChars = isKo ? Math.max(200, Number(TARGET_CARD_SUMMARY_KO_CHARS) || 280) : Math.max(260, Number(TARGET_CARD_SUMMARY_EN_CHARS) || 340);
+        const hardMaxChars = isKo ? Math.max(320, targetChars + 70) : Math.max(420, targetChars + 90);
+
+        const units = normalized
+          .split(/(?<=[.!?。！？])\s+|\n+/)
+          .map((part) => decodeHtmlEntitiesText(part || "").replace(/\s+/g, " ").trim())
+          .filter(Boolean);
+
+        const candidates = units.length
+          ? units
+          : normalized
+              .split(/\s*(?:,\s+|;\s+| 그리고\s+| 또한\s+| 다만\s+| but\s+| and\s+| while\s+)\s*/i)
+              .map((part) => decodeHtmlEntitiesText(part || "").replace(/\s+/g, " ").trim())
+              .filter(Boolean);
+
+        const picked = [];
+        const seen = new Set();
+        for (const raw of candidates) {
+          let s = decodeHtmlEntitiesText(raw || "").replace(/\s+/g, " ").trim();
+          if (!s || s.length < minUnitChars) continue;
+          const norm = normalizeCompareText(s);
+          if (!norm) continue;
+          if (titleNorm && norm === titleNorm) continue;
+          if (seen.has(norm)) continue;
+          if (picked.some((prev) => {
+            const p = normalizeCompareText(prev);
+            return p === norm || (p.length >= 28 && norm.length >= 28 && (p.includes(norm) || norm.includes(p)));
+          })) {
+            continue;
+          }
+
+          if (s.length > maxUnitChars) {
+            const clipped = s.slice(0, maxUnitChars);
+            const cut = Math.max(clipped.lastIndexOf(". "), clipped.lastIndexOf("다. "), clipped.lastIndexOf(" "));
+            s = (cut > Math.floor(maxUnitChars * 0.55) ? clipped.slice(0, cut) : clipped).trim();
+          }
+          if (!/[.!?]$/.test(s)) s += ".";
+
+          picked.push(s);
+          seen.add(norm);
+
+          const joined = picked.join(" ").replace(/\s+/g, " ").trim();
+          const joinedLen = normalizeCompareText(joined).length;
+          if (picked.length >= 3 && joinedLen >= targetChars) break;
+          if (joinedLen >= hardMaxChars) break;
+        }
+
+        let out = picked.slice(0, 3).join(" ").replace(/\s+/g, " ").trim();
+        if (!out) out = normalized;
+        if (out.length > hardMaxChars) {
+          const clipped = trimToCompleteSentences(out, lang, hardMaxChars);
+          out = (clipped || out).trim();
+          if (!/[.!?]$/.test(out)) out += ".";
+        }
+        out = trimToCompleteSentences(out, lang, hardMaxChars) || out;
+        return out;
       }
 
       function expandKoreanCardSummary(item, titleText = "", baseSummary = "") {
@@ -6808,21 +6497,12 @@
         let merged = picked.join(" ").replace(/\s+/g, " ").trim();
         const minLen = Math.max(MIN_CARD_SUMMARY_KO_CHARS, 130);
         if (merged.length < minLen || sentenceCount(merged) < 2) {
-          const topicLabel = decodeHtmlEntitiesText(getCardTopicLabel(item) || "").replace(/\s+/g, " ").trim();
-          const titleAnchor = decodeHtmlEntitiesText(title || item?.title || "")
-            .replace(/\s+/g, " ")
-            .replace(/["'“”‘’]/g, "")
-            .split(/\s+/)
-            .slice(0, 4)
-            .join(" ")
-            .trim();
-          const supplements = [
-            `${titleAnchor || topicLabel || "해당 이슈"}는 적용 범위와 실제 운영 방식 측면에서 주목할 만한 변화를 담고 있습니다.`,
-          ];
-          for (const sup of supplements) {
-            const next = `${merged} ${sup}`.replace(/\s+/g, " ").trim();
-            merged = next;
-            if (merged.length >= minLen && sentenceCount(merged) >= 2) break;
+          const extra = sanitizeKoreanCardSummaryText(
+            buildArticleLeadSummaryText(item?.summaryText || item?.__articleBodyText || "", title || item?.title || "", "ko"),
+            title || item?.title || "",
+          );
+          if (extra && !normalizeCompareText(merged).includes(normalizeCompareText(extra))) {
+            merged = `${merged} ${extra}`.replace(/\s+/g, " ").trim();
           }
         }
         const clipped = merged.length > 420 ? `${merged.slice(0, 420).trim().replace(/[.!?]+$/g, "")}.` : merged;
@@ -7279,76 +6959,6 @@
         return trimByWord(headline, maxChars);
       }
 
-      /**
-       * Normalize AI/tech company and product names in English text.
-       * Fixes typos (Antropic→Anthropic), spacing (Open AI→OpenAI),
-       * and stray punctuation (e.g. "Paper Orchestra, " → "Paper Orchestra").
-       */
-      function normalizeEnglishProperNames(text) {
-        if (!text) return text;
-        let out = text;
-        const nameMap = [
-          // Anthropic
-          [/\bAntropic\b/gi, "Anthropic"],
-          [/\bAntrhopic\b/gi, "Anthropic"],
-          [/\bAnthroppic\b/gi, "Anthropic"],
-          [/\bAnthropics\b/gi, "Anthropic"],
-          // OpenAI
-          [/\bOpen\s+AI\b/g, "OpenAI"],
-          [/\bOPENAI\b/g, "OpenAI"],
-          [/\bOpen-AI\b/gi, "OpenAI"],
-          // Google DeepMind / Google Cloud
-          [/\bGoogle\s+DeepMind\b/gi, "Google DeepMind"],
-          [/\bGoogleDeepMind\b/gi, "Google DeepMind"],
-          [/\bGoogle\s+Cloud\b/gi, "Google Cloud"],
-          [/\bGoogel\b/gi, "Google"],
-          // Microsoft
-          [/\bMicorsoft\b/gi, "Microsoft"],
-          [/\bMicrosft\b/gi, "Microsoft"],
-          // Meta AI
-          [/\bMetaAI\b/g, "Meta AI"],
-          // NVIDIA
-          [/\bNVidia\b/g, "NVIDIA"],
-          [/\bNvidea\b/gi, "NVIDIA"],
-          [/\bNvida\b/gi, "NVIDIA"],
-          // Hugging Face
-          [/\bHuggingface\b/gi, "Hugging Face"],
-          [/\bHugging\s*face\b/gi, "Hugging Face"],
-          // ChatGPT / GPT
-          [/\bChat\s*GPT\b/gi, "ChatGPT"],
-          [/\bGPT-?4o\b/gi, "GPT-4o"],
-          // Gemini
-          [/\bGemeni\b/gi, "Gemini"],
-          // Claude
-          [/\bClaud\b(?!e)/gi, "Claude"],
-          // LLaMA / Llama
-          [/\bLLAMA\b/g, "Llama"],
-          [/\bLLaMa\b/g, "Llama"],
-          // GitHub
-          [/\bGithub\b/g, "GitHub"],
-          [/\bGIT\s*HUB\b/gi, "GitHub"],
-          // YouTube
-          [/\bYoutube\b/g, "YouTube"],
-          // LinkedIn
-          [/\bLinkedin\b/g, "LinkedIn"],
-          // Mistral AI
-          [/\bMistral\s+AI\b/gi, "Mistral AI"],
-          // xAI
-          [/\bx\.AI\b/gi, "xAI"],
-        ];
-        for (const [re, replacement] of nameMap) {
-          out = out.replace(re, replacement);
-        }
-        // Strip a trailing comma that is the last character before end-of-string
-        // or before a sentence-end mark — e.g. "Paper Orchestra," → "Paper Orchestra"
-        // (Intentionally narrow: do NOT strip commas inside sentences.)
-        out = out
-          .replace(/,\s*(?=[.!?]\s*$|$)/g, "")
-          .replace(/\s{2,}/g, " ")
-          .trim();
-        return out;
-      }
-
       function proofreadEnglishHeadlineText(input) {
         const trimByWord = (value, maxChars = 120) => {
           const src = String(value || "").trim();
@@ -7359,25 +6969,13 @@
         };
 
         let out = decodeHtmlEntitiesText(input || "")
-          .replace(/[“”"]/g, '"')
-          .replace(/[‘’']/g, "'")
+          .replace(/[“”]/g, '"')
+          .replace(/[‘’]/g, "'")
           .replace(/\s+/g, " ")
-          // Normalize quote/punctuation spacing: “Paper Orchestra, ” → "Paper Orchestra,"
-          .replace(/\s+([,.;:!?])(?=["'])/g, "$1")
-          .replace(/([,.;:!?])\s+(?=["'])/g, "$1")
-          // "Company, Verb" → "Company Verb"
-          // Only strip comma when it is directly between a proper-name subject and a verb.
-          // We target specific action verbs so we don't accidentally remove list commas
-          // ("Google, Apple, and Microsoft…") or appositive commas ("Sam Altman, CEO of…").
-          .replace(
-            /([A-Z][A-Za-z0-9]+(?:\s+[A-Z][A-Za-z0-9]+)*),\s+(?=(?:announce|launch|release|unveil|introduce|present|reveal|debut|partner|acqui|secure|sign|raise|fund|invest|deploy|expand|open|close|join|bring|offer|plan|target|report|reach|hit|set|win|cut|add|build|make|take|get|push|roll|kick|pull|develop|create|design|update|upgrade|advance|scale|grow|merge|hire|appoint|sue|gain|top|enter|exit|return|halt|resume|delay|compete|buy|sell|back|warn|confirm|share|patent|file|claim|deny|drop|boost|double|slash|surpass|exceed)\w*\b)/gi,
-            "$1 "
-          )
           .replace(/\s+([,:;!?])/g, "$1")
           .replace(/([,:;!?])(?!\s|$)/g, "$1 ")
           .replace(/\b([A-Za-z][A-Za-z0-9'-]{1,})\s+\1\b/gi, "$1")
-          // Strip trailing punctuation: commas, pipes, colons, semicolons, ellipsis
-          .replace(/\s*[,|:;\u2026]+\s*$/g, "")
+          .replace(/\s*[-|,:;]\s*$/g, "")
           .replace(/[.?!]+$/g, "")
           .replace(/\s{2,}/g, " ")
           .trim();
@@ -7420,8 +7018,146 @@
           }
         }
 
-        out = normalizeEnglishProperNames(out);
-        return trimByWord(out, 120);
+        return trimByWord(normalizeKnownSummaryTypos(out, "en", out), 120);
+      }
+
+      function normalizeKnownSummaryTypos(text, lang = currentLang, titleHint = "") {
+        let out = decodeHtmlEntitiesText(text || "").replace(/\s+/g, " ").trim();
+        if (!out) return "";
+        if (lang === "en") {
+          const anthroTypoRe = new RegExp("Ant" + "ropic", "gi");
+          const mythosTypoRe = new RegExp("Mis" + "os", "gi");
+          const lawCompanyTypoRe = new RegExp("Super Law\\s*&\\s*Company", "gi");
+          out = out
+            .replace(anthroTypoRe, "Anthropic")
+            .replace(mythosTypoRe, "Mythos")
+            .replace(lawCompanyTypoRe, "Super Lawyer Academy")
+            .replace(/\bintroduced a host of new automated functions\b/gi, "introduced new automated functions");
+          return out;
+        }
+
+        const weirdGeminiRe = new RegExp("제미나이\\s*인" + "업체", "gi");
+        const antropicRe = new RegExp("Ant" + "ropic", "gi");
+        const anthropicKrTypoRe = new RegExp("안트" + "로픽", "g");
+        const mythosKrTypoRe = new RegExp("미" + "소스", "g");
+        const unnaturalEnoughRe = new RegExp("충분" + "이다\\.", "g");
+        const unnaturalCanRe = new RegExp("높일\\s*수" + "이다\\.", "g");
+        const unnaturalSuffixRe = new RegExp("수" + "이다\\.", "g");
+        out = out
+          .replace(antropicRe, "Anthropic")
+          .replace(anthropicKrTypoRe, "앤트로픽")
+          .replace(mythosKrTypoRe, "미소스")
+          .replace(weirdGeminiRe, "제미니 인 크롬")
+          .replace(unnaturalEnoughRe, "충분하다.")
+          .replace(unnaturalCanRe, "높일 수 있다.")
+          .replace(unnaturalSuffixRe, "수 있다.")
+          .replace(/AI의 기술적\./g, "AI 기술의")
+          .replace(/공개했다\.\s*공개했다\./g, "공개했다.");
+
+        const ctx = normalizeCompareText(titleHint || "");
+        if (/flow\s*music|플로우\s*뮤직/.test(ctx)) {
+          out = out.replace(/이 모델/g, "이 플랫폼");
+        }
+        return out;
+      }
+
+      function isGenericEnglishFallbackTitle(text) {
+        const t = decodeHtmlEntitiesText(text || "")
+          .replace(/\s+/g, " ")
+          .trim();
+        if (!t) return true;
+        return /^(?:AI Industry|Technology|Company|Policy|Regulation|Startup|AI)\s+AI\s+[A-Za-z ]+\s+update$/i.test(t);
+      }
+
+      function deriveEnglishTitleFromSummary(summaryText, fallbackTitle = "AI update") {
+        const src = decodeHtmlEntitiesText(summaryText || "")
+          .replace(/\s+/g, " ")
+          .trim();
+        if (!src || /[가-힣]/.test(src)) return fallbackTitle;
+        const first = src
+          .split(/(?<=[.!?])\s+|\n+/)
+          .map((s) => s.trim())
+          .filter((s) => s && s.length >= 16)[0];
+        if (!first) return fallbackTitle;
+        const cleaned = first
+          .replace(/^\s*(?:According to (?:it|the report),\s*)/i, "")
+          .replace(/\s+/g, " ")
+          .trim();
+        const words = cleaned.split(/\s+/).slice(0, 11);
+        const out = words.join(" ").replace(/[,:;]+$/g, "").trim();
+        if (!out || !isReliableEnglishText(out, 3) || /[가-힣]/.test(out)) return fallbackTitle;
+        return proofreadEnglishHeadlineText(out) || fallbackTitle;
+      }
+
+      function sanitizeKoreanCardSummaryText(summaryText, titleHint = "") {
+        const raw = decodeHtmlEntitiesText(summaryText || "")
+          .replace(/\s+/g, " ")
+          .trim();
+        if (!raw) return "";
+
+        const blocked = [
+          /관련 주요 (?:변경 사항|업데이트)가 (?:공개됐다|보도됐다)\.?/g,
+          /관련 업데이트가 보도됐다\.?/g,
+          /세부 (?:기능|내용)은 원문 기사에서 확인할 수 있다\.?/g,
+          /PRODUCT UPDATE의 세부 내용은 원문 기사에서 확인할 수 있다\.?/gi,
+        ];
+        let cleaned = normalizeKnownSummaryTypos(raw, "ko", titleHint);
+        blocked.forEach((re) => {
+          cleaned = cleaned.replace(re, " ");
+        });
+
+        const sentences = cleaned
+          .split(/(?<=[.!?。！？])\s+|\n+/)
+          .map((s) => s.trim())
+          .filter(Boolean)
+          .filter((s) => {
+            const hangul = (s.match(/[가-힣]/g) || []).length;
+            const latin = (s.match(/[A-Za-z]/g) || []).length;
+            if (latin >= 24 && hangul <= 4) return false;
+            return s.length >= 14;
+          })
+          .map((s) => s.replace(/\s+/g, " ").trim())
+          .map((s) => (/[.!?]$/.test(s) ? s : `${s}.`));
+
+        const uniq = [];
+        const seen = new Set();
+        for (const s of sentences) {
+          const key = normalizeCompareText(s);
+          if (!key || seen.has(key)) continue;
+          seen.add(key);
+          uniq.push(s);
+          if (uniq.length >= 3) break;
+        }
+        if (!uniq.length) return "";
+        return trimToCompleteSentences(uniq.join(" "), "ko", 620) || uniq.join(" ");
+      }
+
+      function trimToCompleteSentences(text, lang = currentLang, maxChars = 0) {
+        let src = decodeHtmlEntitiesText(text || "").replace(/\s+/g, " ").trim();
+        if (!src) return "";
+        if (maxChars > 0 && src.length > maxChars) {
+          src = src.slice(0, maxChars).trim();
+        }
+        const sentences = src
+          .split(/(?<=[.!?。！？])\s+|\n+/)
+          .map((s) => s.trim())
+          .filter(Boolean)
+          .map((s) => (/[.!?]$/.test(s) ? s : `${s}.`));
+        if (!sentences.length) return "";
+
+        const isIncomplete = (s) => {
+          const line = String(s || "").trim();
+          if (!line) return true;
+          if (lang === "en") {
+            return /\b(?:a|an|the|to|for|with|of|in|on|at|by|from|through|via|and|or)\.$/i.test(line);
+          }
+          return /(수이다\.|이다\.$|중이다\.$)/.test(line) && !/(있다\.|했다\.|된다\.|했다\.)$/.test(line);
+        };
+
+        while (sentences.length > 1 && isIncomplete(sentences[sentences.length - 1])) {
+          sentences.pop();
+        }
+        return sentences.join(" ").replace(/\s+/g, " ").trim();
       }
 
       function proofreadEnglishSummaryText(input, titleHint = "") {
@@ -7436,24 +7172,8 @@
           /\b(?:photo|pictured|image|images|screenshot|render(?:ing)?|illustration|on the left|on the right|background)\b/i,
           /\b(?:wearing|poses?|standing|sitting|smiling|looks? at|holding)\b/i,
         ];
-        // 메타 안내문·필러 문장 — 카드에 절대 노출 금지
-        const metaInstructionPatterns = [
-          /\bcheck\s+(?:the\s+)?(?:original\s+)?source\s+link\b/i,
-          /\bsee\s+(?:the\s+)?(?:full|original|source)\s+(?:article|story|post|link|details?)\b/i,
-          /\bvisit\s+(?:the\s+)?(?:link|source|website|site|page)\s+for\b/i,
-          /\bread\s+(?:more|the\s+full)\s+(?:article|story|post)?\s+(?:at|on|here)\b/i,
-          /\bfor\s+(?:more|full|further|implementation|additional)\s+(?:details?|information|info|context|coverage)\b/i,
-          /\bfor\s+(?:rollout|deployment|implementation)\s+(?:details?|boundaries?|scope)\b/i,
-          /\b(?:click|tap)\s+(?:here|the\s+link)\s+(?:to\s+)?(?:read|view|learn)\b/i,
-          /\bthe\s+(?:key\s+point|main\s+point|bottom\s+line|takeaway)\s+is\b/i,
-          /\bit(?:'s|\s+is)\s+worth\s+noting\s+that\b/i,
-          /\bstay\s+tuned\b/i,
-          /\bmore\s+details?\s+(?:to\s+follow|coming\s+soon|available\s+at)\b/i,
-          /\bsource\s*:\s*https?:\/\//i,
-          /\bvia\s+https?:\/\//i,
-        ];
 
-        const raw = cleanText(input);
+        const raw = cleanText(normalizeKnownSummaryTypos(input, "en", titleHint));
         if (!raw || isSummaryEmptyText(raw)) return raw;
 
         const lines = raw
@@ -7461,24 +7181,12 @@
           .map((s) => {
             let cleaned = cleanText(s)
               .replace(/\b([A-Za-z][A-Za-z0-9'-]{1,})\s+\1\b/gi, "$1")
-              // Only strip bare conjunctions when they appear alone at start with no content value
-              // ("And the" → keep; "And, " → strip the comma stub only)
-              .replace(/^\s*(?:And|But|So|Also),\s+/i, "")
+              .replace(/^\s*(?:And|But|So|Also)\s+/i, "")
               .trim();
             cleaned = cleaned.replace(/^([a-z])/, (m) => m.toUpperCase());
             return cleaned;
           })
-          .filter((s) => {
-            if (!s || s.length < 22) return false;
-            // 메타 안내문·필러 문장 제거
-            if (metaInstructionPatterns.some((re) => re.test(s))) return false;
-            // 단어 1~2개짜리 파편 문장 제거 (e.g. "Launches.")
-            if (s.replace(/[^A-Za-z\s가-힣]/g, "").trim().split(/\s+/).length <= 2) return false;
-            // Korean sentences must never appear in English output
-            const koCharCount = (s.match(/[가-힣]/g) || []).length;
-            if (koCharCount > 3) return false;
-            return true;
-          })
+          .filter((s) => s && s.length >= 22)
           .map((s) => sentenceEnd(s));
 
         if (!lines.length) return sentenceEnd(raw);
@@ -7533,8 +7241,9 @@
 
         if (!out) out = uniq[0];
         if (normalizeCompareText(out).length < 190 && uniq.length >= 2) out = `${uniq[0]} ${uniq[1]}`;
+        out = normalizeKnownSummaryTypos(out, "en", titleHint);
+        out = trimToCompleteSentences(out, "en", 560) || out;
         out = out.replace(/\s+/g, " ").trim();
-        out = normalizeEnglishProperNames(out);
         if (out && !/[.!?]$/.test(out)) out += ".";
         return out;
       }
@@ -7591,7 +7300,7 @@
               .filter((tok) => tok && tok.length >= 2 && !ISSUE_STOPWORDS.has(tok)),
           );
 
-        const raw = cleanText(input);
+        const raw = cleanText(normalizeKnownSummaryTypos(input, "ko", input || ""));
         if (!raw || isSummaryEmptyText(raw)) return raw;
 
         const isNearDuplicateSentence = (a, b) => {
@@ -7649,13 +7358,6 @@
           .filter((s) => {
             if (!s || s.length < 16) return false;
             if (/^(?:동안|중)\s+[A-Za-z][A-Za-z0-9_-]*\.?$/i.test(s)) return false;
-            // 메타 안내문 필터 — "원문 링크에서 확인" 류 문장 제거
-            if (/원문\s*(?:링크|기사|에서)\s*(?:에서\s*)?확인/.test(s)) return false;
-            if (/(?:링크|출처|기사)\s*(?:에서|를)\s*확인/.test(s)) return false;
-            if (/자세한\s*(?:내용|사항|정보)\s*(?:은|는)?\s*(?:원문|링크|기사)/.test(s)) return false;
-            if (/더\s*많은\s*(?:정보|내용|내역)\s*(?:은|는)?\s*(?:원문|링크|사이트|홈페이지)/.test(s)) return false;
-            if (/(?:전체|상세)\s*내용\s*(?:은|는)?\s*(?:아래|위)?\s*링크/.test(s)) return false;
-            if (/관련\s*내용\s*은?\s*링크/.test(s)) return false;
             const tokenCount = s.split(/\s+/).filter(Boolean).length;
             const hasPredicate = /(?:다|했다|한다|된다|지원|제공|추가|공개|출시|발표|도입|강화|개선|확장|탑재|적용|구축|비판|계획|가능)\.?$/.test(
               s,
@@ -7692,25 +7394,13 @@
             for (let i = 1; i < uniq.length; i++) {
               const subjI = getLeadSubject(uniq[i]);
               if (subjI && subjI === subj0 && hasReleaseVerb(uniq[0]) && hasReleaseVerb(uniq[i])) {
-                // 1단계: 반복 주어 + 날짜 패턴 제거 후 "이 모델은"으로 교체
-                let fixed = uniq[i]
+                // 반복 주어 + 날짜 패턴 제거 후 "이 모델은"으로 교체
+                uniq[i] = uniq[i]
                   .replace(
                     /^[가-힣A-Za-z·\-&]{2,20}(?:\s+[가-힣A-Za-z]{2,10}){0,2}[은이가는]\s+(?:\d+일\s*\(현지\s*시(?:각|간)\)\s*)?/,
                     "이 모델은 ",
                   )
                   .replace(/^이 모델은\s+(?:은|는|이|가)\s+/, "이 모델은 ");
-                // 2단계: "이 모델은 ... [ProductObj]를/을 공개/출시/발표했다" →
-                //         "이 모델은 ... [ProductObj]이다" (동사를 서술어로 전환)
-                fixed = fixed.replace(
-                  /([가-힣A-Za-z0-9'''""\-·+]+)(?:를|을)\s*(?:공개|출시|발표|선보|발매|배포|내놓|소개)(?:했다|한다|해|하였다)\.?$/,
-                  "$1이다.",
-                );
-                // 3단계: 날짜·주어 없이 동사만 남은 경우 처리 ("이 모델은 ...했다" → "...이다")
-                fixed = fixed.replace(
-                  /(?:이 모델은\s+)(.+?)(?:를|을)\s*(?:공개|출시|발표)(?:했다|한다)\.?$/,
-                  (_, body) => `이 모델은 ${body}이다.`,
-                );
-                uniq[i] = fixed;
               }
             }
           }
@@ -7724,6 +7414,8 @@
           out = next;
         }
         out = (out || uniq.join(" ")).replace(/\s+/g, " ").trim();
+        out = normalizeKnownSummaryTypos(out, "ko", input || "");
+        out = trimToCompleteSentences(out, "ko", 620) || out;
         if (out && !/[.!?]$/.test(out)) out += ".";
         return out;
       }
@@ -7962,27 +7654,10 @@
         );
       }
 
-      // 제목에 출시·공개·업데이트·협업 신호가 명확한 기사 — Tier-1 선별용
-      function isLaunchFocusedItem(item) {
-        if (!item) return false;
-        const title = decodeHtmlEntitiesText(item?.title || "").toLowerCase();
-        const summary = decodeHtmlEntitiesText(item?.summaryText || "").toLowerCase();
-        // 제목 기준 출시·업데이트 신호
-        if (/(?:launch|launched|launches|release[sd]?|unveil[sed]?|introduc|announc|debut|ship[ps]?|rollout|roll\s*out|general\s*availability|\bga\b|preview|beta|v\d+\.\d+|new\s+model|new\s+version|new\s+feature|update[sd]?|upgrade[sd]?)/.test(title)) return true;
-        // 한국어 출시·업데이트 신호
-        if (/(?:출시|공개|발표|업데이트|배포|도입|선보|발매|런칭|릴리스|베타|프리뷰|신규\s*기능|새\s*버전|새\s*모델)/.test(title)) return true;
-        // 협업·파트너십 신호 (제목 또는 요약 앞부분)
-        const summaryLead = summary.slice(0, 200);
-        if (/(?:partner(?:ship)?|collaborat|integrat|deal\s+with|agreement\s+with|제휴|협업|협력|파트너십|통합)/.test(title)) return true;
-        if (/(?:partner(?:ship)?|collaborat|integrat|제휴|협업|협력|파트너십)/.test(summaryLead)) return true;
-        return false;
-      }
-
       function isProductTechCardCandidate(item, relaxed = false) {
         if (!item) return false;
         if (isBlockedCardSourceKey(item?.sourceFeed || "")) return false;
         if (isNewsDigestCard(item)) return false;  // digest/offtopic 먼저 체크 (aitimes 포함)
-        if (isKoreanDomesticArticle(item)) return false;  // 국내 업체 단독 기사 제외
         if (String(item?.sourceFeed || "") === "aitimes_industry") return true;
         if (isPromotionalSelfPost(item) || isSubjectiveStyleStory(item)) return false;
 
@@ -8004,12 +7679,7 @@
       function isSourcePriorityCandidate(item, relaxed = false) {
         if (isBlockedCardSourceKey(item?.sourceFeed || "")) return false;
         if (isNewsDigestCard(item)) return false;
-        if (isKoreanDomesticArticle(item)) return false;  // 국내 업체 단독 기사 제외
-        // aitimes: relaxed 모드엔 통과, strict 모드엔 기술/제품 신호 요구
-        if (String(item?.sourceFeed || "") === "aitimes_industry") {
-          if (relaxed) return true;
-          return isProductTechCardCandidate(item, true) || isLaunchFocusedItem(item);
-        }
+        if (String(item?.sourceFeed || "") === "aitimes_industry") return true;
         if (!isProductTechCardCandidate(item, relaxed)) return false;
         const { launchHits, titleLaunchHits, techHits, nonProductHits } = getLaunchSignalMetrics(item);
         const launchSignal = titleLaunchHits > 0 || launchHits > 0 || hasLaunchUpdateSignal(item);
@@ -8336,6 +8006,7 @@
         const text = decodeHtmlEntitiesText(input || "")
           .replace(/\s+/g, " ")
           .trim();
+        if (isNoisySummaryText(text)) return false;
         if (!text || isSummaryEmptyText(text)) return false;
         const hangulCount = (text.match(/[가-힣]/g) || []).length;
         return hangulCount >= Math.max(1, Number(minHangul) || 1);
@@ -8432,93 +8103,138 @@
               titleKo = proofreadKoreanHeadlineText(stylizeKoreanHeadlineText(titleKo) || titleKo) || titleKo;
             }
 
-            let summaryKo = decodeHtmlEntitiesText(it.cardSummaryKo || it.summaryKo || "")
+            const summaryKoSource = decodeHtmlEntitiesText(it.cardSummaryKo || it.summaryKo || "")
               .replace(/\s+/g, " ")
               .trim();
+            let summaryKo = summaryKoSource;
             let summaryEn = decodeHtmlEntitiesText(it.cardSummaryEn || canonical.summaryEn || "")
               .replace(/\s+/g, " ")
               .trim();
-            const hasKoSummary = isReliableKoreanText(summaryKo, 24);
-            const hasEnSummary = isReliableEnglishText(summaryEn, 18) && !/[가-힣]/.test(summaryEn);
+            const hasKoSummary = isReliableKoreanText(summaryKoSource, 24);
+            const isUsableEnSummary = (value) => {
+              const clean = decodeHtmlEntitiesText(value || "")
+                .replace(/\s+/g, " ")
+                .trim();
+              if (!clean || /[가-힣]/.test(clean)) return false;
+              if (!isReliableEnglishText(clean, 18)) return false;
+              if (isNoisySummaryText(clean) || isSummaryEmptyText(clean)) return false;
+              return !isSummaryTooShortForCard(clean, "en");
+            };
+            const hasEnSummary = isUsableEnSummary(summaryEn);
+            const sourceFeedKey = String(it?.sourceFeed || "").trim();
+            const sourceTitleRaw = decodeHtmlEntitiesText(it?.title || "").trim();
+            const isKoreanSourceItem = sourceFeedKey === "aitimes_industry" || /[가-힣]/.test(sourceTitleRaw);
 
-            // For Korean-source articles (AiTimes), the original Korean RSS text is often richer than
-            // what was produced by the English translation pipeline. Use it as a fallback Korean source.
-            const rawKoreanSource = decodeHtmlEntitiesText(it.summaryText || "").replace(/\s+/g, " ").trim();
-            const hasRawKoreanSource = /[가-힣]/.test(rawKoreanSource) && rawKoreanSource.length >= 60;
-            // Prefer summaryKo (already processed) but fall back to raw Korean RSS if unavailable
-            const koreanSourceText = hasKoSummary ? summaryKo : (hasRawKoreanSource ? rawKoreanSource : "");
-            const hasAnyKoreanSource = !!koreanSourceText;
-
-            // English-first: 영어가 원본, 한국어는 영어에서 번역
-            // Prefer Groq AI English summary as translation source — it's what the English tab shows.
-            // If Groq AI English isn't ready yet, fall back to canonical RSS English.
-            const aiEnSummary = decodeHtmlEntitiesText(getAiCardText(it, "__aiSummary", currentAiProvider, "en") || "").replace(/\s+/g, " ").trim();
-            const useAiEnAsBase = !!aiEnSummary && isReliableEnglishText(aiEnSummary, 18) && !/[가-힣]/.test(aiEnSummary);
-            let baseEn = useAiEnAsBase ? aiEnSummary : hasEnSummary ? summaryEn : "";
-            if (!baseEn) {
-              const canonicalEn = decodeHtmlEntitiesText(canonical.summaryEn || "").replace(/\s+/g, " ").trim();
-              if (canonicalEn && isReliableEnglishText(canonicalEn, 18) && !/[가-힣]/.test(canonicalEn)) {
-                baseEn = canonicalEn;
-              }
-            }
-            // If baseEn is short/generic (likely a placeholder from buildEnglishFallbackSummaryFromItem)
-            // AND Korean source is available, translate from Korean for better content.
-            if (!useAiEnAsBase && hasAnyKoreanSource && (!baseEn || normalizeCompareText(baseEn).length < 120)) {
-              const tryEn = await translateEnFromText(koreanSourceText, "summary");
-              if (tryEn && !/[가-힣]/.test(tryEn) && isReliableEnglishText(tryEn, 18)
-                  && normalizeCompareText(tryEn).length > normalizeCompareText(baseEn).length) {
-                baseEn = tryEn;
-              }
-            }
-            if (!baseEn && hasAnyKoreanSource) {
-              // 영어가 없을 때 한국어 → 영어 번역으로 보완
-              const tryEn = await translateEnFromText(koreanSourceText, "summary");
-              if (tryEn && !/[가-힣]/.test(tryEn) && isReliableEnglishText(tryEn, 18)) baseEn = tryEn;
-            }
-            if (!baseEn) {
-              // Only use Korean emergency text if we can translate it; don't pass Korean to English pipeline
-              const emergencyRaw = hasRawKoreanSource ? "" : (it.summaryText || "");
-              const emergency = emergencyRaw ? buildEmergencySummaryText(emergencyRaw, titleEn || it.title || "") : "";
-              if (emergency) {
-                baseEn = !/[가-힣]/.test(emergency) ? emergency : await translateEnFromText(emergency, "summary");
-              }
-            }
-            baseEn = proofreadEnglishSummaryText(baseEn || summaryEn, titleEn) || "";
-
-            // 한국어는 영어에서 번역
-            // If Groq AI Korean is already available (translated from the same English AI), use it directly.
-            const aiKoSummary = decodeHtmlEntitiesText(getAiCardText(it, "__aiSummary", currentAiProvider, "ko") || "").replace(/\s+/g, " ").trim();
+            let baseEn = "";
             let syncedKo = "";
-            if (aiKoSummary && isReliableKoreanText(aiKoSummary, 24)) {
-              // Groq Korean AI already exists — use it; no need to translate again
-              syncedKo = proofreadKoreanSummaryText(stylizeKoreanSummaryText(aiKoSummary, titleKo || titleEn) || aiKoSummary) || aiKoSummary;
-            } else if (baseEn && !isSummaryEmptyText(baseEn)) {
-              syncedKo = await translateKoFromText(baseEn, "summary");
-              syncedKo = proofreadKoreanSummaryText(stylizeKoreanSummaryText(syncedKo, titleKo || titleEn) || syncedKo) || "";
-            }
-            if (!isReliableKoreanText(syncedKo, 24) && hasKoSummary) {
-              // 번역 실패 시 기존 한국어 사용
-              syncedKo = proofreadKoreanSummaryText(stylizeKoreanSummaryText(summaryKo, titleKo || titleEn) || summaryKo) || summaryKo;
-            }
-            // For Korean-source articles (AiTimes): if syncedKo is short/poor compared to the
-            // original Korean RSS text, prefer the raw Korean source directly.
-            // KO→EN→KO round-trips lose content; the original Korean is authoritative for Korean readers.
-            // EXCEPTION: When Groq AI Korean came from the bilingual bundle (generated from Korean source,
-            // NOT translated from English), it is already the correct editorial version.
-            // Do NOT replace it with raw RSS text — that would break the Korean/English pairing.
-            const aiKoIsFromBilingualBundle = !!aiKoSummary && isReliableKoreanText(aiKoSummary, 24);
-            if (hasRawKoreanSource && !aiKoIsFromBilingualBundle) {
-              const syncedKoLen = isReliableKoreanText(syncedKo, 24) ? normalizeCompareText(syncedKo).length : 0;
-              const rawKoLen = normalizeCompareText(rawKoreanSource).length;
-              const rawIsMuchBetter = rawKoLen > syncedKoLen * 1.4 && rawKoLen > 60;
-              if (!isReliableKoreanText(syncedKo, 24) || rawIsMuchBetter) {
-                const polishedRaw = proofreadKoreanSummaryText(stylizeKoreanSummaryText(rawKoreanSource, titleKo || titleEn) || rawKoreanSource) || rawKoreanSource;
-                if (isReliableKoreanText(polishedRaw, 24)) syncedKo = polishedRaw;
+
+            if (isKoreanSourceItem) {
+              const koCandidates = [
+                summaryKoSource,
+                decodeHtmlEntitiesText(it?.__articleBodySummary || ""),
+                buildArticleLeadSummaryText(it?.__articleBodyText || it?.summaryText || "", titleKo || titleEn, "ko"),
+                decodeHtmlEntitiesText(it?.summaryText || ""),
+              ]
+                .map((v) => decodeHtmlEntitiesText(v || "").replace(/\s+/g, " ").trim())
+                .filter(Boolean);
+              let baseKo =
+                koCandidates.find((candidate) => isReliableKoreanText(candidate, 24) && !isNoisySummaryText(candidate)) || "";
+              if (!baseKo) {
+                const looseKo =
+                  koCandidates.find((candidate) => isReliableKoreanText(candidate, 10) && !isNoisySummaryText(candidate)) || "";
+                baseKo = sanitizeKoreanCardSummaryText(looseKo, titleKo || titleEn) || looseKo;
+              }
+              if (!baseKo) baseKo = buildMinimalKoreanSummaryFromTitle(titleKo || titleEn);
+              syncedKo = proofreadKoreanSummaryText(stylizeKoreanSummaryText(baseKo, titleKo || titleEn) || baseKo) || baseKo;
+
+              let translatedEn = await translateEnFromText(syncedKo, "summary");
+              if ((!translatedEn || /[가-힣]/.test(translatedEn) || !isReliableEnglishText(translatedEn, 18)) && syncedKo) {
+                try {
+                  const forcedEn = await translateTextViaPublicGoogle(syncedKo, "ko", "en");
+                  if (isReliableEnglishText(forcedEn, 18)) translatedEn = forcedEn;
+                } catch (e) {}
+              }
+              baseEn = proofreadEnglishSummaryText(translatedEn || summaryEn || canonical.summaryEn || "", titleEn) || "";
+              baseEn = sanitizeEnglishCardSummaryText(baseEn, it, titleEn) || baseEn;
+              if (baseEn && !isSummaryEmptyText(baseEn)) {
+                const expansionRaw = [syncedKo, decodeHtmlEntitiesText(it?.summaryText || ""), decodeHtmlEntitiesText(it?.__articleBodyText || "")]
+                  .filter(Boolean)
+                  .join(" ");
+                baseEn = ensureLongSummaryEn(it, baseEn, expansionRaw, titleEn, it?.categories || []);
+                baseEn = sanitizeEnglishCardSummaryText(baseEn, it, titleEn) || baseEn;
+              }
+              if (!isUsableEnSummary(baseEn)) {
+                baseEn =
+                  sanitizeEnglishCardSummaryText(buildEnglishFallbackSummaryFromItem(it, titleEn), it, titleEn) ||
+                  buildMinimalEnglishSummaryFromTitle(titleEn);
+              }
+            } else {
+              // English-first: 영어가 원본, 한국어는 영어에서 번역
+              baseEn = hasEnSummary ? summaryEn : "";
+              if (!baseEn) {
+                const canonicalEn = decodeHtmlEntitiesText(canonical.summaryEn || "").replace(/\s+/g, " ").trim();
+                if (canonicalEn && isUsableEnSummary(canonicalEn)) {
+                  baseEn = canonicalEn;
+                }
+              }
+              if (!baseEn && hasKoSummary) {
+                // 영어가 없을 때만 한국어 → 영어 번역으로 보완
+                const tryEn = await translateEnFromText(summaryKo, "summary");
+                if (tryEn && isUsableEnSummary(tryEn)) baseEn = tryEn;
+              }
+              if (!baseEn) {
+                const emergency = buildEmergencySummaryText(it.summaryText || "", titleEn || it.title || "");
+                if (emergency) {
+                  baseEn = !/[가-힣]/.test(emergency) ? emergency : await translateEnFromText(emergency, "summary");
+                }
+              }
+              baseEn = proofreadEnglishSummaryText(baseEn || summaryEn, titleEn) || "";
+              baseEn = sanitizeEnglishCardSummaryText(baseEn, it, titleEn) || baseEn;
+              if (baseEn && !isSummaryEmptyText(baseEn)) {
+                const expansionRaw = [
+                  summaryKo,
+                  decodeHtmlEntitiesText(it?.summaryText || ""),
+                  decodeHtmlEntitiesText(it?.__articleBodyText || ""),
+                ]
+                  .filter(Boolean)
+                  .join(" ");
+                baseEn = ensureLongSummaryEn(it, baseEn, expansionRaw, titleEn, it?.categories || []);
+                baseEn = sanitizeEnglishCardSummaryText(baseEn, it, titleEn) || baseEn;
+              }
+              if (!isUsableEnSummary(baseEn)) {
+                const recoveryCandidates = [
+                  sanitizeEnglishCardSummaryText(
+                    buildArticleLeadSummaryText(it?.__articleBodyText || it?.summaryText || "", titleEn, "en"),
+                    it,
+                    titleEn,
+                  ),
+                  sanitizeEnglishCardSummaryText(buildEnglishFallbackSummaryFromItem(it, titleEn), it, titleEn),
+                  sanitizeEnglishCardSummaryText(
+                    buildExpandedEnglishSummary(
+                      decodeHtmlEntitiesText(it?.summaryText || ""),
+                      decodeHtmlEntitiesText(it?.__articleBodyText || it?.summaryText || ""),
+                      titleEn,
+                    ),
+                    it,
+                    titleEn,
+                  ),
+                ].filter((candidate) => isUsableEnSummary(candidate));
+                baseEn = recoveryCandidates[0] || buildMinimalEnglishSummaryFromTitle(titleEn);
+              }
+
+              // 한국어는 영어에서 번역
+              if (baseEn && !isSummaryEmptyText(baseEn)) {
+                syncedKo = await translateKoFromText(baseEn, "summary");
+                syncedKo = proofreadKoreanSummaryText(stylizeKoreanSummaryText(syncedKo, titleKo || titleEn) || syncedKo) || "";
+              }
+              if (!isReliableKoreanText(syncedKo, 24) && hasKoSummary) {
+                // 번역 실패 시 기존 한국어 사용
+                syncedKo = proofreadKoreanSummaryText(stylizeKoreanSummaryText(summaryKo, titleKo || titleEn) || summaryKo) || summaryKo;
               }
             }
 
-            if (!baseEn || /[가-힣]/.test(baseEn) || !isReliableEnglishText(baseEn, 18)) baseEn = I18N.en.summary_empty;
-            if (!syncedKo || !isReliableKoreanText(syncedKo, 24)) syncedKo = I18N.ko.summary_empty;
+            if (!isUsableEnSummary(baseEn)) baseEn = buildMinimalEnglishSummaryFromTitle(titleEn);
+            if (!syncedKo || !isReliableKoreanText(syncedKo, 10)) syncedKo = buildMinimalKoreanSummaryFromTitle(titleKo || titleEn);
 
             it.cardTitleEn = titleEn;
             it.titleEn = titleEn;
@@ -8561,14 +8277,15 @@
             const summarySource = canonical.summaryEn;
             const hasSummary = summarySource && !isSummaryEmptyText(summarySource);
             const summaryEmergency = buildEmergencySummaryText(it.summaryText || "", titleBase);
-            const summaryBase = hasSummary ? summarySource : summaryEmergency;
+            const summaryTitleFallbackEn = buildEnglishFallbackSummaryFromItem(it, titleBase);
+            const summaryBase = hasSummary ? summarySource : summaryEmergency || summaryTitleFallbackEn;
 
             const existingTitleKo = pickKoreanOrEmpty(it.cardTitleKo || it.titleKo || "");
-            // BILINGUAL_CONTENT_SYNC: always re-translate summary from English so cardSummaryKo
-            // is sourced from canonical English, not from the original AiTimes RSS Korean feed.
-            const existingSummaryKoRaw = BILINGUAL_CONTENT_SYNC ? "" : pickKoreanOrEmpty(it.cardSummaryKo || it.summaryKo || "");
+            const existingSummaryKoRaw = pickKoreanOrEmpty(it.cardSummaryKo || it.summaryKo || "");
             const existingSummaryKo =
-              !BILINGUAL_CONTENT_SYNC && normalizeCompareText(existingSummaryKoRaw).length >= 170 ? existingSummaryKoRaw : "";
+              !isNoisySummaryText(existingSummaryKoRaw) && normalizeCompareText(existingSummaryKoRaw).length >= 170
+                ? existingSummaryKoRaw
+                : "";
 
             let titleKo = existingTitleKo || (await translateTextToKo(titleBase, "title"));
             let titleStyled = proofreadKoreanHeadlineText(stylizeKoreanHeadlineText(titleKo || titleBase));
@@ -8586,6 +8303,9 @@
             let summaryStyled = summaryBase
               ? proofreadKoreanSummaryText(stylizeKoreanSummaryText(summaryKo || summaryBase, titleStyled || titleKo || titleBase))
               : "";
+            if (summaryStyled) {
+              summaryStyled = sanitizeKoreanCardSummaryText(summaryStyled, titleStyled || titleKo || titleBase) || summaryStyled;
+            }
 
             if (summaryBase && (!summaryStyled || !hasHangul(summaryStyled))) {
               try {
@@ -8598,12 +8318,16 @@
                   summaryKo = forcedSummaryKo;
                   const forcedStyled = stylizeKoreanSummaryText(forcedSummaryKo, titleStyled || titleKo || titleBase);
                   summaryStyled = proofreadKoreanSummaryText(forcedStyled || forcedSummaryKo);
+                  summaryStyled = sanitizeKoreanCardSummaryText(summaryStyled, titleStyled || titleKo || titleBase) || summaryStyled;
                 }
               } catch (_e) {}
             }
 
             it.cardTitleKo = titleStyled && hasHangul(titleStyled) ? titleStyled : proofreadKoreanHeadlineText(stylizeKoreanHeadlineText(titleBase));
-            it.cardSummaryKo = summaryStyled && hasHangul(summaryStyled) ? summaryStyled : I18N.ko.summary_empty;
+            it.cardSummaryKo =
+              summaryStyled && hasHangul(summaryStyled)
+                ? summaryStyled
+                : buildTitleBasedFallbackSummary(it, it.cardTitleKo || titleBase, "ko");
             // Backward-compat fields used by older code paths.
             it.titleKo = it.cardTitleKo;
             it.summaryKo = it.cardSummaryKo;
@@ -8618,12 +8342,8 @@
 
       async function localizeItemsToEnglish(items) {
         if (!Array.isArray(items) || !items.length) return;
-        const queue = items.filter((it) => {
-          const canonical = ensureCanonicalCardText(it);
-          const titleRaw = decodeHtmlEntitiesText(it?.title || canonical.titleEn || "");
-          const summaryRaw = decodeHtmlEntitiesText(it?.summaryText || canonical.summaryEn || "");
-          return /[가-힣]/.test(titleRaw) || /[가-힣]/.test(summaryRaw) || /[가-힣]/.test(canonical.titleEn || "") || /[가-힣]/.test(canonical.summaryEn || "");
-        });
+        // EN 페이지 혼합 언어를 막기 위해 모든 아이템을 영어 기준으로 재검증한다.
+        const queue = items.slice();
         if (!queue.length) return;
 
         let cursor = 0;
@@ -8637,22 +8357,7 @@
             const canonical = ensureCanonicalCardText(it);
             const titleSource = decodeHtmlEntitiesText(it?.title || canonical.titleEn || "");
             const summarySource = decodeHtmlEntitiesText(it?.summaryText || canonical.summaryEn || "");
-            const editorialOverrideKey = getEditorialOverrideKeyForItem(it);
-            const editorialOverride =
-              getEditorialOverrideByKey(editorialOverrideKey) ||
-              resolveEditorialEnglishCardOverride(it, titleSource, summarySource) ||
-              resolveEditorialEnglishCardOverride(it, decodeHtmlEntitiesText(canonical?.titleEn || ""), decodeHtmlEntitiesText(canonical?.summaryEn || ""));
-            if (editorialOverride?.titleEn && editorialOverride?.summaryEn) {
-              const lockedTitle = decodeHtmlEntitiesText(editorialOverride.titleEn).replace(/\s+/g, " ").trim();
-              const lockedSummary = decodeHtmlEntitiesText(editorialOverride.summaryEn).replace(/\s+/g, " ").trim();
-              it.cardTitleEn = proofreadEnglishHeadlineText(lockedTitle) || lockedTitle;
-              it.cardSummaryEn = proofreadEnglishSummaryText(lockedSummary, lockedTitle) || lockedSummary;
-              it.titleEn = it.cardTitleEn;
-              it.summaryEn = it.cardSummaryEn;
-              const localizedCategories = getLocalizedCategories(it, "en");
-              if (localizedCategories.length) it.categoriesEn = localizedCategories;
-              continue;
-            }
+            const isAiTimesItem = String(it?.sourceFeed || "") === "aitimes_industry";
 
             let titleEn = canonical.titleEn || titleSource || "(No title)";
             if (/[가-힣]/.test(titleEn) || /[가-힣]/.test(titleSource)) {
@@ -8676,30 +8381,50 @@
                 : [summarySource, summaryFallback].filter(Boolean).join(" ").trim();
             const summaryBase = summarySeed || canonical.summaryEn || summaryFallback;
             let summaryEn = canonical.summaryEn || summaryBase || I18N.en.summary_empty;
-            if (/[가-힣]/.test(summaryEn) || /[가-힣]/.test(summaryBase)) {
-              summaryEn = (await translateTextToEn(summaryBase || summaryEn, "summary")) || summaryEn;
+            const summaryKoSource = decodeHtmlEntitiesText(it?.cardSummaryKo || it?.summaryKo || "");
+            const summaryTranslateSeed =
+              isAiTimesItem && /[가-힣]/.test(summaryKoSource)
+                ? summaryKoSource
+                : summaryBase || summaryEn;
+            if (/[가-힣]/.test(summaryEn) || /[가-힣]/.test(summaryTranslateSeed)) {
+              summaryEn = (await translateTextToEn(summaryTranslateSeed || summaryEn, "summary")) || summaryEn;
             }
-            if ((/[가-힣]/.test(summaryEn) || !isReliableEnglishText(summaryEn, 18)) && summaryBase) {
+            if ((/[가-힣]/.test(summaryEn) || !isReliableEnglishText(summaryEn, 18)) && summaryTranslateSeed) {
               try {
-                const forced = await translateTextViaPublicGoogle(summaryBase, /[가-힣]/.test(summaryBase) ? "ko" : "auto", "en");
+                const forced = await translateTextViaPublicGoogle(
+                  summaryTranslateSeed,
+                  /[가-힣]/.test(summaryTranslateSeed) ? "ko" : "auto",
+                  "en",
+                );
                 if (isReliableEnglishText(forced, 18)) summaryEn = forced;
               } catch (e) {}
             }
             summaryEn = proofreadEnglishSummaryText(summaryEn || summaryBase, titleEn) || summaryEn || I18N.en.summary_empty;
+            summaryEn =
+              sanitizeEnglishCardSummaryText(summaryEn, it, titleEn) ||
+              sanitizeEnglishCardSummaryText(summaryBase, it, titleEn) ||
+              summaryEn;
             if (!summaryEn || /[가-힣]/.test(summaryEn) || !isReliableEnglishText(summaryEn, 18)) {
               summaryEn = buildEnglishFallbackSummaryFromItem(it, titleEn);
             }
+            summaryEn = sanitizeEnglishCardSummaryText(summaryEn, it, titleEn) || summaryEn;
             if (summaryEn && !isSummaryEmptyText(summaryEn)) {
               summaryEn = ensureLongSummaryEn(it, summaryEn, summaryBase, titleEn, it?.categories || []);
             }
-            // Note: removed isAiTimesItem special-case strictness — if translation produced Korean-free
-            // text with sufficient English letters, keep it regardless of source domain.
-            if (!summaryEn || /[가-힣]/.test(summaryEn)) {
-              summaryEn = I18N.en.summary_empty;
+            summaryEn = sanitizeEnglishCardSummaryText(summaryEn, it, titleEn) || summaryEn;
+
+            if (isGenericEnglishFallbackTitle(titleEn) && isReliableEnglishText(summaryEn, 18)) {
+              titleEn = deriveEnglishTitleFromSummary(summaryEn, titleEn);
             }
-            const repaired = regenerateEnglishCardText(it, canonical, titleEn, summaryEn);
-            titleEn = repaired.titleText || titleEn;
-            summaryEn = repaired.summaryText || summaryEn;
+
+            if (!summaryEn || /[가-힣]/.test(summaryEn) || (isAiTimesItem && !isReliableEnglishText(summaryEn, 18))) {
+              const emergencyEn = sanitizeEnglishCardSummaryText(
+                buildExpandedEnglishSummary(summaryBase || summarySource || "", summaryBase || summarySource || "", titleEn),
+                it,
+                titleEn,
+              );
+              summaryEn = emergencyEn || I18N.en.summary_empty;
+            }
 
             it.cardTitleEn = titleEn;
             it.cardSummaryEn = summaryEn;
@@ -8749,9 +8474,6 @@
       }
 
       function pickBetterDuplicateItem(a, b) {
-        const aIsAiTimes = isAiTimesSource(a);
-        const bIsAiTimes = isAiTimesSource(b);
-        if (aIsAiTimes !== bIsAiTimes) return aIsAiTimes ? a : b;
         const qa = summaryQualityScore(a);
         const qb = summaryQualityScore(b);
         if (qb !== qa) return qb > qa ? b : a;
@@ -8759,57 +8481,6 @@
         const be = getEngagementScore(b);
         if (be !== ae) return be > ae ? b : a;
         return toDateMs(b?.pubDate) > toDateMs(a?.pubDate) ? b : a;
-      }
-
-      function isNearDuplicateTopicForSelection(a, b) {
-        if (!a || !b) return false;
-        return (
-          isNearDuplicateByTitle(a, b) ||
-          isNearDuplicateByContent(a, b) ||
-          contentSimilarity(a, b) >= 0.37 ||
-          titleSimilarity(a, b) >= 0.42
-        );
-      }
-
-      function dedupeWithAiTimesPriority(items, limit = HOT_LIMIT) {
-        const out = [];
-        for (const it of items || []) {
-          if (!it) continue;
-          let hit = -1;
-          for (let i = 0; i < out.length; i++) {
-            if (isNearDuplicateTopicForSelection(it, out[i])) {
-              hit = i;
-              break;
-            }
-          }
-          if (hit === -1) {
-            out.push(it);
-            continue;
-          }
-          out[hit] = pickBetterDuplicateItem(out[hit], it);
-        }
-        return out.slice(0, limit);
-      }
-
-      function dedupeByEditorialKeyPreserveOrder(items) {
-        const out = [];
-        const keyToIndex = new Map();
-        for (const it of items || []) {
-          if (!it) continue;
-          const ovKey = getEditorialOverrideKeyForItem(it);
-          if (!ovKey) {
-            out.push(it);
-            continue;
-          }
-          if (!keyToIndex.has(ovKey)) {
-            keyToIndex.set(ovKey, out.length);
-            out.push(it);
-            continue;
-          }
-          const idx = keyToIndex.get(ovKey);
-          out[idx] = pickBetterDuplicateItem(out[idx], it);
-        }
-        return out;
       }
 
       function dedupeByGuidOrLink(items) {
@@ -8888,26 +8559,26 @@
           const avProductPriority =
             (isProductTechNews(a) ? 220 : -120) +
             (hasProductDetailCard(a, true) ? 140 : 0) +
-            (isLaunchUpdatePriorityItem(a, false) ? 220 : 0);
+            (isLaunchUpdatePriorityItem(a, false) ? 90 : 0);
           const bvProductPriority =
             (isProductTechNews(b) ? 220 : -120) +
             (hasProductDetailCard(b, true) ? 140 : 0) +
-            (isLaunchUpdatePriorityItem(b, false) ? 220 : 0);
+            (isLaunchUpdatePriorityItem(b, false) ? 90 : 0);
           const avTotal =
-            avLaunch * 4.5 +
+            avLaunch * 2.9 +
             avTech * 2.45 +
             avSummary * 0.92 +
-            avIssue * 0.25 +
-            avEng * 0.15 +
+            avIssue * 0.52 +
+            avEng * 0.34 +
             avProductPriority +
             avSourcePriorityBoost -
             avLowSignal * 1.3;
           const bvTotal =
-            bvLaunch * 4.5 +
+            bvLaunch * 2.9 +
             bvTech * 2.45 +
             bvSummary * 0.92 +
-            bvIssue * 0.25 +
-            bvEng * 0.15 +
+            bvIssue * 0.52 +
+            bvEng * 0.34 +
             bvProductPriority +
             bvSourcePriorityBoost -
             bvLowSignal * 1.3;
@@ -8940,24 +8611,12 @@
         );
         const deduped = dedupeItems(withoutPromo);
         const { sorted, sortBasis } = sortHotItems(deduped);
-        const cap = Math.max(HOT_LIMIT, Number(selectionLimit) || HOT_LIMIT);
-
-        // Tier-1: 제목에 출시·업데이트·협업 신호 + 기술/제품 후보
-        const launchEligible = sorted
-          .filter((it) => isSourcePriorityCandidate(it, false) && isLaunchFocusedItem(it))
-          .sort(compareItemsBySourceOrder);
-        // Tier-2: 출시 신호 없어도 기술/제품 후보 (fallback)
         const eligible = sorted.filter((it) => isSourcePriorityCandidate(it, false)).sort(compareItemsBySourceOrder);
         const relaxedEligible = sorted.filter((it) => isSourcePriorityCandidate(it, true)).sort(compareItemsBySourceOrder);
-
-        // 우선 Tier-1 (출시·업데이트·협업 기사)로 채우기
-        const launchPreferred = launchEligible.filter((it) => isGoodSummaryItem(it));
-        const picked = launchPreferred.slice(0, cap);
-        let selected = fillHotItems(picked, launchEligible, cap);
-        // 부족하면 일반 tech/product 기사로 보충
-        if (selected.length < cap) {
-          selected = fillHotItems(selected, eligible, cap);
-        }
+        const preferred = eligible.filter((it) => isGoodSummaryItem(it)).sort(compareItemsBySourceOrder);
+        const cap = Math.max(HOT_LIMIT, Number(selectionLimit) || HOT_LIMIT);
+        const picked = preferred.slice(0, cap);
+        let selected = fillHotItems(picked, eligible, cap);
         if (selected.length < cap) {
           const relaxedPool = dedupeItems([...eligible, ...relaxedEligible]);
           selected = fillHotItems(selected, relaxedPool, cap, { allowRelaxedSummary: true });
@@ -8980,29 +8639,32 @@
         const endExclusiveMs = Date.UTC(endDate.getUTCFullYear(), endDate.getUTCMonth(), endDate.getUTCDate() + 1);
         const startMs = endExclusiveMs - HOT_WINDOW_DAYS * 24 * 60 * 60 * 1000;
         const cap = Math.max(HOT_LIMIT, Number(selectionLimit) || 0, Number(AITIMES_MIN_CARDS) || 0, 15);
-        const baseClean = (it) => !!String(it?.title || "").trim() && !isNewsDigestCard(it) && !isKoreanDomesticArticle(it);
-        const launchSort = (a, b) => {
-          // 출시·업데이트·협업 신호 기사 우선
-          const aLaunch = isLaunchFocusedItem(a) ? 1 : 0;
-          const bLaunch = isLaunchFocusedItem(b) ? 1 : 0;
-          if (bLaunch !== aLaunch) return bLaunch - aLaunch;
-          const scoreDelta = getLaunchPriorityScore(b) - getLaunchPriorityScore(a);
-          if (scoreDelta !== 0) return scoreDelta;
-          return toDateMs(b?.pubDate || "") - toDateMs(a?.pubDate || "");
-        };
-        const dedupedItems = dedupeByGuidOrLink((items || []).filter(baseClean));
+        const dedupedItems = dedupeByGuidOrLink((items || []).filter((it) => !isNewsDigestCard(it)));
         const weeklyItems = dedupeByGuidOrLink(
           (items || []).filter((it) => {
             const ms = toDateMs(it?.pubDate || "");
-            return ms >= startMs && ms < endExclusiveMs && baseClean(it);
+            return ms >= startMs && ms < endExclusiveMs && !!String(it?.title || "").trim() && !isNewsDigestCard(it);
           }),
-        ).sort(launchSort);
+        ).sort((a, b) => {
+          const dateDelta = toDateMs(b?.pubDate || "") - toDateMs(a?.pubDate || "");
+          if (dateDelta !== 0) return dateDelta;
+          const launchDelta = getLaunchPriorityScore(b) - getLaunchPriorityScore(a);
+          if (launchDelta !== 0) return launchDelta;
+          return getEngagementScore(b) - getEngagementScore(a);
+        });
         let selected = weeklyItems.slice(0, cap);
         if (selected.length < cap) {
           const selectedKeySet = new Set(selected.map((it) => getItemIdentityKey(it)));
           const fallbackItems = dedupedItems
+            .filter((it) => !!String(it?.title || "").trim())
             .filter((it) => !selectedKeySet.has(getItemIdentityKey(it)))
-            .sort(launchSort);
+            .sort((a, b) => {
+              const dateDelta = toDateMs(b?.pubDate || "") - toDateMs(a?.pubDate || "");
+              if (dateDelta !== 0) return dateDelta;
+              const launchDelta = getLaunchPriorityScore(b) - getLaunchPriorityScore(a);
+              if (launchDelta !== 0) return launchDelta;
+              return getEngagementScore(b) - getEngagementScore(a);
+            });
           if (fallbackItems.length) {
             selected = selected.concat(fallbackItems.slice(0, cap - selected.length));
           }
@@ -9696,7 +9358,7 @@
             sourceFeedTitle,
           }));
           if (feedKey === "aitimes_industry") {
-            await prefetchArticleBodiesForSourceItems(sourceItems, "aitimes_industry", 24);
+            await prefetchArticleBodiesForSourceItems(sourceItems, "aitimes_industry", 80);
             const aiTimesBundle = buildAiTimesWeeklyBundle(sourceItems, endDateStr, HOT_LIMIT);
             return {
               meta: lastFeedMeta?.title ? lastFeedMeta : { title: feed.label || feedKey, link: feed.url, updated: "" },
@@ -9808,7 +9470,7 @@
               sourceFeedTitle: feed.label || feedKey,
             }));
             if (feedKey === "aitimes_industry") {
-              await prefetchArticleBodiesForSourceItems(parsedItems, "aitimes_industry", 24);
+              await prefetchArticleBodiesForSourceItems(parsedItems, "aitimes_industry", 80);
               const aiTimesBundle = buildAiTimesWeeklyBundle(parsedItems, endDateStr, HOT_LIMIT);
               return {
                 meta: lastFeedMeta?.title ? lastFeedMeta : { title: feed.label || feedKey, link: feed.url, updated: "" },
@@ -9829,7 +9491,7 @@
             };
           }
           if (feedKey === "aitimes_industry") {
-            await prefetchArticleBodiesForSourceItems(sourceItems, "aitimes_industry", 24);
+            await prefetchArticleBodiesForSourceItems(sourceItems, "aitimes_industry", 80);
             const aiTimesBundle = buildAiTimesWeeklyBundle(sourceItems, endDateStr, HOT_LIMIT);
             return {
               meta: latest.meta || {},
@@ -9860,7 +9522,7 @@
             sourceFeedTitle: feed.label || feedKey,
           }));
           if (feedKey === "aitimes_industry") {
-            await prefetchArticleBodiesForSourceItems(sourceItems, "aitimes_industry", 24);
+            await prefetchArticleBodiesForSourceItems(sourceItems, "aitimes_industry", 80);
             const aiTimesBundle = buildAiTimesWeeklyBundle(sourceItems, endDateStr, HOT_LIMIT);
             return {
               meta: lastFeedMeta?.title ? lastFeedMeta : { title: feed.label || feedKey, link: feed.url, updated: "" },
@@ -9955,7 +9617,7 @@
             if (aiTimesFeed?.url) {
               try {
                 const aiTimesItems = await fetchSourceItemsWithParser(aiTimesFeed);
-                await prefetchArticleBodiesForSourceItems(aiTimesItems, "aitimes_industry", 24);
+                await prefetchArticleBodiesForSourceItems(aiTimesItems, "aitimes_industry", 80);
                 const aiTimesTitle = lastFeedMeta?.title || aiTimesFeed.label;
                 aiTimesItems.forEach((it) => {
                   mergedItems.push({ ...it, sourceFeed: "aitimes_industry", sourceFeedTitle: aiTimesTitle });
@@ -10274,6 +9936,14 @@
           if (elQ) elQ.value = "";
         }
 
+        const endDateForRender = parseDateInputToUtc((elDatePick?.value || "").trim());
+        const renderEndExclusiveMs = Date.UTC(
+          endDateForRender.getUTCFullYear(),
+          endDateForRender.getUTCMonth(),
+          endDateForRender.getUTCDate() + 1,
+        );
+        const renderStartMs = renderEndExclusiveMs - HOT_WINDOW_DAYS * 24 * 60 * 60 * 1000;
+
         const useCuratedAllItems = selectedCategoryKey === "all_ai" && !q;
         if (useCuratedAllItems) {
           const curatedPool = dedupeByGuidOrLink(Array.isArray(items) ? items : []);
@@ -10282,14 +9952,6 @@
             filtered = topUpItemsByIdentity(filtered, curatedPool, HOT_LIMIT);
           }
         } else {
-          const endDateForRender = parseDateInputToUtc((elDatePick?.value || "").trim());
-          const renderEndExclusiveMs = Date.UTC(
-            endDateForRender.getUTCFullYear(),
-            endDateForRender.getUTCMonth(),
-            endDateForRender.getUTCDate() + 1,
-          );
-          const renderStartMs = renderEndExclusiveMs - HOT_WINDOW_DAYS * 24 * 60 * 60 * 1000;
-
           const strictFiltered = filtered.filter((it) => {
             const ms = toDateMs(it?.pubDate || "");
             const inWindow = ms >= renderStartMs && ms < renderEndExclusiveMs;
@@ -10338,14 +10000,11 @@
           }
         }
 
-        // Keep card membership stable across language toggle.
+        // Keep base card selection identical across languages.
         const isQualityRenderable = (it) => !shouldSkipCardByAiSummary(it, provider, "en");
         const launchSortScore = (it) => {
-          // isLaunchFocusedItem: 제목에 출시·업데이트·협업 키워드 있으면 최우선
-          const focusedBoost = isLaunchFocusedItem(it) ? 2400 : 0;
           const launchBoost = isLaunchUpdatePriorityItem(it, false) ? 1200 : 0;
           return (
-            focusedBoost +
             launchBoost +
             getLaunchPriorityScore(it) * 4 +
             getProductTechBoost(it) * 2 +
@@ -10373,35 +10032,42 @@
           // Emergency refill: keep cards visible even when quality filter is too strict.
           filtered = topUpItemsByIdentity(filtered, refillPool, HOT_LIMIT);
         }
-        const absolutePool = [
-          ...(Array.isArray(items) ? items : []),
-          ...(Array.isArray(lastAiTimesBackfillItems) ? lastAiTimesBackfillItems : []),
-          ...(Array.isArray(lastAiTimesCandidateItems) ? lastAiTimesCandidateItems : []),
-          ...(Array.isArray(lastAiTimesEmergencyItems) ? lastAiTimesEmergencyItems : []),
-        ];
-        const finalPool = dedupeByGuidOrLink([...(filtered || []), ...absolutePool]).sort(compareLaunchFirst);
-        filtered = dedupeWithAiTimesPriority(finalPool, HOT_LIMIT);
-        let renderPool = dedupeByGuidOrLink([...(Array.isArray(filtered) ? filtered : []), ...finalPool]).sort(compareLaunchFirst);
-        renderPool = dedupeByEditorialKeyPreserveOrder(renderPool);
-        renderPool = dedupeWithAiTimesPriority(renderPool, Math.max(HOT_LIMIT * 4, renderPool.length || HOT_LIMIT));
+        filtered = dedupeByGuidOrLink(filtered).sort(compareLaunchFirst).slice(0, HOT_LIMIT);
 
         elGrid.classList.add("hotList");
-        if (!renderPool.length) {
+        if (!filtered.length) {
           updateAiNetworkStatus([]);
           updateFooterSources([]);
           elGrid.innerHTML = `<div class="note">${t("no_items")}</div>`;
           return;
         }
 
-        log("render-hot", { total: renderPool.length });
+        log("render-hot", { total: filtered.length });
+
+        const renderTopupCandidates = dedupeByGuidOrLink(
+          [
+            ...filtered,
+            ...refillPool,
+            ...((items || [])
+              .filter((it) => {
+                const ms = toDateMs(it?.pubDate || "");
+                const inWindow = ms >= renderStartMs && ms < renderEndExclusiveMs;
+                if (!inWindow || isBlockedCardSourceKey(it?.sourceFeed || "")) return false;
+                if (isPromotionalSelfPost(it) || isSubjectiveStyleStory(it)) return false;
+                return true;
+              })
+              .sort(compareLaunchFirst)),
+          ],
+        )
+          .sort(compareLaunchFirst)
+          .slice(0, HOT_LIMIT * 10);
 
         const cardHtml = [];
         const renderItems = [];
-        const exclusionReasons = [];
-        const bgAssignments = buildFallbackCardBgAssignments(renderPool);
-        for (let idx = 0; idx < renderPool.length; idx++) {
+        const bgAssignments = buildFallbackCardBgAssignments(renderTopupCandidates);
+        for (let idx = 0; idx < renderTopupCandidates.length; idx++) {
           if (cardHtml.length >= HOT_LIMIT) break;
-          const it = renderPool[idx];
+          const it = renderTopupCandidates[idx];
           const canonical = ensureCanonicalCardText(it);
           let titleText =
             currentLang === "ko"
@@ -10414,51 +10080,42 @@
             if (!titleText || /[가-힣]/.test(titleText)) {
               titleText = buildEnglishFallbackTitleFromItem(it);
             }
-            if (isGenericEnglishFallbackTitle(titleText) && canonical.titleEn && !isGenericEnglishFallbackTitle(canonical.titleEn)) {
-              titleText = decodeHtmlEntitiesText(canonical.titleEn);
-            }
           }
-          // Initial summary: always use the language-appropriate source.
-          // In BILINGUAL_CONTENT_SYNC mode, cardSummaryKo is a Korean translation of canonical English
-          // (set by synchronizeBilingualCardTexts). The Groq AI Korean translation overrides later.
           let summaryText =
             currentLang === "ko"
               ? decodeHtmlEntitiesText(it.cardSummaryKo || it.summaryKo || "")
               : decodeHtmlEntitiesText(canonical.summaryEn);
+          if (isNoisySummaryText(summaryText)) summaryText = "";
           if (!summaryText) summaryText = t("summary_empty");
           if (isSummaryEmptyText(summaryText)) {
             if (currentLang === "en") {
-              // For English mode: never use Korean source text as fallback — it produces Korean sentences in English cards.
-              const isKoreanSource = /[가-힣]/.test(it.summaryText || "");
-              const fallbackFromRaw = isKoreanSource ? "" : buildEmergencySummaryText(it.summaryText || "", canonical.titleEn || it.title || "");
+              const fallbackFromRaw = buildEmergencySummaryText(it.summaryText || "", canonical.titleEn || it.title || "");
               const fallbackFromEn = isSummaryEmptyText(canonical.summaryEn) ? "" : decodeHtmlEntitiesText(canonical.summaryEn || "");
               summaryText = fallbackFromRaw || fallbackFromEn || "";
             } else {
+              const fallbackFromKoRawRaw = decodeHtmlEntitiesText(it.cardSummaryKo || it.summaryKo || "");
+              const fallbackFromKoRaw = isNoisySummaryText(fallbackFromKoRawRaw) ? "" : fallbackFromKoRawRaw;
               const fallbackFromRaw = buildEmergencySummaryText(it.summaryText || "", canonical.titleEn || it.title || "");
-              summaryText = fallbackFromRaw || "";
+              summaryText = fallbackFromKoRaw || fallbackFromRaw || "";
             }
           }
           if (currentLang === "en" && summaryText && !isSummaryEmptyText(summaryText)) {
             summaryText = proofreadEnglishSummaryText(summaryText, titleText) || summaryText;
+            summaryText = sanitizeEnglishCardSummaryText(summaryText, it, titleText) || summaryText;
             if (/[가-힣]/.test(summaryText)) {
               summaryText = buildEnglishFallbackSummaryFromItem(it, titleText);
-            }
-            if (isKeywordFallbackSummary(summaryText)) {
-              summaryText = "";
             }
           }
           if (currentLang === "ko" && summaryText && /[가-힣]/.test(summaryText) && !isSummaryEmptyText(summaryText)) {
             summaryText = proofreadKoreanSummaryText(summaryText) || summaryText;
+            summaryText = sanitizeKoreanCardSummaryText(summaryText, titleText) || summaryText;
           }
           const articleLeadSummary = buildArticleLeadSummaryText(it.__articleBodyText || "", titleText, currentLang);
           if ((!summaryText || isSummaryEmptyText(summaryText) || isSummaryTooShortForCard(summaryText, currentLang)) && articleLeadSummary) {
             summaryText = articleLeadSummary;
           }
           if (!summaryText || isSummaryEmptyText(summaryText)) {
-            // For English mode: don't use Korean source text as emergency fallback — it would show Korean in English cards.
-            const isKoreanSrc = currentLang === "en" && /[가-힣]/.test(it.summaryText || "");
-            const emergencyRawText = isKoreanSrc ? "" : (it.summaryText || "");
-            const emergencySummary = emergencyRawText ? buildEmergencySummaryText(emergencyRawText, canonical.titleEn || it.title || titleText || "") : "";
+            const emergencySummary = buildEmergencySummaryText(it.summaryText || "", canonical.titleEn || it.title || titleText || "");
             if (emergencySummary && !isSummaryEmptyText(emergencySummary)) {
               summaryText =
                 currentLang === "ko"
@@ -10467,21 +10124,24 @@
             }
           }
           if (!summaryText || isSummaryEmptyText(summaryText)) {
-            summaryText = ""; // No link-reference fallback — leave blank rather than mislead
+            summaryText = buildTitleBasedFallbackSummary(it, titleText, currentLang);
           }
           const generatedSummary = getAiCardText(it, "__aiSummary", currentAiProvider, currentLang);
           const generatedQualityScore = getAiSummaryQualityScore(it, provider, lang);
           const fallbackPreferred = shouldPreferFallbackSummary(it, provider, lang);
-          const useGeneratedSummary = !fallbackPreferred && (!Number.isFinite(generatedQualityScore) || generatedQualityScore >= 60);
+          const isAiTimesSource = String(it?.sourceFeed || "").trim() === "aitimes_industry";
+          const useGeneratedSummary =
+            (isAiTimesSource && !!generatedSummary) ||
+            (!fallbackPreferred && (!Number.isFinite(generatedQualityScore) || generatedQualityScore >= 60));
           if (generatedSummary && useGeneratedSummary) {
-            const generatedHasHangul = /[가-힣]/.test(generatedSummary);
+            const cleanedGeneratedSummary = stripSummaryNoiseText(generatedSummary);
+            const candidateGeneratedSummary = cleanedGeneratedSummary || "";
+            const generatedHasHangul = /[가-힣]/.test(candidateGeneratedSummary);
             const generatedLooksEnglish =
-              !generatedHasHangul &&
-              isReliableEnglishText(generatedSummary, 18) &&
-              !isSummaryTooShortForCard(generatedSummary, "en") &&
-              !isKeywordFallbackSummary(generatedSummary);
-            const generatedLooksKorean = generatedHasHangul && isReliableKoreanText(generatedSummary, 10) && !isSummaryTooShortForCard(generatedSummary, "ko");
+              !generatedHasHangul && isReliableEnglishText(candidateGeneratedSummary, 18) && !isSummaryTooShortForCard(candidateGeneratedSummary, "en");
+            const generatedLooksKorean = generatedHasHangul && isReliableKoreanText(candidateGeneratedSummary, 10) && !isSummaryTooShortForCard(candidateGeneratedSummary, "ko");
             if (
+              !candidateGeneratedSummary ||
               (currentLang === "ko" && !generatedLooksKorean) ||
               (currentLang === "en" && !generatedLooksEnglish)
             ) {
@@ -10494,85 +10154,206 @@
                 currentLang,
               );
             } else {
-              summaryText = generatedSummary;
+              summaryText = candidateGeneratedSummary;
             }
           }
+          if (currentLang === "en") {
+            summaryText = sanitizeEnglishCardSummaryText(summaryText, it, titleText) || summaryText;
+          }
           if (currentLang === "ko" && summaryText && !isSummaryEmptyText(summaryText) && !/[가-힣]/.test(summaryText)) {
-            if (!BILINGUAL_CONTENT_SYNC) {
-              // Non-sync mode: try to find a Korean version from the raw feed
-              const koRaw = decodeHtmlEntitiesText(it.cardSummaryKo || it.summaryKo || "").trim();
-              if (koRaw && /[가-힣]/.test(koRaw)) {
-                summaryText = proofreadKoreanSummaryText(koRaw) || koRaw;
+            const koRaw = decodeHtmlEntitiesText(it.cardSummaryKo || it.summaryKo || "").trim();
+            if (koRaw && /[가-힣]/.test(koRaw) && !isNoisySummaryText(koRaw)) {
+              summaryText = proofreadKoreanSummaryText(koRaw) || koRaw;
+            } else {
+              const emergencyRaw = buildEmergencySummaryText(it.summaryText || "", canonical.titleEn || it.title || titleText || "");
+              const emergencyKo = proofreadKoreanSummaryText(stylizeKoreanSummaryText(emergencyRaw, titleText) || emergencyRaw) || emergencyRaw;
+              if (emergencyKo && /[가-힣]/.test(emergencyKo)) {
+                summaryText = emergencyKo;
               } else {
-                const emergencyRaw = buildEmergencySummaryText(it.summaryText || "", canonical.titleEn || it.title || titleText || "");
-                const emergencyKo = proofreadKoreanSummaryText(stylizeKoreanSummaryText(emergencyRaw, titleText) || emergencyRaw) || emergencyRaw;
-                if (emergencyKo && /[가-힣]/.test(emergencyKo)) {
-                  summaryText = emergencyKo;
-                }
-                // No "원문 링크" fallback — leave summaryText as English rather than show a bad placeholder
+                summaryText = "";
               }
             }
-            // BILINGUAL_CONTENT_SYNC=true: keep English AI content as-is.
-            // It is the authoritative summary; Korean translation will override on next render cycle.
           }
           if (!BILINGUAL_CONTENT_SYNC && currentLang === "ko" && isSummaryTooShortForCard(summaryText, "ko")) {
             const expandedKo = expandKoreanCardSummary(it, titleText, summaryText);
             if (expandedKo) summaryText = expandedKo;
-          }
-          if (!BILINGUAL_CONTENT_SYNC && currentLang === "ko" && isSummaryTooShortForCard(summaryText, "ko")) {
-            const paddedKo = `${decodeHtmlEntitiesText(summaryText || "").replace(/\s+/g, " ").trim().replace(/[.!?]+$/g, ".")} 세부 기능 및 적용 범위에 관한 업데이트입니다.`;
-            summaryText = proofreadKoreanSummaryText(paddedKo) || paddedKo;
           }
           summaryText = ensureCardSummaryDisplayLines(summaryText, it, currentLang, titleText);
           summaryText =
             currentLang === "ko"
               ? proofreadKoreanSummaryText(summaryText) || summaryText
               : proofreadEnglishSummaryText(summaryText, titleText) || summaryText;
-          if (currentLang === "en" && isKeywordFallbackSummary(summaryText)) {
-            const repairedSummary =
-              buildArticleLeadSummaryText(it.__articleBodyText || "", titleText, "en") ||
-              decodeHtmlEntitiesText(canonical.summaryEn || "");
-            if (repairedSummary && !isKeywordFallbackSummary(repairedSummary)) {
-              summaryText = proofreadEnglishSummaryText(repairedSummary, titleText) || repairedSummary;
-            }
+          if (currentLang === "ko") {
+            summaryText = sanitizeKoreanCardSummaryText(summaryText, titleText) || summaryText;
           }
-          const editorialOverrideKey = getEditorialOverrideKeyForItem(it);
-          const editorialOverride = getEditorialOverrideByKey(editorialOverrideKey) || resolveEditorialEnglishCardOverride(it, titleText, summaryText);
-          if (editorialOverride) {
-            if (currentLang === "ko") {
-              titleText = decodeHtmlEntitiesText(editorialOverride.titleKo || titleText);
-              summaryText = decodeHtmlEntitiesText(editorialOverride.summaryKo || summaryText);
-            } else {
-              titleText = decodeHtmlEntitiesText(editorialOverride.titleEn || titleText);
-              summaryText = decodeHtmlEntitiesText(editorialOverride.summaryEn || summaryText);
-            }
-          }
+          summaryText = compactCardSummaryForDisplay(summaryText, titleText, currentLang);
           if (currentLang === "en") {
-            const repaired = regenerateEnglishCardText(it, canonical, titleText, summaryText);
-            titleText = repaired.titleText;
-            summaryText = repaired.summaryText;
-            const issue = repaired.issue;
-            if (issue) {
-              const fallbackTitle =
-                proofreadEnglishHeadlineText(buildHeadlineText(it?.title || "", it?.summaryText || "")) ||
-                buildEnglishFallbackTitleFromItem(it) ||
-                decodeHtmlEntitiesText(canonical.titleEn || "") ||
-                "AI update";
-              const fallbackSummary =
-                proofreadEnglishSummaryText(
-                  buildArticleLeadSummaryText(it?.__articleBodyText || it?.summaryText || "", fallbackTitle, "en") ||
-                    buildEnglishFallbackSummaryFromItem(it, fallbackTitle) ||
-                    decodeHtmlEntitiesText(canonical.summaryEn || "") ||
-                    "",
-                  fallbackTitle,
-                ) ||
-                decodeHtmlEntitiesText(canonical.summaryEn || "") ||
-                "No summary available.";
-              titleText = decodeHtmlEntitiesText(fallbackTitle).replace(/\s+/g, " ").trim();
-              summaryText = decodeHtmlEntitiesText(fallbackSummary).replace(/\s+/g, " ").trim();
-              const label = decodeHtmlEntitiesText(titleText || it?.title || it?.link || "item").slice(0, 100);
-              exclusionReasons.push(`review-fixed (${issue}): ${label}`);
+            const fromArticle = sanitizeEnglishCardSummaryText(
+              buildArticleLeadSummaryText(it.__articleBodyText || "", titleText, "en"),
+              it,
+              titleText,
+            );
+            const fromRaw = sanitizeEnglishCardSummaryText(
+              buildEmergencySummaryText(it.summaryText || "", canonical.titleEn || it.title || titleText || ""),
+              it,
+              titleText,
+            );
+            summaryText = sanitizeEnglishCardSummaryText(summaryText, it, titleText) || fromArticle || fromRaw || "";
+            if (!summaryText) {
+              summaryText = buildEnglishFallbackSummaryFromItem(it, titleText);
             }
+          }
+          if (currentLang === "en" && isSummaryTooShortForCard(summaryText, "en")) {
+            const rebuiltCandidates = [
+              sanitizeEnglishCardSummaryText(
+                ensureLongSummaryEn(
+                  it,
+                  decodeHtmlEntitiesText(summaryText || ""),
+                  decodeHtmlEntitiesText(it.__articleBodyText || it.summaryText || ""),
+                  titleText,
+                  it?.categories || [],
+                ),
+                it,
+                titleText,
+              ),
+              sanitizeEnglishCardSummaryText(
+                buildArticleLeadSummaryText(it.__articleBodyText || it.summaryText || "", titleText, "en"),
+                it,
+                titleText,
+              ),
+              sanitizeEnglishCardSummaryText(buildEnglishFallbackSummaryFromItem(it, titleText), it, titleText),
+              sanitizeEnglishCardSummaryText(
+                buildExpandedEnglishSummary(
+                  decodeHtmlEntitiesText(it.summaryText || ""),
+                  decodeHtmlEntitiesText(it.__articleBodyText || it.summaryText || ""),
+                  titleText,
+                ),
+                it,
+                titleText,
+              ),
+            ].filter((candidate) => candidate && !isSummaryTooShortForCard(candidate, "en"));
+            if (!rebuiltCandidates.length) {
+              const emergencyCandidate = sanitizeEnglishCardSummaryText(
+                buildTitleBasedFallbackSummary(it, titleText, "en"),
+                it,
+                titleText,
+              );
+              summaryText = emergencyCandidate || buildTitleBasedFallbackSummary(it, titleText, "en");
+            } else {
+              summaryText = rebuiltCandidates[0];
+            }
+          }
+          if (isNoisySummaryText(summaryText)) {
+            summaryText = buildTitleBasedFallbackSummary(it, titleText, currentLang);
+          }
+          if (shouldSkipCardForWeakSummary(summaryText, currentLang)) {
+            if (currentLang === "en") {
+              const candidates = [
+                sanitizeEnglishCardSummaryText(
+                  decodeHtmlEntitiesText(it.cardSummaryEn || canonical.summaryEn || it.summaryEn || ""),
+                  it,
+                  titleText,
+                ),
+                sanitizeEnglishCardSummaryText(
+                  buildArticleLeadSummaryText(it.__articleBodyText || it.summaryText || "", titleText, "en"),
+                  it,
+                  titleText,
+                ),
+                sanitizeEnglishCardSummaryText(buildEnglishFallbackSummaryFromItem(it, titleText), it, titleText),
+                sanitizeEnglishCardSummaryText(
+                  buildExpandedEnglishSummary(
+                    decodeHtmlEntitiesText(it.summaryText || ""),
+                    decodeHtmlEntitiesText(it.__articleBodyText || it.summaryText || ""),
+                    titleText,
+                  ),
+                  it,
+                  titleText,
+                ),
+              ].filter((candidate) => candidate && !isSummaryTooShortForCard(candidate, "en"));
+              summaryText = candidates[0] || "";
+            } else {
+              const candidates = [
+                sanitizeKoreanCardSummaryText(
+                  decodeHtmlEntitiesText(it.cardSummaryKo || it.summaryKo || ""),
+                  titleText,
+                ),
+                sanitizeKoreanCardSummaryText(
+                  buildArticleLeadSummaryText(it.__articleBodyText || it.summaryText || "", titleText, "ko"),
+                  titleText,
+                ),
+                sanitizeKoreanCardSummaryText(buildTitleBasedFallbackSummary(it, titleText, "ko"), titleText),
+              ].filter(Boolean);
+              summaryText = candidates[0] || "";
+            }
+          }
+          if (shouldSkipCardForWeakSummary(summaryText, currentLang)) {
+            if (currentLang === "en") {
+              const hardFallback = sanitizeEnglishCardSummaryText(
+                ensureLongSummaryEn(
+                  it,
+                  buildTitleBasedFallbackSummary(it, titleText, "en"),
+                  decodeHtmlEntitiesText(it.__articleBodyText || it.summaryText || ""),
+                  titleText,
+                  it?.categories || [],
+                ),
+                it,
+                titleText,
+              );
+              summaryText = hardFallback || buildTitleBasedFallbackSummary(it, titleText, "en");
+            } else {
+              const hardFallbackKo = sanitizeKoreanCardSummaryText(
+                buildTitleBasedFallbackSummary(it, titleText, "ko"),
+                titleText,
+              );
+              summaryText = hardFallbackKo || buildTitleBasedFallbackSummary(it, titleText, "ko");
+            }
+          }
+          if (shouldSkipCardForWeakSummary(summaryText, currentLang)) {
+            if (currentLang === "en") {
+              if (!isReliableEnglishText(titleText, 3) || /[가-힣]/.test(titleText)) {
+                titleText = buildEnglishFallbackTitleFromItem(it);
+              }
+              const rebuilt = sanitizeEnglishCardSummaryText(
+                buildEnglishFallbackSummaryFromItem(it, titleText),
+                it,
+                titleText,
+              );
+              summaryText =
+                (rebuilt && !isSummaryTooShortForCard(rebuilt, "en") ? rebuilt : "") ||
+                buildMinimalEnglishSummaryFromTitle(titleText);
+            } else {
+              summaryText =
+                sanitizeKoreanCardSummaryText(buildTitleBasedFallbackSummary(it, titleText, "ko"), titleText) ||
+                buildTitleBasedFallbackSummary(it, titleText, "ko");
+            }
+          }
+          if (currentLang === "en" && !isStrictEnglishCardText(titleText, summaryText)) {
+            titleText =
+              proofreadEnglishHeadlineText(decodeHtmlEntitiesText(canonical.titleEn || it.title || "")) ||
+              buildEnglishFallbackTitleFromItem(it);
+            const repairedSummary = buildEnglishFallbackSummaryFromItem(it, titleText);
+            summaryText = proofreadEnglishSummaryText(repairedSummary, titleText) || repairedSummary;
+            summaryText =
+              sanitizeEnglishCardSummaryText(summaryText, it, titleText) ||
+              summaryText;
+          }
+          if (currentLang === "en" && !isStrictEnglishCardText(titleText, summaryText)) {
+            const repaired = sanitizeEnglishCardSummaryText(buildEnglishFallbackSummaryFromItem(it, titleText), it, titleText);
+            summaryText =
+              (repaired && !isSummaryTooShortForCard(repaired, "en") ? repaired : "") ||
+              buildMinimalEnglishSummaryFromTitle(titleText);
+          }
+          if (!summaryText || isSummaryEmptyText(summaryText)) {
+            summaryText =
+              currentLang === "ko"
+                ? buildMinimalKoreanSummaryFromTitle(titleText)
+                : buildMinimalEnglishSummaryFromTitle(titleText);
+          }
+          if (currentLang === "ko" && !/[가-힣]/.test(summaryText)) {
+            summaryText = buildMinimalKoreanSummaryFromTitle(titleText);
+          }
+          if (currentLang === "en" && (/[가-힣]/.test(summaryText) || isSummaryTooShortForCard(summaryText, "en"))) {
+            summaryText = buildMinimalEnglishSummaryFromTitle(titleText);
           }
           const creatorText = getLocalizedCreatorText(it, currentLang);
           const date = it.pubDate ? new Date(it.pubDate) : null;
@@ -10585,7 +10366,7 @@
           const sourceMarkup = it.link
             ? `<a class="hotSourceLink" href="${escapeHtml(it.link)}" target="_blank" rel="noopener noreferrer">${escapeHtml(sourceText)}</a>`
             : `<span class="hotSourceText">${escapeHtml(sourceText)}</span>`;
-          const topicLabel = editorialOverride?.topicLabel || getCardTopicLabel(it, titleText, summaryText);
+          const topicLabel = getCardTopicLabel(it);
           let devInsightText = "";
           if (DEV_INSIGHT_ENABLED) {
             const aiInsightText = getAiCardText(it, "__aiInsight", currentAiProvider, currentLang);
@@ -10633,7 +10414,7 @@
           const bgStyle = `--card-bg:${cardBgLayer};`;
           const cardClass = bgInfo.hasSourceImage ? "hotCard hotCardBg hasImage" : "hotCard hotCardBg noImage";
           cardHtml.push(`
-            <article class="${cardClass}" style="--delay:${idx * 70}ms;${bgStyle}">
+            <article class="${cardClass}" style="--delay:${(cardHtml.length - 1) * 70}ms;${bgStyle}">
               <div class="hotCardOverlay"></div>
               <div class="hotBody">
                 <div class="hotTopline">
@@ -10670,26 +10451,12 @@
         if (!cardHtml.length) {
           updateAiNetworkStatus([]);
           updateFooterSources([]);
-          const reasonHtml =
-            currentLang === "en" && exclusionReasons.length && cardHtml.length < HOT_LIMIT
-              ? `<div class="note">Excluded items: ${escapeHtml(exclusionReasons.slice(0, 8).join(" | "))}</div>`
-              : "";
-          elGrid.innerHTML = `<div class="note">${t("no_items")}</div>${reasonHtml}`;
+          elGrid.innerHTML = `<div class="note">${t("no_items")}</div>`;
           return;
         }
 
         updateAiNetworkStatus(renderItems);
         updateFooterSources(renderItems);
-        const showExclusionNote = currentLang === "en" && exclusionReasons.length && cardHtml.length < HOT_LIMIT;
-        const exclusionHtml = showExclusionNote
-          ? `<div class="note">Excluded ${exclusionReasons.length} item(s): ${escapeHtml(exclusionReasons.slice(0, 6).join(" | "))}</div>`
-          : "";
-        if (showExclusionNote) {
-          setStatus(
-            "warn",
-            `EN render ${cardHtml.length}/${HOT_LIMIT}. Excluded ${exclusionReasons.length}: ${exclusionReasons.slice(0, 3).join(" | ")}`,
-          );
-        }
         elGrid.innerHTML = `
           <div class="hotHeader">
             <div>
@@ -10699,7 +10466,6 @@
             <div class="pill">${cardHtml.length}/${HOT_LIMIT}</div>
           </div>
           <div class="hotScroller">${cardHtml.join("")}</div>
-          ${exclusionHtml}
         `;
 
         preloadAllImagesInOrder(renderItems, 0);
@@ -11253,11 +11019,12 @@
             lastItems.forEach((it) => ensureCanonicalCardText(it));
             await localizeItemsToEnglish(lastItems);
           }
-          if (currentLang === "ko" && lastItems.length) {
-            await localizeItemsToKorean(lastItems);
-          }
           if (lastItems.length) {
-            await synchronizeBilingualCardTexts(lastItems);
+            if (BILINGUAL_CONTENT_SYNC) {
+              await synchronizeBilingualCardTexts(lastItems);
+            } else if (currentLang === "ko") {
+              await localizeItemsToKorean(lastItems);
+            }
           }
           log("load-feed-done", { items: lastItems.length });
           setStatus("ok", t("status_done"), "status_done");
@@ -11290,11 +11057,6 @@
         loadEnTranslateCacheFromStorage();
         loadActiveSourcesFromStorage();
         loadAiProviderFromStorage();
-        // Restore last-used language (default "en"); fall back to "en" for any unrecognised value
-        try {
-          const savedLang = localStorage.getItem("lang");
-          if (savedLang === "ko" || savedLang === "en") currentLang = savedLang;
-        } catch (e) {}
         applyI18n();
         // Options
         elCategory.innerHTML = FEEDS.map((f) => `<option value="${f.key}">${f.label}</option>`).join("");
@@ -11350,17 +11112,13 @@
           setMetaText();
           if (lastItems.length) {
             lastItems.forEach((it) => ensureCanonicalCardText(it));
-          }
-          if (currentLang === "en" && lastItems.length) {
             setStatus("warn", t("status_loading"), "status_loading");
             await localizeItemsToEnglish(lastItems);
-          }
-          if (currentLang === "ko" && lastItems.length) {
-            setStatus("warn", t("status_loading"), "status_loading");
-            await localizeItemsToKorean(lastItems);
-          }
-          if (lastItems.length) {
-            await synchronizeBilingualCardTexts(lastItems);
+            if (BILINGUAL_CONTENT_SYNC) {
+              await synchronizeBilingualCardTexts(lastItems);
+            } else if (currentLang === "ko") {
+              await localizeItemsToKorean(lastItems);
+            }
           }
           setStatus(prevStatus.kind, t(prevStatus.key), prevStatus.key);
           render(lastItems);
@@ -11390,3 +11148,4 @@ init();
     </script>
   </body>
 </html>
+
