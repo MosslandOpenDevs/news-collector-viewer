@@ -40,7 +40,7 @@ function loadEnvFile(filePath) {
       if (!match) return;
       const key = match[1];
       const value = stripEnvWrappingQuotes(match[2]);
-      if (!key || process.env[key]) return;
+      if (!key) return;
       process.env[key] = value;
     });
   } catch (e) {
@@ -119,9 +119,16 @@ const GEMINI_SUMMARY_MODEL = String(process.env.GEMINI_SUMMARY_MODEL || process.
 const GEMINI_API_BASE_URL = String(process.env.GEMINI_API_BASE_URL || "https://generativelanguage.googleapis.com/v1beta/models").trim();
 const GROQ_API_KEY = String(process.env.GROQ_API_KEY || "").trim();
 const GROQ_MODEL = String(process.env.GROQ_MODEL || process.env.GROQ_INSIGHT_MODEL || process.env.GROQ_SUMMARY_MODEL || "").trim();
+const GROQ_SUMMARY_MODEL = String(process.env.GROQ_SUMMARY_MODEL || GROQ_MODEL || "").trim();
+const GROQ_SUMMARY_FALLBACK_MODELS = String(
+  process.env.GROQ_SUMMARY_FALLBACK_MODELS || "llama-3.1-8b-instant,llama-3.3-70b-versatile",
+)
+  .split(",")
+  .map((model) => model.trim())
+  .filter(Boolean);
 const GROQ_API_URL = String(process.env.GROQ_API_URL || "https://api.groq.com/openai/v1/chat/completions").trim();
 const AI_REQUEST_TIMEOUT_MS = Math.max(4000, Number(process.env.AI_REQUEST_TIMEOUT_MS || 20000));
-const CARD_TEXT_SCHEMA_VERSION = "card_text_v1";
+const CARD_TEXT_SCHEMA_VERSION = "card_text_v2_groq_throttle";
 const CARD_TEXT_CACHE_TTL_MS = 1000 * 60 * 20;
 
 const feedCache = new Map();
@@ -510,19 +517,25 @@ function normalizeInsightText(input, lang = "ko") {
 }
 
 function normalizeSummaryText(input, lang = "ko") {
-  const out = decodeHtmlEntities(String(input || ""))
+  let out = decodeHtmlEntities(String(input || ""))
     .replace(/\s+/g, " ")
     .replace(/\s+([,.;!?])/g, "$1")
     .trim();
   if (!out) return "";
+  out = out
+    .replace(/^Here(?:'s| is)\s+(?:a\s+)?(?:rewritten|revised|stronger|concise|card[- ]news|news)?[^:：]{0,120}[:：]\s*/i, "")
+    .replace(/^다음은\s*[^:：]{0,120}[:：]\s*/i, "")
+    .replace(/^(?:요약|Summary|News summary)\s*[:：]\s*/i, "")
+    .replace(/^["']|["']$/g, "")
+    .trim();
+  if (!out) return "";
   if (lang === "ko") {
     return out
-      .replace(/^["']|["']$/g, "")
       .replace(/\s*\n\s*/g, "\n")
       .replace(/\s{2,}/g, " ")
       .trim();
   }
-  return out.replace(/^["']|["']$/g, "").trim();
+  return out.trim();
 }
 
 function countTextSentences(input) {
@@ -737,19 +750,23 @@ function buildInsightPrompts(title, summary, articleBody = "", lang = "ko", stri
 
 function buildSummaryPrompts(title, summary, articleBody = "", lang = "ko", strict = false) {
   const languageName = lang === "ko" ? "Korean" : "English";
-  const bodyExcerpt = normalizeArticleBodyText(articleBody, 3200);
+  const bodyExcerpt = normalizeArticleBodyText(articleBody, 520);
   return {
     systemPrompt:
       strict
-        ? "You rewrite AI news summaries for ranked cards. Write 2 to 3 complete sentences in the requested language. Mention who announced or released what, what changed in the product, model, benchmark, platform, or deployment, and why it matters in practice. Use only the provided title and summary. Do not invent facts. Never answer with fragments."
-        : "You rewrite AI news summaries for ranked cards. Write 2 to 3 complete sentences in the requested language. Cover the company or product, the concrete update or release, and the practical technical or product impact. Use only the provided title and summary. Do not invent facts. Do not answer with fragments.",
+        ? "You rewrite AI news summaries for ranked cards. Output only the finished summary text, with no introduction, label, markdown, bullet, or phrase like 'Here is'. Write 2 to 3 complete sentences in the requested language. If the requested language is English, write natural native newsroom English, not a literal translation. Mention who announced or released what, what changed in the product, model, benchmark, platform, or deployment, and why it matters in practice. Use only the provided title, source summary, and article body excerpt. Do not invent facts. Never answer with fragments."
+        : "You rewrite AI news summaries for ranked cards. Output only the finished summary text, with no introduction, label, markdown, bullet, or phrase like 'Here is'. Write 2 to 3 complete sentences in the requested language. If the requested language is English, write natural native newsroom English, not a literal translation. Cover the company or product, the concrete update or release, and the practical technical or product impact. Use only the provided title, source summary, and article body excerpt. Do not invent facts. Do not answer with fragments.",
     userPrompt: [
       `Language: ${languageName}`,
       strict
-        ? `Target length: ${lang === "ko" ? "140-260 Korean characters" : "220-380 English characters"}`
-        : `Target length: ${lang === "ko" ? "110-220 Korean characters" : "180-320 English characters"}`,
+        ? `Target length: ${lang === "ko" ? "120-210 Korean characters" : "180-300 English characters"}`
+        : `Target length: ${lang === "ko" ? "100-190 Korean characters" : "160-260 English characters"}`,
+      lang === "en"
+        ? "English style: concise technology-news prose for a native reader. Avoid translationese, filler such as 'recently' unless needed for timing, and awkward phrases such as 'is a strategy to'. Prefer active verbs like unveiled, launched, added, expanded, integrated, or tested."
+        : "Korean style: 바로 기사 요약 본문만 쓰세요. '다음은', '요약:', 'Here is' 같은 머리말을 절대 쓰지 마세요.",
+      "Do not change tense. If the source says launched, released, announced, introduced, or added, do not rewrite it as a future plan.",
       `Title: ${normalizeTranslateText(title).slice(0, 240)}`,
-      `Source summary: ${normalizeTranslateText(summary).slice(0, 1100)}`,
+      `Source summary: ${normalizeTranslateText(summary).slice(0, 420)}`,
       bodyExcerpt ? `Article body excerpt: ${bodyExcerpt}` : "",
     ]
       .filter(Boolean)
@@ -811,7 +828,7 @@ function hasGroqInsightConfig() {
 }
 
 function hasGroqSummaryConfig() {
-  return ENABLE_GROQ_PROVIDER && !!GROQ_API_KEY && !!GROQ_MODEL;
+  return ENABLE_GROQ_PROVIDER && !!GROQ_API_KEY && !!(GROQ_SUMMARY_MODEL || GROQ_MODEL);
 }
 
 function resolveInsightProvider(requestedProvider = "") {
@@ -848,7 +865,7 @@ function buildInsightProviderCandidates(requestedProvider = "") {
 
 function getInsightModelForProvider(provider, kind = "insight") {
   const resolvedKind = kind === "summary" ? "summary" : "insight";
-  if (provider === "groq") return GROQ_MODEL || "";
+  if (provider === "groq") return resolvedKind === "summary" ? GROQ_SUMMARY_MODEL || GROQ_MODEL || "" : GROQ_MODEL || "";
   if (provider === "gemini") return resolvedKind === "summary" ? GEMINI_SUMMARY_MODEL || "" : GEMINI_INSIGHT_MODEL || "";
   return resolvedKind === "summary" ? OPENAI_SUMMARY_MODEL || "" : OPENAI_INSIGHT_MODEL || "";
 }
@@ -1026,7 +1043,7 @@ async function generateOpenAiSummary(title, summary, lang = "ko", articleBody = 
           { role: "system", content: [{ type: "input_text", text: systemPrompt }] },
           { role: "user", content: [{ type: "input_text", text: userPrompt }] },
         ],
-        max_output_tokens: strict ? 320 : 260,
+        max_output_tokens: strict ? 220 : 180,
       }),
     }, "openai");
     if (!res.ok) {
@@ -1063,7 +1080,7 @@ async function generateGeminiSummary(title, summary, lang = "ko", articleBody = 
         ],
         generationConfig: {
           temperature: strict ? 0.15 : 0.2,
-          maxOutputTokens: strict ? 320 : 260,
+          maxOutputTokens: strict ? 220 : 180,
           thinkingConfig: {
             thinkingBudget: 0,
           },
@@ -1121,36 +1138,43 @@ async function generateGroqInsight(title, summary, lang = "ko", articleBody = ""
 
 async function generateGroqSummary(title, summary, lang = "ko", articleBody = "") {
   if (!GROQ_API_KEY) throw new Error("groq_api_key_missing");
-  if (!GROQ_MODEL) throw new Error("groq_summary_model_missing");
+  const modelCandidates = Array.from(new Set([GROQ_SUMMARY_MODEL || GROQ_MODEL, ...GROQ_SUMMARY_FALLBACK_MODELS].filter(Boolean)));
+  if (!modelCandidates.length) throw new Error("groq_summary_model_missing");
 
   return generateRichAiText("summary", lang, async (strict) => {
     const { systemPrompt, userPrompt } = buildSummaryPrompts(title, summary, articleBody, lang, strict);
-    const res = await fetchAiJsonWithTimeout(
-      GROQ_API_URL,
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${GROQ_API_KEY}`,
-          "Content-Type": "application/json",
+    const errors = [];
+    for (const model of modelCandidates) {
+      const res = await fetchAiJsonWithTimeout(
+        GROQ_API_URL,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${GROQ_API_KEY}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            model,
+            messages: [
+              { role: "system", content: systemPrompt },
+              { role: "user", content: userPrompt },
+            ],
+            temperature: strict ? 0.15 : 0.2,
+            max_tokens: strict ? 160 : 130,
+          }),
         },
-        body: JSON.stringify({
-          model: GROQ_MODEL,
-          messages: [
-            { role: "system", content: systemPrompt },
-            { role: "user", content: userPrompt },
-          ],
-          temperature: strict ? 0.15 : 0.2,
-          max_tokens: strict ? 320 : 260,
-        }),
-      },
-      "groq",
-    );
-    if (!res.ok) {
+        "groq",
+      );
+      if (res.ok) {
+        const json = await res.json();
+        return normalizeSummaryText(extractGroqResponseText(json), lang);
+      }
       const errText = await res.text().catch(() => "");
-      throw new Error(`groq_http_${res.status}:${errText.slice(0, 200)}`);
+      const message = `groq_http_${res.status}:${errText.slice(0, 200)}`;
+      errors.push(`${model}:${message}`);
+      if (!/groq_http_(?:429|5\d\d)/i.test(message)) break;
     }
-    const json = await res.json();
-    return normalizeSummaryText(extractGroqResponseText(json), lang);
+    throw new Error(errors.join(" | ") || "groq_summary_generation_failed");
   });
 }
 
@@ -2678,10 +2702,16 @@ app.get("/api/article-body", async (req, res) => {
 async function handleSummaryRoute(req, res) {
   try {
     const title = normalizeTranslateText(getRequestField(req, "title", "")).slice(0, 260);
-    const summary = normalizeTranslateText(getRequestField(req, "summary", "")).slice(0, 1200);
-    const articleBody = normalizeArticleBodyText(getRequestField(req, "bodyText", ""), ARTICLE_BODY_MAX_TEXT);
+    const summary = normalizeTranslateText(getRequestField(req, "summary", "")).slice(0, 520);
+    const articleBody = normalizeArticleBodyText(getRequestField(req, "bodyText", ""), 720);
     const lang = normalizeLangCode(getRequestField(req, "lang", "ko"), "ko").startsWith("en") ? "en" : "ko";
     const provider = String(getRequestField(req, "provider", "auto") || "auto");
+    const summaryCacheKey = `summary:${buildCardTextCacheKey({ title, summary, articleBody, lang, provider })}`;
+    const cachedSummary = getCardTextCache(summaryCacheKey);
+    if (cachedSummary && cachedSummary.source === "ai") {
+      res.json(cachedSummary);
+      return;
+    }
     const rawText = [articleBody, summary].filter(Boolean).join("\n\n");
     const result = summarizeArticleRuleBased({
       title,
@@ -2701,6 +2731,7 @@ async function handleSummaryRoute(req, res) {
     let source = "rule";
     let providerName = "rule";
     let modelName = "extractive-v1";
+    let aiSummaryFailed = false;
 
     if (USE_AI_SUMMARY) {
       try {
@@ -2723,6 +2754,7 @@ async function handleSummaryRoute(req, res) {
           modelName = ai?.model || "unknown";
         }
       } catch (e) {
+        aiSummaryFailed = true;
         const message = String(e?.message || e);
         const status = getAiErrorStatus(message);
         logAiRouteError("summary_ai", {
@@ -2735,7 +2767,13 @@ async function handleSummaryRoute(req, res) {
       }
     }
 
-    res.json({
+    if (USE_AI_SUMMARY && source !== "ai") {
+      shouldSkip = true;
+      usedFallback = true;
+      if (aiSummaryFailed) qualityScore = Math.min(Number(qualityScore || 0), 39);
+    }
+
+    const responsePayload = {
       schemaVersion: "summary_rule_v1",
       ok: true,
       kind: "summary",
@@ -2753,7 +2791,9 @@ async function handleSummaryRoute(req, res) {
         selectedSentences: Array.isArray(result.debug?.selectedSentences) ? result.debug.selectedSentences : [],
         topScored: Array.isArray(result.debug?.topScored) ? result.debug.topScored : [],
       },
-    });
+    };
+    if (source === "ai") setCardTextCache(summaryCacheKey, responsePayload);
+    res.json(responsePayload);
   } catch (e) {
     const lang = normalizeLangCode(getRequestField(req, "lang", "ko"), "ko").startsWith("en") ? "en" : "ko";
     const title = normalizeTranslateText(getRequestField(req, "title", "")).slice(0, 260);

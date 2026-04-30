@@ -1,122 +1,137 @@
 # news-collector-viewer
 
-AI 뉴스 소스를 수집·정규화해 주간 Top 10 카드 형태로 보여주는 뷰어 프로젝트입니다.  
-현재 운영 기준 화면은 `ai4.html`이며, 한국어/영어 카드가 **동일 순위·동일 기사 기준으로 1:1 정렬**되도록 구성되어 있습니다.
+AI Times와 TechCrunch 기사를 기반으로 주간 AI HOT 카드뉴스를 만드는 뷰어입니다.  
+현재 업데이트 버전의 기준 화면은 `ai6.html`이며, 한국어/영어 카드 표시와 Medium 업로드용 PNG 추출을 지원합니다.
 
-## 프로젝트 목적
+## Table of Contents
 
-- 여러 AI 뉴스 소스를 한 화면에서 비교 가능한 형태로 통합
-- 중복 기사 제거 및 우선순위 기반 랭킹으로 주간 Top 10 구성
-- 한국어/영어 이중 언어 카드 제공(번역이 아니라 **동일 기사 매칭 기반 표시**)
-- 카드 품질 저하(플레이스홀더, 짧은 요약, 언어 혼합 등) 방지
+- [Overview](#overview)
+- [Features](#features)
+- [Tech Stack](#tech-stack)
+- [Getting Started](#getting-started)
+- [Current Version](#current-version)
+- [PNG Export](#png-export)
+- [Backend API](#backend-api)
+- [Publishing Checklist](#publishing-checklist)
 
-## 현재 메인 페이지
+## Overview
 
-- `ai4.html`: KR/EN 정렬형 주간 Top 10 카드 뷰
+이 프로젝트는 AI 뉴스 원문을 수집하고, API 기반 요약과 번역을 거쳐 카드뉴스 형태로 보여주는 도구입니다.  
+현재 운영 흐름은 AI Times를 우선 소스로 사용하고, 필요할 때 TechCrunch를 보조 소스로 사용할 수 있도록 구성되어 있습니다.
 
-## 핵심 동작 원칙
+카드는 한국어와 영어가 같은 기사, 같은 순위, 같은 링크를 기준으로 매칭됩니다. 요약은 로컬 fallback 문구로 채우지 않고, 기사 원문을 API로 요약한 결과만 사용합니다. API 요약이 실패한 카드는 표시하지 않거나 다른 기사로 대체하는 것을 원칙으로 합니다.
 
-## 1) KR/EN 엄격 정렬
+## Features
 
-- 한국어와 영어는 서로 다른 리스트를 만들지 않습니다.
-- 동일한 랭킹 풀을 기준으로, 언어별 제목/요약만 전환합니다.
-- 토글 시 순위·기사가 바뀌지 않아야 하며, 문구만 KR/EN으로 바뀌어야 합니다.
+- `ai6.html` 기준 AI HOT TOP 5 카드 뷰어
+- 한국어/영어 카드 1:1 매칭
+- AI Times 우선, TechCrunch 보조 소스 지원
+- 기사 원문 기반 API 요약 및 번역
+- fallback 요약 비사용 정책
+- 출시, 도입, 공개, 논란, 등장성 기사 우선 선별
+- 브리핑, 칼럼성 기사 제외
+- 영어 카드용 자연스러운 에디토리얼 문체 보정
+- 고유명사 정규화: `Cirrascale`, `OpenClaw`, `ClawSweeper`, `Anthropic`, `Claude Opus 4.6`, `Google DeepMind`, `ChatGPT`, `Codex`
+- 숫자 표기 정규화: `4, 000` 대신 `4,000`
+- 현재 카드 수에 맞춘 `HOT 5` 푸터 표시
+- Medium 업로드용 썸네일/본문 PNG 추출
+- HTML 하단 원문 링크 표시, PNG 추출 시 원문 링크 숨김
 
-## 2) 중복 제어
-
-- 제목/본문 토큰 유사도 기반으로 근접 중복을 제거합니다.
-- 동일 이슈 복수 기사가 들어오면 소스 우선순위 및 요약 품질 점수를 반영해 대표 카드를 선택합니다.
-- 렌더 직전에도 추가 중복 제거를 수행해 카드 중복 노출을 막습니다.
-
-## 3) 에디토리얼 오버라이드
-
-- 반복적으로 다뤄지는 핵심 이슈는 오버라이드 키로 고정 매칭합니다.
-- 목적:
-  - KR/EN 문구 품질 안정화
-  - 동일 이슈의 제목/요약 톤 일관성 유지
-  - 순위별 기사-문구 매칭 붕괴 방지
-
-## 4) 요약 품질 가드레일
-
-- 플레이스홀더 문장, 지나치게 짧은 요약, 언어 혼입(한글/영문 혼재) 감지
-- 문제 감지 시:
-  - 기사 본문 리드 요약 재생성
-  - canonical summary 재활용
-  - 최종 fallback 문구 보정
-- 깨진 카드가 전체 랭킹/렌더를 망치지 않도록 방어 로직을 적용합니다.
-
-## 아키텍처 개요
-
-## 프론트엔드 (`ai4.html`)
-
-- 카드 렌더링, 토글, 필터, 랭킹/중복 제어
-- KR/EN 텍스트 전환과 카드 매칭 일관성 유지
-- 에디토리얼 오버라이드 적용 및 품질 보정
-
-## 백엔드 (`backend/`)
-
-- 피드 수집/파싱/RSS 및 HTML 정규화
-- 기사 본문 수집(`article-body`)로 요약 품질 보강
-- 요약/인사이트 API 연동(옵션)
-- 프론트에서 사용할 통합 JSON 응답 제공
-
-## 기술 스택
+## Tech Stack
 
 - Frontend: HTML, CSS, Vanilla JavaScript
 - Backend: Node.js, Express
 - Parsing: `fast-xml-parser`, `cheerio`
 - HTTP: `node-fetch`, `cors`
+- AI Summary: Groq 호환 Chat Completions API 중심
+- PNG Export: Playwright, Pillow
 
-## 실행 방법
+## Getting Started
 
-## 1) 의존성 설치
+백엔드 의존성을 설치합니다.
 
 ```powershell
 cd backend
 npm install
 ```
 
-## 2) 백엔드 실행
+필요 시 `backend/.env`에 API 키를 설정합니다.
+
+```text
+GROQ_API_KEY=...
+GROQ_MODEL=...
+```
+
+백엔드를 실행합니다.
 
 ```powershell
 cd backend
 npm start
 ```
 
-- 기본 주소: `http://localhost:3000`
+기본 주소는 `http://localhost:3000`입니다. 브라우저에서는 프로젝트 루트의 `ai6.html`을 열어 현재 카드 뷰어를 확인합니다.
 
-## 3) 프론트 열기
+## Current Version
 
-- 로컬 파일 직접 실행:
-  - `file:///.../ai4.html`
-- 또는 로컬 서버 환경에서 서빙
+현재 게시 기준 파일은 `ai6.html`입니다.
 
-## 주요 API 엔드포인트
+- Build: `2026-04-30-groq-throttle-r2`
+- Rank Count: `AI HOT TOP 5`
+- Primary Source: AI Times
+- Secondary Source: TechCrunch
+- Language Mode: Korean / English
 
-- `GET /api/feed`
-- `GET /api/article-body`
-- `GET|POST /api/summary`
-- `GET|POST /api/insight`
-- `GET /api/health`
+현재 HOT 5는 아래 기사 ID를 기준으로 고정되어 한국어와 영어 카드가 같은 순서로 표시됩니다.
 
-## 운영/수정 시 권장 절차
+| Rank | Source | Article ID | Topic |
+| --- | --- | --- | --- |
+| 01 | AI Times | `209681` | GPT-5.5 |
+| 02 | AI Times | `209678` | Cirrascale / Gemini |
+| 03 | AI Times | `209762` | NVIDIA Korean virtual personas dataset |
+| 04 | AI Times | `209851` | AI automation incident |
+| 05 | AI Times | `209751` | ClawSweeper / OpenClaw |
 
-카드 문구 또는 랭킹 로직 수정 후:
+## PNG Export
 
-1. `ai4.html` 저장
-2. 백엔드 재시작 (`backend`에서 `npm start`)
-3. `ai4.html` 캐시 무효화 새로고침
-   - 예: `file:///.../ai4.html?refresh=<timestamp>`
-4. KR/EN 모두에서 아래 항목 확인
-   - 순위 1~10 기사 매칭 일치
-   - 중복 카드 없음
-   - 헤드라인/요약 문구 품질
-   - KR은 한국어, EN은 영어로만 출력
+표준 영어 PNG를 생성합니다.
 
-## 퍼블리싱 전 체크리스트
+```powershell
+python .\.agents\skills\ai4-png-export\scripts\export_ai4_png.py --html .\ai6.html --lang en --min-cards 5 --thumb-name ai6-en-thumbnail.png --body-name ai6-en-body.png
+```
 
-- KR/EN이 같은 기사 순서로 정렬되어 있는가
-- 특정 순위 카드가 토글 시 다른 기사로 바뀌지 않는가
-- 플레이스홀더 문구(예: generic update)가 남아 있지 않은가
-- 문장부호(인용부호, 쉼표)와 고유명사 표기가 안정적인가
-- Top 10이 정확히 10개 렌더되는가
+Medium 700px 기준으로 균형 조정된 PNG를 생성합니다.
+
+```powershell
+python .\.agents\skills\ai4-png-export\scripts\export_ai4_png.py --html .\ai6.html --lang en --min-cards 5 --content-width 700 --device-scale 1 --thumb-name ai6-en-thumbnail-700w-balanced.png --body-name ai6-en-body-medium-700w-balanced.png
+```
+
+최근 게시용 권장 출력 파일은 아래와 같습니다.
+
+- `output/ai6-en-thumbnail-700w-balanced.png`
+- `output/ai6-en-body-medium-700w-balanced.png`
+
+PNG 추출 시 카드 사이 구분선은 유지하고, HTML 하단의 원문 링크 영역은 이미지에 포함하지 않습니다.
+
+## Backend API
+
+백엔드는 카드 렌더링에 필요한 기사 수집, 본문 추출, 요약, 번역을 담당합니다.
+
+- `GET /api/health`: 서버 상태 확인
+- `GET /api/feed`: 기사 목록 수집
+- `GET /api/article-body`: 기사 본문 추출
+- `POST /api/summary`: 기사 원문 요약
+- `POST /api/translate`: 번역
+- `POST /api/insight`: 보조 인사이트 생성
+
+요약 API는 품질 유지를 위해 원문 기반 결과만 사용합니다. 공개 CORS 프록시가 불안정할 수 있으므로 안정적인 사용을 위해 로컬 백엔드를 실행한 상태에서 작업합니다.
+
+## Publishing Checklist
+
+- 백엔드가 `http://localhost:3000`에서 실행 중인지 확인
+- `ai6.html`을 새로고침하여 HOT 5가 모두 표시되는지 확인
+- 한국어/영어 카드의 순위와 원문 링크가 일치하는지 확인
+- 영어 카드 제목과 요약이 직역체가 아닌지 확인
+- 푸터의 `HOT 5` 표기가 현재 카드 수와 맞는지 확인
+- HTML 하단에 원문 링크가 표시되는지 확인
+- PNG에서는 원문 링크 영역이 제외되는지 확인
+- Medium 업로드용 파일은 `output/ai6-en-body-medium-700w-balanced.png`를 우선 사용
