@@ -57,13 +57,6 @@ cd backend
 npm install
 ```
 
-필요 시 `backend/.env`에 API 키를 설정합니다.
-
-```text
-GROQ_API_KEY=...
-GROQ_MODEL=...
-```
-
 백엔드를 실행합니다.
 
 ```powershell
