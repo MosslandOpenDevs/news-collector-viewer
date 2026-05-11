@@ -21,6 +21,8 @@ AI Times와 TechCrunch 기사를 기반으로 주간 AI HOT 카드뉴스를 만�
 이 프로젝트는 AI 뉴스 원문을 수집하고, API 기반 요약과 번역을 거쳐 카드뉴스 형태로 보여주는 도구입니다.  
 현재 운영 흐름은 AI Times를 우선 소스로 사용하고, 필요할 때 TechCrunch를 보조 소스로 사용할 수 있도록 구성되어 있습니다.
 
+**관련 프로젝트**: [Alpha](https://alpha.moss.land?utm_source=github&utm_medium=referral&utm_campaign=news-collector-readme) (alpha.moss.land) — Mossland 의 크립토 × AI 미디어 surface. 한국 유튜브 채널·뉴스·매크로 피드를 통합 분석하여 채널별 stance 분포, AI 합성 데일리 브리프, 12개 MCP 도구를 제공 ([repo](https://github.com/MosslandOpenDevs/alpha)).
+
 카드는 한국어와 영어가 같은 기사, 같은 순위, 같은 링크를 기준으로 매칭됩니다. 요약은 로컬 fallback 문구로 채우지 않고, 기사 원문을 API로 요약한 결과만 사용합니다. API 요약이 실패한 카드는 표시하지 않거나 다른 기사로 대체하는 것을 원칙으로 합니다.
 
 ## Features
