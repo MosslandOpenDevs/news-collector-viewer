@@ -12,6 +12,7 @@ AI Times와 TechCrunch 기사를 기반으로 주간 AI HOT 카드뉴스를 만�
 - [Current Version](#current-version)
 - [PNG Export](#png-export)
 - [Backend API](#backend-api)
+- [Configuration](#configuration)
 - [Publishing Checklist](#publishing-checklist)
 - [Operating Principles](#operating-principles)
 - [Project Philosophy](#project-philosophy)
@@ -124,6 +125,28 @@ PNG 추출 시 카드 사이 구분선은 유지하고, HTML 하단의 원문 �
 - `GET /api/backfill`: 날짜별 스냅샷 생성(운영/백필용)
 
 요약 API는 품질 유지를 위해 원문 기반 결과만 사용합니다. 공개 CORS 프록시가 불안정할 수 있으므로 안정적인 사용을 위해 로컬 백엔드를 실행한 상태에서 작업합니다. `/api/article-body`는 사설·루프백·링크로컬 등 내부 주소로의 요청을 차단하며, 공개 뉴스 호스트만 대상으로 합니다.
+
+## Configuration
+
+운영 동작은 환경 변수로 조정합니다. LLM 제공자 API 키 등 비밀 값의 구체적인 이름과 값은 팀 내부 설정 문서를 따르며, 여기서는 비밀이 아닌 운영 옵션만 정리합니다. 모든 값은 선택 사항이며 기본값으로도 동작합니다.
+
+**서버**
+
+- `PORT`: 서버 포트 (기본 `3000`)
+- `ALLOWED_ORIGINS`: 쉼표로 구분한 CORS 허용 오리진. 미설정 시 개방(로컬 `file://` 뷰어 호환), 프로덕션에서는 명시 권장
+
+**외부 요청 안전장치 (SSRF/DoS 방지)**
+
+- `/api/article-body`와 모든 외부 fetch는 사설·루프백·링크로컬·메타데이터(`169.254.169.254` 등) 대역을 DNS 확인 및 리다이렉트 홉별 재검증으로 차단합니다. 공개 뉴스 호스트만 대상으로 합니다.
+- `FETCH_TIMEOUT_MS`: 외부 fetch 타임아웃 (기본 `12000`)
+- `MAX_FETCH_BYTES`: 응답 크기 상한 (기본 `5MB`)
+- `MAX_FETCH_REDIRECTS`: 허용 리다이렉트 홉 수 (기본 `5`)
+- `ALLOW_PRIVATE_FETCH`: 내부 주소 차단 해제 (기본 `false`, 신뢰된 환경에서만 사용)
+
+**캐시**
+
+- 요약·번역·본문·OG 캐시는 상한을 두고 오래된 항목을 정리하며, `cache.json`은 임시 파일 + rename으로 원자적으로 저장됩니다.
+- `MAX_ARTICLE_CACHE_ENTRIES`(기본 `1000`), `MAX_OG_CACHE_ENTRIES`(기본 `2000`), `MAX_TRANSLATE_CACHE_ENTRIES`(기본 `5000`), `MAX_CARD_TEXT_CACHE_ENTRIES`(기본 `1000`), `MAX_SNAPSHOT_DATES_PER_FEED`(기본 `120`)
 
 ## Publishing Checklist
 
