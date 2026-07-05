@@ -90,7 +90,9 @@ const CLEAN_DROP_PATTERNS = [
   /(?:무단전재|재배포|저작권자|copyright|all rights reserved)/i,
   /(?:구독|subscribe|newsletter|회원가입|로그인|sign up)/i,
   /(?:관련기사|추천기사|read more|recommended|관련 뉴스|more from)/i,
-  /(?:공유|share|facebook|x\.com|twitter|linkedin|카카오톡|copy link)/i,
+  // Share-UI/CTA boilerplate only. Anchored so ordinary prose like "market share" or
+  // "shares surged" (and "Meta acquired the Twitter rival") is not discarded as a share widget.
+  /(?:공유하기|소셜\s*공유|share this|share on|copy link|링크\s*복사|카카오톡|\bfacebook\.com\b|\bx\.com\b|\btwitter\.com\b|\blinkedin\.com\b)/i,
   /(?:사진=|이미지=|image source|caption)/i,
   /(?:출처[:：]\s*\S+|\bsource[:：]\s*\S+)/i,
   /(?:광고|sponsored|advertisement)/i,
@@ -98,8 +100,9 @@ const CLEAN_DROP_PATTERNS = [
 
 const LOW_INFO_PATTERNS = [
   /(?:업계를 뒤흔들|판도를 바꿀|혁신적인|획기적인|엄청난|dramatic|game[- ]?changer)/i,
-  /(?:전망이다|전망된다|기대된다|관측된다|expected to|is expected to|could)/i,
-  /(?:칼럼|opinion|editorial)/i,
+  // "could" only as a hedging modal (not "could not <verb>", which is factual reporting).
+  /(?:전망이다|전망된다|기대된다|관측된다|expected to|is expected to|\bcould\b(?!\s+not\b))/i,
+  /(?:칼럼|\bopinion\b|\beditorial\b)/i,
 ];
 
 function decodeHtmlEntities(input) {
@@ -109,11 +112,11 @@ function decodeHtmlEntities(input) {
   out = out
     .replace(/&#(\d+);/g, (_m, dec) => {
       const n = Number(dec);
-      return Number.isFinite(n) ? String.fromCodePoint(n) : _m;
+      return Number.isInteger(n) && n >= 0 && n <= 0x10ffff ? String.fromCodePoint(n) : _m;
     })
     .replace(/&#x([0-9a-fA-F]+);/g, (_m, hex) => {
       const n = Number.parseInt(hex, 16);
-      return Number.isFinite(n) ? String.fromCodePoint(n) : _m;
+      return Number.isInteger(n) && n >= 0 && n <= 0x10ffff ? String.fromCodePoint(n) : _m;
     })
     .replace(/&([a-zA-Z]+);/g, (m, name) => named[name] ?? m);
   return out;
@@ -205,10 +208,7 @@ export function splitIntoSentences(text) {
     .split(/(?<=[.!?。！？])\s+|(?<=다\.)\s+|(?<=니다\.)\s+|(?<=했다\.)\s+|\n+/)
     .map((sentence) => sentence.trim())
     .filter(Boolean)
-    .map((sentence) => ({
-      text: sentence,
-      isShort: sentence.length <= 8,
-    }));
+    .map((sentence) => ({ text: sentence }));
 }
 
 function pickNamedEntities(title) {
@@ -257,12 +257,6 @@ function hasTitleKeyword(sentence, titleKeywords = []) {
   });
 }
 
-function hasNumericSignal(sentence) {
-  return /(?:\d|%|퍼센트|억원|만명|달러|원|million|billion|trillion|ms|sec|seconds?|minutes?|hours?|days?|배|x)/i.test(
-    sentence || "",
-  );
-}
-
 function hasNumericEvidence(sentence) {
   return /\d/.test(sentence || "");
 }
@@ -271,9 +265,21 @@ function hasEntitySignal(sentence) {
   return /\b[A-Z][A-Za-z0-9+\-]{1,}\b/.test(sentence || "") || /(?:오픈AI|OpenAI|구글|Google|메타|Meta|엔비디아|NVIDIA|마이크로소프트|Microsoft|아마존|Amazon|애플|Apple)/i.test(sentence || "");
 }
 
+// English event verbs must match on word boundaries (substring matching wrongly fired on
+// "plan" inside "airplane"/"planet", "release" inside "unreleased", etc.). Korean verbs have
+// no word spacing, so they stay substring-matched.
+const EVENT_VERBS_EN = EVENT_VERBS.filter((v) => /[a-z]/i.test(v));
+const EVENT_VERBS_KO = EVENT_VERBS.filter((v) => !/[a-z]/i.test(v));
+const EVENT_VERBS_EN_RE = new RegExp(
+  `\\b(?:${EVENT_VERBS_EN.map((v) => v.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|")})s?\\b`,
+  "i",
+);
+
 function hasEventVerb(sentence) {
-  const lower = String(sentence || "").toLowerCase();
-  return EVENT_VERBS.some((verb) => lower.includes(String(verb).toLowerCase()));
+  const s = String(sentence || "");
+  if (EVENT_VERBS_EN_RE.test(s)) return true;
+  const lower = s.toLowerCase();
+  return EVENT_VERBS_KO.some((verb) => lower.includes(verb));
 }
 
 function titleSimilarity(sentence, title) {

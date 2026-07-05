@@ -59,6 +59,8 @@ cd backend
 npm install
 ```
 
+요약과 번역은 로컬 fallback 없이 API 결과만 사용하므로, 백엔드가 사용할 LLM 제공자 API 키를 환경 변수로 먼저 설정해야 합니다. 키를 설정하지 않으면 백엔드는 실행되지만 모든 카드의 요약이 실패해 뷰어에 카드가 표시되지 않습니다. 구체적인 환경 변수 이름과 값은 팀 내부 설정 문서를 참고합니다.
+
 백엔드를 실행합니다.
 
 ```powershell
@@ -66,7 +68,7 @@ cd backend
 npm start
 ```
 
-기본 주소는 `http://localhost:3000`입니다. 브라우저에서는 프로젝트 루트의 `ai6.html`을 열어 현재 카드 뷰어를 확인합니다.
+기본 주소는 `http://localhost:3000`입니다(`PORT` 환경 변수로 변경 가능). 브라우저에서는 프로젝트 루트의 `ai6.html`을 열어 현재 카드 뷰어를 확인합니다.
 
 ## Current Version
 
@@ -116,11 +118,12 @@ PNG 추출 시 카드 사이 구분선은 유지하고, HTML 하단의 원문 �
 - `GET /api/health`: 서버 상태 확인
 - `GET /api/feed`: 기사 목록 수집
 - `GET /api/article-body`: 기사 본문 추출
-- `POST /api/summary`: 기사 원문 요약
-- `POST /api/translate`: 번역
-- `POST /api/insight`: 보조 인사이트 생성
+- `GET`/`POST /api/summary`: 기사 원문 요약
+- `GET /api/translate`: 번역
+- `GET`/`POST /api/insight`: 보조 인사이트 생성
+- `GET /api/backfill`: 날짜별 스냅샷 생성(운영/백필용)
 
-요약 API는 품질 유지를 위해 원문 기반 결과만 사용합니다. 공개 CORS 프록시가 불안정할 수 있으므로 안정적인 사용을 위해 로컬 백엔드를 실행한 상태에서 작업합니다.
+요약 API는 품질 유지를 위해 원문 기반 결과만 사용합니다. 공개 CORS 프록시가 불안정할 수 있으므로 안정적인 사용을 위해 로컬 백엔드를 실행한 상태에서 작업합니다. `/api/article-body`는 사설·루프백·링크로컬 등 내부 주소로의 요청을 차단하며, 공개 뉴스 호스트만 대상으로 합니다.
 
 ## Publishing Checklist
 

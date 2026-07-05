@@ -5,6 +5,7 @@ import { XMLParser } from "fast-xml-parser";
 import * as cheerio from "cheerio";
 import fs from "fs";
 import path from "path";
+import dns from "dns";
 import { fileURLToPath } from "url";
 import { summarizeArticleRuleBased } from "./utils/articleSummary.js";
 
@@ -41,18 +42,28 @@ function loadEnvFile(filePath) {
       const key = match[1];
       const value = stripEnvWrappingQuotes(match[2]);
       if (!key) return;
-      process.env[key] = value;
+      // Do not override values already present (OS/deployment env or an earlier-loaded file),
+      // matching dotenv's default precedence so injected production secrets always win.
+      if (process.env[key] === undefined) process.env[key] = value;
     });
   } catch (e) {
     console.warn(`Failed to load env file: ${filePath}`, e?.message || e);
   }
 }
 
-loadEnvFile(path.join(__dirname, "..", ".env"));
+// Load the more specific backend/.env first; with non-override loading the effective
+// precedence is: OS/deployment env > backend/.env > project-root .env.
 loadEnvFile(path.join(__dirname, ".env"));
+loadEnvFile(path.join(__dirname, "..", ".env"));
 
 const app = express();
-app.use(cors());
+const ALLOWED_ORIGINS = String(process.env.ALLOWED_ORIGINS || "")
+  .split(",")
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+// Default to open CORS so the local file:// card viewer and localhost keep working.
+// Set ALLOWED_ORIGINS (comma-separated) to restrict cross-origin access in production.
+app.use(cors(ALLOWED_ORIGINS.length ? { origin: ALLOWED_ORIGINS } : {}));
 app.use(express.json({ limit: "1mb" }));
 
 const PORT = process.env.PORT || 3000;
@@ -140,6 +151,52 @@ const cardTextCache = new Map();
 const CACHE_FILE = path.join(__dirname, "cache.json");
 let saveTimer = null;
 
+// --- Cache bounds & fetch-safety tunables ---
+const MAX_OG_CACHE_ENTRIES = Math.max(100, Number(process.env.MAX_OG_CACHE_ENTRIES || 2000));
+const MAX_ARTICLE_CACHE_ENTRIES = Math.max(100, Number(process.env.MAX_ARTICLE_CACHE_ENTRIES || 1000));
+const MAX_TRANSLATE_CACHE_ENTRIES = Math.max(100, Number(process.env.MAX_TRANSLATE_CACHE_ENTRIES || 5000));
+const MAX_CARD_TEXT_CACHE_ENTRIES = Math.max(100, Number(process.env.MAX_CARD_TEXT_CACHE_ENTRIES || 1000));
+const MAX_SNAPSHOT_DATES_PER_FEED = Math.max(7, Number(process.env.MAX_SNAPSHOT_DATES_PER_FEED || 120));
+const FETCH_TIMEOUT_MS = Math.max(2000, Number(process.env.FETCH_TIMEOUT_MS || 12000));
+const MAX_FETCH_BYTES = Math.max(64 * 1024, Number(process.env.MAX_FETCH_BYTES || 5 * 1024 * 1024));
+const MAX_FETCH_REDIRECTS = Math.max(0, Number(process.env.MAX_FETCH_REDIRECTS || 5));
+const ALLOW_PRIVATE_FETCH = parseBooleanEnv(process.env.ALLOW_PRIVATE_FETCH, false);
+
+// LRU-ish bounded insert for Map caches keyed by caller-influenced input:
+// re-inserting moves the key to the tail, then oldest entries are evicted past the cap.
+function boundedMapSet(map, key, value, maxEntries) {
+  if (map.has(key)) map.delete(key);
+  map.set(key, value);
+  while (map.size > maxEntries) {
+    const oldest = map.keys().next().value;
+    if (oldest === undefined) break;
+    map.delete(oldest);
+  }
+}
+
+// Delete entries whose { ts } is older than ttlMs. Returns the number removed.
+function pruneExpiredEntries(map, ttlMs) {
+  const now = Date.now();
+  let removed = 0;
+  for (const [k, v] of map) {
+    const ts = v && typeof v === "object" ? Number(v.ts || 0) : 0;
+    if (now - ts >= ttlMs) {
+      map.delete(k);
+      removed += 1;
+    }
+  }
+  return removed;
+}
+
+// Keep only the newest N date buckets per feed (YYYY-MM-DD keys sort lexically).
+function pruneSnapshotDates(maxDatesPerFeed) {
+  snapshotCache.forEach((byDate) => {
+    if (!(byDate instanceof Map) || byDate.size <= maxDatesPerFeed) return;
+    const dates = [...byDate.keys()].sort();
+    dates.slice(0, dates.length - maxDatesPerFeed).forEach((d) => byDate.delete(d));
+  });
+}
+
 function loadCacheFromDisk() {
   try {
     if (!fs.existsSync(CACHE_FILE)) return;
@@ -178,6 +235,11 @@ function scheduleSaveCache() {
   saveTimer = setTimeout(() => {
     saveTimer = null;
     try {
+      // Prune expired/overflowing entries so neither memory nor cache.json grows without bound.
+      pruneExpiredEntries(ogCache, OG_CACHE_TTL_MS);
+      pruneExpiredEntries(articleCache, ARTICLE_CACHE_TTL_MS);
+      pruneExpiredEntries(translateCache, TRANSLATE_CACHE_TTL_MS);
+      pruneSnapshotDates(MAX_SNAPSHOT_DATES_PER_FEED);
       const snapshotsObj = {};
       snapshotCache.forEach((map, feedKey) => {
         snapshotsObj[feedKey] = Object.fromEntries(map.entries());
@@ -189,7 +251,10 @@ function scheduleSaveCache() {
         snapshots: snapshotsObj,
         translateCache: Object.fromEntries(translateCache.entries()),
       };
-      fs.writeFileSync(CACHE_FILE, JSON.stringify(data, null, 2), "utf-8");
+      // Write atomically (temp file + rename) so a crash mid-write cannot corrupt cache.json.
+      const tmpFile = `${CACHE_FILE}.tmp.${process.pid}`;
+      fs.writeFileSync(tmpFile, JSON.stringify(data, null, 2), "utf-8");
+      fs.renameSync(tmpFile, CACHE_FILE);
       console.log(
         `Cache saved: feeds=${feedCache.size}, og=${ogCache.size}, article=${articleCache.size}, snapshots=${snapshotCache.size}, translate=${translateCache.size}`,
       );
@@ -229,11 +294,11 @@ function decodeHtmlEntities(input) {
     out = out
       .replace(/&#(\d+);/g, (_m, dec) => {
         const n = Number(dec);
-        return Number.isFinite(n) ? String.fromCodePoint(n) : _m;
+        return Number.isInteger(n) && n >= 0 && n <= 0x10ffff ? String.fromCodePoint(n) : _m;
       })
       .replace(/&#x([0-9a-fA-F]+);/g, (_m, hex) => {
         const n = Number.parseInt(hex, 16);
-        return Number.isFinite(n) ? String.fromCodePoint(n) : _m;
+        return Number.isInteger(n) && n >= 0 && n <= 0x10ffff ? String.fromCodePoint(n) : _m;
       })
       .replace(/&([a-zA-Z]+);/g, (m, name) => named[name] ?? m);
   }
@@ -443,7 +508,7 @@ async function translateText(text, toLang = TRANSLATE_DEFAULT_TARGET, fromLang =
     q: normalizedText,
   });
   const url = `https://translate.googleapis.com/translate_a/single?${params.toString()}`;
-  const res = await fetch(url, { headers: { "User-Agent": USER_AGENT } });
+  const res = await fetchAiJsonWithTimeout(url, { headers: { "User-Agent": USER_AGENT } }, "translate");
   if (!res.ok) throw new Error(`translate_http_${res.status}`);
 
   const json = await res.json();
@@ -454,11 +519,14 @@ async function translateText(text, toLang = TRANSLATE_DEFAULT_TARGET, fromLang =
       .join("")
       .trim();
   }
-  if (!translated) translated = normalizedText;
 
-  translateCache.set(key, { val: translated, ts: Date.now() });
-  scheduleSaveCache();
-  return translated;
+  // Only cache a genuine translation. A soft error / unexpected 200 body leaves `translated`
+  // empty; caching the source echo would poison the cache with an untranslated value for 14 days.
+  if (translated) {
+    boundedMapSet(translateCache, key, { val: translated, ts: Date.now() }, MAX_TRANSLATE_CACHE_ENTRIES);
+    scheduleSaveCache();
+  }
+  return translated || normalizedText;
 }
 
 function extractOpenAiResponseText(payload) {
@@ -844,9 +912,16 @@ function resolveInsightProvider(requestedProvider = "") {
   return INSIGHT_PROVIDER_DEFAULT === "gemini" ? "gemini" : "openai";
 }
 
-function buildInsightProviderCandidates(requestedProvider = "") {
+function buildProviderCandidates(requestedProvider = "", kind = "insight") {
   const requested = normalizeInsightProvider(requestedProvider);
   if (requested === "openai" || requested === "gemini" || requested === "groq") return [requested];
+
+  // Gate candidates on the config that matches the requested kind: a provider set up only for
+  // summaries (e.g. GEMINI_SUMMARY_MODEL without GEMINI_INSIGHT_MODEL) must still be selectable.
+  const isSummary = kind === "summary";
+  const hasGroq = isSummary ? hasGroqSummaryConfig : hasGroqInsightConfig;
+  const hasGemini = isSummary ? hasGeminiSummaryConfig : hasGeminiInsightConfig;
+  const hasOpenAi = isSummary ? hasOpenAiSummaryConfig : hasOpenAiInsightConfig;
 
   const preferred = normalizeInsightProvider(INSIGHT_PROVIDER_DEFAULT);
   const candidates = [];
@@ -856,11 +931,15 @@ function buildInsightProviderCandidates(requestedProvider = "") {
   };
 
   push(preferred);
-  if (hasGroqInsightConfig()) push("groq");
-  if (hasGeminiInsightConfig()) push("gemini");
-  if (hasOpenAiInsightConfig()) push("openai");
+  if (hasGroq()) push("groq");
+  if (hasGemini()) push("gemini");
+  if (hasOpenAi()) push("openai");
   if (!candidates.length) push(preferred || "openai");
   return candidates;
+}
+
+function buildInsightProviderCandidates(requestedProvider = "") {
+  return buildProviderCandidates(requestedProvider, "insight");
 }
 
 function getInsightModelForProvider(provider, kind = "insight") {
@@ -881,7 +960,7 @@ async function generateRichAiText(kind, lang, generator, validator = null) {
 async function generateCardTextWithProvider(kind, title, summary, lang = "ko", requestedProvider = "", articleBody = "") {
   const resolvedKind = kind === "summary" ? "summary" : "insight";
   const requested = normalizeInsightProvider(requestedProvider);
-  const candidates = buildInsightProviderCandidates(requestedProvider);
+  const candidates = buildProviderCandidates(requestedProvider, resolvedKind);
   const errors = [];
 
   for (const provider of candidates) {
@@ -910,48 +989,6 @@ async function generateCardTextWithProvider(kind, title, summary, lang = "ko", r
   }
 
   throw new Error(errors.join(" | ") || `${resolvedKind}_generation_failed`);
-}
-
-async function generateOpenAiInsight(title, summary, lang = "ko", articleBody = "") {
-  if (!OPENAI_API_KEY) throw new Error("openai_api_key_missing");
-  if (!OPENAI_INSIGHT_MODEL) throw new Error("openai_insight_model_missing");
-
-  const languageName = lang === "ko" ? "Korean" : "English";
-  const systemPrompt =
-    lang === "ko"
-      ? "당신은 AI 산업 카드뉴스 편집자입니다. 제목과 요약을 읽고 한 줄짜리 DEV INSIGHT를 작성하세요. 제품, 기술, 아키텍처, 배포 관점에서 핵심 함의를 짚고, 추측이나 과장은 금지합니다. 설명 없이 문장 하나만 반환하세요."
-      : "You are an editor writing one-line DEV INSIGHT copy for AI industry cards. Read the title and summary, then produce exactly one concise insight about product, technology, architecture, or deployment impact. Do not speculate. Return one sentence only.";
-
-  const userPrompt = [
-    `Language: ${languageName}`,
-    `Title: ${normalizeTranslateText(title).slice(0, 240)}`,
-    `Summary: ${normalizeTranslateText(summary).slice(0, 900)}`,
-    normalizeArticleBodyText(articleBody, 2200) ? `Article body excerpt: ${normalizeArticleBodyText(articleBody, 2200)}` : "",
-  ]
-    .filter(Boolean)
-    .join("\n");
-
-  const res = await fetchAiJsonWithTimeout(OPENAI_RESPONSES_URL, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${OPENAI_API_KEY}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      model: OPENAI_INSIGHT_MODEL,
-      input: [
-        { role: "system", content: [{ type: "input_text", text: systemPrompt }] },
-        { role: "user", content: [{ type: "input_text", text: userPrompt }] },
-      ],
-      max_output_tokens: 90,
-    }),
-  }, "openai");
-  if (!res.ok) {
-    const errText = await res.text().catch(() => "");
-    throw new Error(`openai_http_${res.status}:${errText.slice(0, 200)}`);
-  }
-  const json = await res.json();
-  return normalizeInsightText(extractOpenAiResponseText(json), lang);
 }
 
 async function generateOpenAiInsightStable(title, summary, lang = "ko", articleBody = "") {
@@ -1278,7 +1315,6 @@ async function generateAiCardBundleSinglePass(ruleDraft, lang = "ko", requestedP
             { role: "user", content: [{ type: "input_text", text: userPrompt }] },
           ],
           max_output_tokens: 420,
-          temperature: 0.2,
         }),
       },
       "openai",
@@ -1427,8 +1463,97 @@ function ensureSnapshotsFromItems(feedKey, items, datesToEnsure = []) {
 }
 
 
+// Returns a non-empty reason string when an IP literal belongs to a range that must not be
+// reachable from an outbound server fetch (loopback / private / link-local / metadata / CGNAT).
+function blockedIpReason(ip) {
+  const addr = String(ip || "").trim().toLowerCase();
+  if (!addr) return "empty";
+  const v4 = addr.match(/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/);
+  if (v4) {
+    const octets = v4.slice(1).map(Number);
+    if (octets.some((n) => n > 255)) return "invalid-ipv4";
+    const [a, b] = octets;
+    if (a === 0) return "this-network";
+    if (a === 10) return "private-10";
+    if (a === 127) return "loopback";
+    if (a === 169 && b === 254) return "link-local"; // covers 169.254.169.254 metadata
+    if (a === 172 && b >= 16 && b <= 31) return "private-172";
+    if (a === 192 && b === 168) return "private-192";
+    if (a === 100 && b >= 64 && b <= 127) return "cgnat";
+    if (a >= 224) return "multicast-or-reserved";
+    return "";
+  }
+  const mapped = addr.match(/^::ffff:(\d+\.\d+\.\d+\.\d+)$/);
+  if (mapped) return blockedIpReason(mapped[1]);
+  if (addr === "::1") return "loopback-v6";
+  if (addr === "::") return "unspecified-v6";
+  if (addr.startsWith("fe80")) return "link-local-v6";
+  if (addr.startsWith("fc") || addr.startsWith("fd")) return "unique-local-v6";
+  return "";
+}
+
+// Validate an outbound URL before fetching: http(s) only, and neither the host literal nor any
+// of its resolved addresses may fall in a private/loopback/link-local/metadata range. Guards SSRF.
+async function assertSafeFetchTarget(rawUrl) {
+  let parsed;
+  try {
+    parsed = new URL(String(rawUrl || ""));
+  } catch {
+    throw new Error("fetch_url_invalid");
+  }
+  if (parsed.protocol !== "http:" && parsed.protocol !== "https:") throw new Error("fetch_scheme_blocked");
+  if (ALLOW_PRIVATE_FETCH) return parsed;
+  const host = parsed.hostname.replace(/^\[|\]$/g, "");
+  const literalReason = blockedIpReason(host);
+  if (literalReason) throw new Error(`fetch_blocked_host:${literalReason}`);
+  // Not an IP literal → resolve and reject if ANY resolved address is blocked.
+  let addresses = [];
+  try {
+    addresses = await dns.promises.lookup(host, { all: true });
+  } catch {
+    throw new Error("fetch_dns_error");
+  }
+  for (const { address } of addresses) {
+    const reason = blockedIpReason(address);
+    if (reason) throw new Error(`fetch_blocked_host:${reason}`);
+  }
+  return parsed;
+}
+
+// Timeout- and size-bounded fetch with per-hop SSRF revalidation. node-fetch follows redirects
+// by default, so redirects are handled manually and every Location target is re-validated.
+async function safeFetch(rawUrl, options = {}) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+  try {
+    let currentUrl = String(rawUrl || "");
+    for (let hop = 0; hop <= MAX_FETCH_REDIRECTS; hop++) {
+      await assertSafeFetchTarget(currentUrl);
+      const res = await fetch(currentUrl, {
+        ...options,
+        headers: { "User-Agent": USER_AGENT, ...(options.headers || {}) },
+        redirect: "manual",
+        size: MAX_FETCH_BYTES,
+        signal: controller.signal,
+      });
+      const location = res.status >= 300 && res.status < 400 ? res.headers.get("location") : "";
+      if (location) {
+        currentUrl = new URL(location, currentUrl).toString();
+        continue;
+      }
+      return res;
+    }
+    throw new Error("fetch_too_many_redirects");
+  } catch (e) {
+    if (e?.name === "AbortError") throw new Error(`fetch_timeout_${FETCH_TIMEOUT_MS}`);
+    throw e;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 async function fetchText(url) {
-  const res = await fetch(url, { headers: { "User-Agent": USER_AGENT } });
+  const res = await safeFetch(url);
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   return await res.text();
 }
@@ -1446,12 +1571,12 @@ async function fetchOgImage(url) {
       $('meta[property="og:image"]').attr("content") ||
       $('meta[name="og:image"]').attr("content");
     const val = normalizeUrl(og);
-    ogCache.set(url, { val, ts: Date.now() });
+    boundedMapSet(ogCache, url, { val, ts: Date.now() }, MAX_OG_CACHE_ENTRIES);
     scheduleSaveCache();
     console.log(`OG fetched: ${val ? "ok" : "empty"} (${url})`);
     return val;
   } catch {
-    ogCache.set(url, { val: "", ts: Date.now() });
+    boundedMapSet(ogCache, url, { val: "", ts: Date.now() }, MAX_OG_CACHE_ENTRIES);
     scheduleSaveCache();
     console.log(`OG fetch failed: ${url}`);
     return "";
@@ -1875,7 +2000,9 @@ function buildCardTextCacheKey({ title = "", summary = "", articleBody = "", lan
     normalizeArticleBodyText(summary, 1200),
     normalizeArticleBodyText(articleBody, ARTICLE_BODY_MAX_TEXT),
   ].join("|");
-  return `card:${hashText32(raw)}`;
+  // Two independent 32-bit hashes plus the raw length make key collisions between distinct
+  // inputs effectively impossible, so a cache hit can't return another article's summary.
+  return `card:${raw.length.toString(36)}.${hashText32(raw)}.${hashText32(`salt:${raw}`)}`;
 }
 
 function getCardTextCache(key) {
@@ -1890,7 +2017,7 @@ function getCardTextCache(key) {
 
 function setCardTextCache(key, value) {
   if (!key || !value) return;
-  cardTextCache.set(String(key), { value, ts: Date.now() });
+  boundedMapSet(cardTextCache, String(key), { value, ts: Date.now() }, MAX_CARD_TEXT_CACHE_ENTRIES);
 }
 
 function dedupeTextBlocks(blocks = []) {
@@ -2036,7 +2163,7 @@ async function fetchArticleBody(url) {
     bodyText,
     ts: Date.now(),
   };
-  articleCache.set(normalizedUrl, payload);
+  boundedMapSet(articleCache, normalizedUrl, payload, MAX_ARTICLE_CACHE_ENTRIES);
   scheduleSaveCache();
   return payload;
 }
@@ -2695,7 +2822,10 @@ app.get("/api/article-body", async (req, res) => {
       bodyText: article.bodyText || "",
     });
   } catch (e) {
-    res.status(500).json({ error: String(e?.message || e) });
+    // Log detail server-side but return a generic error so response text cannot be used to
+    // fingerprint internal hosts/ports (defense-in-depth alongside the SSRF guard in fetchText).
+    console.error("/api/article-body failed:", e?.message || e);
+    res.status(500).json({ error: "article_fetch_failed" });
   }
 });
 
