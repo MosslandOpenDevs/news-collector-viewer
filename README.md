@@ -1,5 +1,9 @@
 # news-collector-viewer
 
+<!-- opendevs-badges:start -->
+[![Repository: MosslandOpenDevs](https://img.shields.io/badge/Repository-MosslandOpenDevs-64748b?style=flat)](https://github.com/MosslandOpenDevs/news-collector-viewer)
+<!-- opendevs-badges:end -->
+
 AI Times와 TechCrunch 기사를 기반으로 주간 AI HOT 카드뉴스를 만드는 뷰어입니다.  
 현재 업데이트 버전의 기준 화면은 `ai6.html`이며, 한국어/영어 카드 표시와 Medium 업로드용 PNG 추출을 지원합니다.
 
